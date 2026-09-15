@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 40" fill="none" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="divGold" x1="0" y1="0" x2="600" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#C9A15A" stop-opacity="0"/>
+      <stop offset="0.15" stop-color="#C9A15A" stop-opacity="0.9"/>
+      <stop offset="0.5" stop-color="#F3D48B"/>
+      <stop offset="0.85" stop-color="#C9A15A" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#C9A15A" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <line x1="0" y1="20" x2="600" y2="20" stroke="url(#divGold)" stroke-width="1.2"/>
+  <g transform="translate(300,20)">
+    <path d="M0,-11 L3.2,-3.2 L11,0 L3.2,3.2 L0,11 L-3.2,3.2 L-11,0 L-3.2,-3.2 Z" fill="url(#divGold)"/>
+    <circle r="3" fill="none" stroke="url(#divGold)" stroke-width="1"/>
+  </g>
+  <g transform="translate(255,20)"><circle r="2.5" fill="url(#divGold)"/></g>
+  <g transform="translate(345,20)"><circle r="2.5" fill="url(#divGold)"/></g>
+  <g transform="translate(225,20)"><circle r="1.5" fill="url(#divGold)"/></g>
+  <g transform="translate(375,20)"><circle r="1.5" fill="url(#divGold)"/></g>
+</svg>

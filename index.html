@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Топчан — узбекская кухня и восточное гостеприимство</title>
+<meta name="description" content="Топчан — ресторан узбекской и среднеазиатской кухни. Настоящие топчаны, чайхана, живой огонь тандыра и семейные рецепты плова, лагмана, мантов и шашлыка.">
+<link rel="icon" type="image/svg+xml" href="assets/img/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div class="page-loader" id="pageLoader" aria-hidden="true">
+  <img src="assets/img/logo.svg" alt="" class="loader-logo">
+</div>
+
+<header class="site-header" id="siteHeader">
+  <div class="container header-inner">
+    <a href="#hero" class="brand">
+      <img src="assets/img/logo.svg" alt="Топчан" class="brand-logo">
+      <span class="brand-text">Топчан</span>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <a href="#about">О месте</a>
+      <a href="#menu">Меню</a>
+      <a href="#atmosphere">Атмосфера</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+    <a href="#contacts" class="btn btn-ghost header-cta">Забронировать топчан</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Открыть меню" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-pattern" aria-hidden="true"></div>
+    <div class="hero-vignette" aria-hidden="true"></div>
+    <img src="assets/img/hero-plov.svg" alt="" class="hero-image" aria-hidden="true">
+    <div class="container hero-inner">
+      <p class="eyebrow reveal" data-reveal>Чайхана&nbsp;·&nbsp;Узбекская кухня&nbsp;·&nbsp;Живой тандыр</p>
+      <h1 class="hero-title reveal" data-reveal>ТОПЧАН.<br>ВКУС&nbsp;ВОСТОКА</h1>
+      <p class="hero-sub reveal" data-reveal>Настоящие топчаны с коврами и подушками, дым тандыра и рецепты,
+        которые передаются в семьях из поколения в поколение.</p>
+      <div class="hero-actions reveal" data-reveal>
+        <a href="#menu" class="btn btn-primary">Смотреть меню</a>
+        <a href="#contacts" class="btn btn-outline">Забронировать топчан</a>
+      </div>
+    </div>
+    <a href="#about" class="scroll-hint" aria-label="Пролистать вниз"><span></span></a>
+    <img src="assets/img/ornament-divider.svg" alt="" class="section-divider divider-light" aria-hidden="true">
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="container about-inner">
+      <div class="about-media reveal" data-reveal>
+        <img src="assets/img/gallery-topchan.svg" alt="Топчан с коврами и подушками в чайхане «Топчан»" loading="lazy">
+        <div class="about-media-frame" aria-hidden="true"></div>
+      </div>
+      <div class="about-text">
+        <p class="eyebrow reveal" data-reveal>О месте</p>
+        <h2 class="section-title reveal" data-reveal>Место, где время течёт медленнее</h2>
+        <p class="reveal" data-reveal>«Топчан» — это настоящая чайхана: невысокие деревянные помосты, застеленные
+          коврами и подушками, где принято сидеть по-турецки и никуда не спешить. У нас живой огонь тандыра,
+          дымящийся казан с пловом и рецепты, которые бережно хранятся в семьях наших поваров уже несколько
+          поколений.</p>
+        <p class="reveal" data-reveal>Мы воссоздали атмосферу восточного двора: тёплый свет ламп, ковровые узоры,
+          аромат специй и неспешные разговоры за пиалой чая. Заходите — здесь вас ждут как дома.</p>
+        <div class="about-stats reveal" data-reveal>
+          <div class="stat"><span class="stat-num">15+</span><span class="stat-label">лет семейных рецептов</span></div>
+          <div class="stat"><span class="stat-num">100%</span><span class="stat-label">живой огонь тандыра</span></div>
+          <div class="stat"><span class="stat-num">8</span><span class="stat-label">топчанов в чайхане</span></div>
+        </div>
+      </div>
+    </div>
+    <img src="assets/img/ornament-divider.svg" alt="" class="section-divider" aria-hidden="true">
+  </section>
+
+  <!-- MENU -->
+  <section class="menu" id="menu">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow reveal" data-reveal>Меню</p>
+        <h2 class="section-title reveal" data-reveal>Блюда, ради которых возвращаются</h2>
+        <p class="section-lead reveal" data-reveal>Плов в казане, тянутая лапша лагмана, мантты на пару и самса
+          из тандыра — всё готовится так, как готовили на Востоке веками.</p>
+      </div>
+
+      <div class="menu-tabs reveal" data-reveal role="tablist" aria-label="Категории меню">
+        <button class="tab-btn is-active" data-tab="main" role="tab" aria-selected="true">Основные блюда</button>
+        <button class="tab-btn" data-tab="bakery" role="tab" aria-selected="false">Выпечка</button>
+        <button class="tab-btn" data-tab="drinks" role="tab" aria-selected="false">Напитки</button>
+        <span class="tab-indicator" aria-hidden="true"></span>
+      </div>
+
+      <div class="menu-panels">
+        <div class="menu-panel is-active" data-panel="main" role="tabpanel">
+          <div class="menu-grid">
+            <article class="dish-card reveal" data-reveal>
+              <div class="dish-media"><img src="assets/img/dish-lagman.svg" alt="Лагман — тянутая лапша с мясом и овощами" loading="lazy"></div>
+              <div class="dish-body">
+                <div class="dish-head"><h3>Лагман</h3><span class="dish-price">420&nbsp;₽</span></div>
+                <p>Тянутая вручную лапша с говядиной, болгарским перцем и пряной подливой ваджа.</p>
+              </div>
+            </article>
+            <article class="dish-card reveal" data-reveal>
+              <div class="dish-media"><img src="assets/img/dish-manty.svg" alt="Манты — паровые пельмени с бараниной и тыквой" loading="lazy"></div>
+              <div class="dish-body">
+                <div class="dish-head"><h3>Манты</h3><span class="dish-price">380&nbsp;₽</span></div>
+                <p>Паровые пельмени с бараниной, тыквой и луком, подаются со сметаной и зеленью.</p>
+              </div>
+            </article>
+            <article class="dish-card is-featured reveal" data-reveal>
+              <div class="dish-media"><img src="assets/img/dish-plov.svg" alt="Узбекский плов с бараниной, морковью и изюмом" loading="lazy"></div>
+              <div class="dish-body">
+                <div class="dish-head"><h3>Плов по-узбекски</h3><span class="dish-price">450&nbsp;₽</span></div>
+                <p>Баранина, жёлтая морковь, изюм и целая головка чеснока — в казане на живом огне.</p>
+              </div>
+            </article>
+            <article class="dish-card reveal" data-reveal>
+              <div class="dish-media"><img src="assets/img/dish-shashlik.svg" alt="Шашлык из баранины и говядины на углях" loading="lazy"></div>
+              <div class="dish-body">
+                <div class="dish-head"><h3>Шашлык</h3><span class="dish-price">520&nbsp;₽</span></div>
+                <p>Баранина и говядина, маринованные по семейному рецепту, на углях с луковыми кольцами.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="menu-panel" data-panel="bakery" role="tabpanel" hidden>
+          <div class="menu-grid">
+            <article class="dish-card reveal" data-reveal>
+              <div class="dish-media"><img src="assets/img/dish-samsa.svg" alt="Самса — слоёная выпечка с мясом из тандыра" loading="lazy"></div>
+              <div class="dish-body">
+                <div class="dish-head"><h3>Самса</h3><span class="dish-price">180&nbsp;₽</span></div>
+                <p>Слоёное тесто с сочной начинкой из говядины и лука, выпекается прямо на стенках тандыра.</p>
+              </div>
+            </article>
+            <article class="dish-card reveal" data-reveal>
+              <div class="dish-media"><img src="assets/img/dish-samsa.svg" alt="Самса с тыквой из тандыра" loading="lazy"></div>
+              <div class="dish-body">
+                <div class="dish-head"><h3>Самса с тыквой</h3><span class="dish-price">170&nbsp;₽</span></div>
+                <p>Вегетарианская версия — сладковатая тыква, лук и щепотка зиры.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="menu-panel" data-panel="drinks" role="tabpanel" hidden>
+          <div class="tea-feature reveal" data-reveal>
+            <div class="tea-media"><img src="assets/img/dish-tea.svg" alt="Зелёный чай в пиалах" loading="lazy"></div>
+            <div class="tea-text">
+              <h3>Чайхана начинается с чая</h3>
+              <p>Зелёный чай в традиционных пиалах — подаётся первым делом, ещё до заказа, как знак гостеприимства.
+                Завариваем листовой чай в фарфоровых чайниках по многолетнему рецепту чайханщика.</p>
+              <div class="menu-grid menu-grid-tea">
+                <article class="dish-card small">
+                  <div class="dish-body">
+                    <div class="dish-head"><h3>Зелёный чай</h3><span class="dish-price">150&nbsp;₽</span></div>
+                    <p>Классический чойхона-чай в пиале, чайник на двоих.</p>
+                  </div>
+                </article>
+                <article class="dish-card small">
+                  <div class="dish-body">
+                    <div class="dish-head"><h3>Чёрный чай с чабрецом</h3><span class="dish-price">160&nbsp;₽</span></div>
+                    <p>Плотный чёрный чай с горной травой чабреца и мёдом.</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <img src="assets/img/ornament-divider.svg" alt="" class="section-divider" aria-hidden="true">
+  </section>
+
+  <!-- ATMOSPHERE -->
+  <section class="atmosphere" id="atmosphere">
+    <div class="hero-pattern" aria-hidden="true"></div>
+    <div class="container">
+      <div class="section-head section-head-light">
+        <p class="eyebrow reveal" data-reveal>Атмосфера</p>
+        <h2 class="section-title reveal" data-reveal>Восточный двор в сердце города</h2>
+        <p class="section-lead reveal" data-reveal>Ковры, подушки, живой огонь и тёплый свет ламп — всё для того,
+          чтобы вы забыли о времени.</p>
+      </div>
+      <div class="gallery">
+        <figure class="gallery-item reveal" data-reveal>
+          <img src="assets/img/gallery-topchan.svg" alt="Топчан с коврами и подушками для вечернего ужина" loading="lazy">
+          <figcaption>Топчаны с коврами и подушками</figcaption>
+        </figure>
+        <figure class="gallery-item reveal" data-reveal>
+          <img src="assets/img/gallery-tandoor.svg" alt="Тандыр с живым огнём для самсы и лепёшек" loading="lazy">
+          <figcaption>Тандыр на живом огне</figcaption>
+        </figure>
+        <figure class="gallery-item reveal" data-reveal>
+          <img src="assets/img/gallery-chaykhana.svg" alt="Интерьер чайханы с восточной аркой и фонарями" loading="lazy">
+          <figcaption>Зал чайханы под восточной аркой</figcaption>
+        </figure>
+      </div>
+    </div>
+    <img src="assets/img/ornament-divider.svg" alt="" class="section-divider divider-light" aria-hidden="true">
+  </section>
+
+  <!-- CONTACTS / BOOKING -->
+  <section class="contacts" id="contacts">
+    <div class="hero-pattern" aria-hidden="true"></div>
+    <div class="container contacts-inner">
+      <div class="contacts-info">
+        <p class="eyebrow reveal" data-reveal>Бронирование</p>
+        <h2 class="section-title reveal" data-reveal>Займите свой топчан</h2>
+        <p class="section-lead reveal" data-reveal>Оставьте заявку — мы подтвердим бронь и подготовим для вас
+          лучший топчан в чайхане.</p>
+
+        <ul class="contact-list reveal" data-reveal>
+          <li>
+            <span class="contact-icon" aria-hidden="true">✦</span>
+            <div><strong>Адрес</strong><span>ул. Абая, 12, чайхана «Топчан»</span></div>
+          </li>
+          <li>
+            <span class="contact-icon" aria-hidden="true">✦</span>
+            <div><strong>Часы работы</strong><span>Ежедневно, 11:00 — 00:00</span></div>
+          </li>
+          <li>
+            <span class="contact-icon" aria-hidden="true">✦</span>
+            <div><strong>Телефон</strong><span>+7&nbsp;(999)&nbsp;123-45-67</span></div>
+          </li>
+        </ul>
+
+        <div class="map-placeholder reveal" data-reveal aria-hidden="true">
+          <div class="map-grid"></div>
+          <div class="map-pin">
+            <span class="map-pin-dot"></span>
+            <span class="map-pin-pulse"></span>
+          </div>
+          <span class="map-caption">ул. Абая, 12 — карта появится здесь</span>
+        </div>
+      </div>
+
+      <form class="booking-form reveal" data-reveal id="bookingForm" novalidate>
+        <h3>Забронировать топчан</h3>
+        <div class="form-row">
+          <label>
+            <span>Имя</span>
+            <input type="text" name="name" placeholder="Ваше имя" required>
+          </label>
+          <label>
+            <span>Телефон</span>
+            <input type="tel" name="phone" placeholder="+7 (___) ___-__-__" required>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>
+            <span>Дата</span>
+            <input type="date" name="date" required>
+          </label>
+          <label>
+            <span>Гостей</span>
+            <select name="guests">
+              <option>2 гостя</option>
+              <option>4 гостя</option>
+              <option>6 гостей</option>
+              <option>8+ гостей</option>
+            </select>
+          </label>
+        </div>
+        <label class="form-full">
+          <span>Пожелания</span>
+          <textarea name="comment" rows="3" placeholder="Например: топчан у тандыра"></textarea>
+        </label>
+        <button type="submit" class="btn btn-primary btn-block">Забронировать топчан</button>
+        <p class="form-note" id="formNote" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <a href="#hero" class="brand">
+      <img src="assets/img/logo.svg" alt="Топчан" class="brand-logo">
+      <span class="brand-text">Топчан</span>
+    </a>
+    <p class="footer-tag">Вкус Востока в каждом блюде</p>
+    <p class="footer-copy">© <span id="year"></span> Чайхана «Топчан». Все права защищены.</p>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>

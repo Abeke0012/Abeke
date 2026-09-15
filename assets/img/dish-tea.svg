@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <radialGradient id="tea-bg" cx="50%" cy="35%" r="80%">
+      <stop offset="0" stop-color="#2c4a44"/>
+      <stop offset="1" stop-color="#152420"/>
+    </radialGradient>
+    <radialGradient id="tea-shadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#000" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="tea-pot" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4FB3A9"/>
+      <stop offset="1" stop-color="#2E8B84"/>
+    </linearGradient>
+    <linearGradient id="tea-piala" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fdf6e8"/>
+      <stop offset="1" stop-color="#e2d3a8"/>
+    </linearGradient>
+    <radialGradient id="tea-liquid" cx="50%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#a9c96a"/>
+      <stop offset="1" stop-color="#5c7d2e"/>
+    </radialGradient>
+    <style>
+      .steam-path path { animation: teaSteam 4.5s ease-in-out infinite; transform-origin: bottom center; }
+      .steam-path path:nth-child(2) { animation-delay: .8s; }
+      @keyframes teaSteam {
+        0% { opacity: 0; transform: translateY(6px) scaleY(.92); }
+        35% { opacity: .6; }
+        100% { opacity: 0; transform: translateY(-16px) scaleY(1.08); }
+      }
+    </style>
+  </defs>
+  <rect width="400" height="400" fill="url(#tea-bg)"/>
+  <ellipse cx="200" cy="335" rx="150" ry="24" fill="url(#tea-shadow)"/>
+
+  <!-- teapot behind -->
+  <g transform="translate(255,150)">
+    <path d="M-55,40 C-55,5 -25,-18 5,-18 C40,-18 62,8 60,40 C60,68 30,86 3,86 C-28,86 -55,68 -55,40 Z" fill="url(#tea-pot)"/>
+    <ellipse cx="3" cy="-18" rx="26" ry="9" fill="#3a9c93"/>
+    <ellipse cx="3" cy="-18" rx="14" ry="5" fill="#255f59"/>
+    <path d="M-52,20 C-78,15 -85,45 -60,55" stroke="url(#tea-pot)" stroke-width="9" fill="none"/>
+    <path d="M55,25 C90,10 92,60 55,66" stroke="url(#tea-pot)" stroke-width="10" fill="none"/>
+    <g stroke="#C9A15A" stroke-width="1.5" opacity="0.8" fill="none">
+      <path d="M-45,35 Q3,55 51,35"/>
+      <path d="M-40,55 Q3,72 46,55"/>
+    </g>
+  </g>
+
+  <!-- two pialas front -->
+  <g transform="translate(120,255)">
+    <path d="M-42,0 C-42,26 -22,44 0,44 C22,44 42,26 42,0 Z" fill="url(#tea-piala)"/>
+    <ellipse cx="0" cy="0" rx="42" ry="12" fill="url(#tea-liquid)"/>
+    <ellipse cx="0" cy="0" rx="42" ry="12" fill="none" stroke="#C9A15A" stroke-width="2"/>
+    <path d="M-34,4 Q0,16 34,4" stroke="#C9A15A" stroke-width="1.2" opacity="0.7" fill="none"/>
+  </g>
+  <g transform="translate(210,270)">
+    <path d="M-36,0 C-36,22 -19,38 0,38 C19,38 36,22 36,0 Z" fill="url(#tea-piala)"/>
+    <ellipse cx="0" cy="0" rx="36" ry="10" fill="url(#tea-liquid)"/>
+    <ellipse cx="0" cy="0" rx="36" ry="10" fill="none" stroke="#C9A15A" stroke-width="2"/>
+    <path d="M-29,3 Q0,13 29,3" stroke="#C9A15A" stroke-width="1.2" opacity="0.7" fill="none"/>
+  </g>
+
+  <!-- steam -->
+  <g fill="none" stroke="#f5efe0" stroke-width="4" stroke-linecap="round" opacity="0.55" class="steam-path">
+    <path d="M120,215 C110,195 135,185 125,165 C115,145 140,135 130,115"/>
+    <path d="M255,110 C245,90 270,80 260,60 C250,40 275,30 265,10"/>
+  </g>
+</svg>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 420">
+  <defs>
+    <linearGradient id="ck-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#241a2c"/>
+      <stop offset="1" stop-color="#1c130d"/>
+    </linearGradient>
+    <linearGradient id="ck-arch" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a4f26"/>
+      <stop offset="1" stop-color="#5c3418"/>
+    </linearGradient>
+    <radialGradient id="ck-glow" cx="50%" cy="60%" r="60%">
+      <stop offset="0" stop-color="#f3b25a" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#f3b25a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="600" height="420" fill="url(#ck-bg)"/>
+  <ellipse cx="300" cy="300" rx="380" ry="140" fill="url(#ck-glow)"/>
+  <!-- horseshoe arch -->
+  <path d="M120,420 L120,220 C120,150 175,105 300,105 C425,105 480,150 480,220 L480,420" fill="none" stroke="url(#ck-arch)" stroke-width="22"/>
+  <path d="M120,420 L120,220 C120,150 175,105 300,105 C425,105 480,150 480,220 L480,420" fill="none" stroke="#C9A15A" stroke-width="2" opacity="0.6"/>
+  <!-- lattice pattern in arch -->
+  <g stroke="#C9A15A" stroke-width="1" opacity="0.3">
+    <path d="M170,300 L430,300 M170,340 L430,340 M170,260 L430,260"/>
+  </g>
+  <!-- floor rug -->
+  <path d="M90,420 L510,420 L440,330 L160,330 Z" fill="#a83f22"/>
+  <path d="M150,405 L450,405 L410,355 L190,355 Z" fill="none" stroke="#f3d48b" stroke-width="2" opacity="0.6"/>
+  <g fill="#f3d48b" opacity="0.5">
+    <circle cx="200" cy="390" r="3"/><circle cx="260" cy="395" r="3"/><circle cx="340" cy="395" r="3"/><circle cx="400" cy="390" r="3"/>
+  </g>
+  <!-- low topchan seating both sides -->
+  <rect x="130" y="330" width="120" height="30" rx="5" fill="#7a5330"/>
+  <ellipse cx="150" cy="322" rx="26" ry="14" fill="#3F8F87"/>
+  <ellipse cx="210" cy="322" rx="26" ry="14" fill="#C1502E"/>
+  <rect x="350" y="330" width="120" height="30" rx="5" fill="#7a5330"/>
+  <ellipse cx="390" cy="322" rx="26" ry="14" fill="#C9A15A"/>
+  <ellipse cx="450" cy="322" rx="26" ry="14" fill="#3F8F87"/>
+  <!-- hanging lanterns from arch -->
+  <g>
+    <line x1="220" y1="105" x2="220" y2="150" stroke="#3f260f" stroke-width="2"/>
+    <path d="M208,150 L232,150 L228,180 L212,180 Z" fill="#f3d48b" opacity="0.95"/>
+    <ellipse cx="220" cy="180" rx="26" ry="15" fill="#f3b25a" opacity="0.3"/>
+  </g>
+  <g>
+    <line x1="300" y1="100" x2="300" y2="150" stroke="#3f260f" stroke-width="2"/>
+    <path d="M286,150 L314,150 L309,186 L291,186 Z" fill="#f3d48b" opacity="0.95"/>
+    <ellipse cx="300" cy="186" rx="30" ry="17" fill="#f3b25a" opacity="0.3"/>
+  </g>
+  <g>
+    <line x1="380" y1="105" x2="380" y2="150" stroke="#3f260f" stroke-width="2"/>
+    <path d="M368,150 L392,150 L388,180 L372,180 Z" fill="#f3d48b" opacity="0.95"/>
+    <ellipse cx="380" cy="180" rx="26" ry="15" fill="#f3b25a" opacity="0.3"/>
+  </g>
+  <!-- distant stars/atmosphere -->
+  <g fill="#f5efe0" opacity="0.5">
+    <circle cx="60" cy="60" r="1.3"/><circle cx="540" cy="50" r="1.3"/><circle cx="500" cy="90" r="1"/>
+  </g>
+</svg>

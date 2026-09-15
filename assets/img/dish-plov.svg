@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <radialGradient id="pl-bg" cx="50%" cy="40%" r="75%">
+      <stop offset="0" stop-color="#3a2a1e"/>
+      <stop offset="1" stop-color="#1c130d"/>
+    </radialGradient>
+    <radialGradient id="pl-shadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#000" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="pl-plate" cx="42%" cy="38%" r="65%">
+      <stop offset="0" stop-color="#fdf6e8"/>
+      <stop offset="0.65" stop-color="#eadfc4"/>
+      <stop offset="1" stop-color="#c9b98f"/>
+    </radialGradient>
+    <radialGradient id="pl-rice" cx="40%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#f6dfa0"/>
+      <stop offset="1" stop-color="#d9a94f"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#pl-bg)"/>
+  <ellipse cx="200" cy="330" rx="140" ry="26" fill="url(#pl-shadow)"/>
+  <circle cx="200" cy="200" r="168" fill="url(#pl-plate)"/>
+  <circle cx="200" cy="200" r="168" fill="none" stroke="#C9A15A" stroke-width="3"/>
+  <circle cx="200" cy="200" r="152" fill="none" stroke="#3F8F87" stroke-width="1.5" opacity="0.5"/>
+  <!-- rice mound -->
+  <ellipse cx="195" cy="220" rx="118" ry="78" fill="url(#pl-rice)"/>
+  <g fill="#f2e2ab" opacity="0.9">
+    <circle cx="140" cy="200" r="2.2"/><circle cx="155" cy="185" r="2"/><circle cx="170" cy="215" r="2.3"/>
+    <circle cx="190" cy="195" r="2"/><circle cx="210" cy="180" r="2.2"/><circle cx="225" cy="205" r="2"/>
+    <circle cx="245" cy="190" r="2.3"/><circle cx="260" cy="215" r="2"/><circle cx="150" cy="230" r="2.2"/>
+    <circle cx="175" cy="245" r="2"/><circle cx="205" cy="235" r="2.3"/><circle cx="235" cy="240" r="2"/>
+    <circle cx="255" cy="225" r="2.2"/><circle cx="130" cy="220" r="2"/>
+  </g>
+  <!-- carrot strips -->
+  <g fill="#D9772E">
+    <rect x="150" y="175" width="26" height="6" rx="3" transform="rotate(15 150 175)"/>
+    <rect x="200" y="165" width="28" height="6" rx="3" transform="rotate(-10 200 165)"/>
+    <rect x="240" y="195" width="24" height="6" rx="3" transform="rotate(20 240 195)"/>
+    <rect x="165" y="240" width="24" height="6" rx="3" transform="rotate(-15 165 240)"/>
+    <rect x="220" y="245" width="26" height="6" rx="3" transform="rotate(10 220 245)"/>
+  </g>
+  <!-- raisins -->
+  <g fill="#3a2418">
+    <circle cx="160" cy="205" r="3"/><circle cx="195" cy="220" r="3"/><circle cx="225" cy="200" r="3"/>
+    <circle cx="180" cy="235" r="3"/><circle cx="245" cy="225" r="3"/><circle cx="210" cy="255" r="3"/>
+  </g>
+  <!-- garlic bulb -->
+  <g transform="translate(200,178)">
+    <ellipse cx="0" cy="6" rx="17" ry="20" fill="#f3e9d2"/>
+    <path d="M0,-14 C6,-6 6,10 0,26 C-6,10 -6,-6 0,-14 Z" fill="#e8d9b0" opacity="0.7"/>
+    <path d="M-9,-10 C-4,-2 -4,14 -9,22" stroke="#d8c496" stroke-width="1" fill="none" opacity="0.6"/>
+    <path d="M9,-10 C4,-2 4,14 9,22" stroke="#d8c496" stroke-width="1" fill="none" opacity="0.6"/>
+  </g>
+  <!-- meat piece on top -->
+  <ellipse cx="145" cy="180" rx="20" ry="14" fill="#8a4c28" transform="rotate(-10 145 180)"/>
+  <ellipse cx="145" cy="176" rx="16" ry="9" fill="#a45f34" opacity="0.7" transform="rotate(-10 145 176)"/>
+</svg>

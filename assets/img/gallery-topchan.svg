@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 420">
+  <defs>
+    <linearGradient id="tp-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a2a4a"/>
+      <stop offset="0.6" stop-color="#2c2440"/>
+      <stop offset="1" stop-color="#3a2418"/>
+    </linearGradient>
+    <radialGradient id="tp-glow" cx="50%" cy="55%" r="60%">
+      <stop offset="0" stop-color="#f3b25a" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#f3b25a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="tp-wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9a6a3c"/>
+      <stop offset="1" stop-color="#5c3a1e"/>
+    </linearGradient>
+    <linearGradient id="tp-carpet" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#C1502E"/>
+      <stop offset="0.5" stop-color="#a83f22"/>
+      <stop offset="1" stop-color="#8f331a"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="420" fill="url(#tp-sky)"/>
+  <circle cx="500" cy="60" r="26" fill="#f3d48b" opacity="0.85"/>
+  <circle cx="500" cy="60" r="40" fill="#f3d48b" opacity="0.15"/>
+  <g fill="#f5efe0" opacity="0.8">
+    <circle cx="80" cy="40" r="1.4"/><circle cx="140" cy="70" r="1"/><circle cx="220" cy="30" r="1.3"/>
+    <circle cx="330" cy="55" r="1"/><circle cx="410" cy="25" r="1.4"/><circle cx="60" cy="100" r="1"/>
+    <circle cx="180" cy="90" r="1.2"/>
+  </g>
+  <ellipse cx="300" cy="300" rx="380" ry="130" fill="url(#tp-glow)"/>
+  <!-- wooden platform (topchan) -->
+  <path d="M60,300 L540,300 L520,340 L80,340 Z" fill="url(#tp-wood)"/>
+  <rect x="70" y="260" width="460" height="45" rx="6" fill="url(#tp-wood)"/>
+  <g stroke="#3f260f" stroke-width="1" opacity="0.4">
+    <line x1="110" y1="260" x2="110" y2="305"/>
+    <line x1="180" y1="260" x2="180" y2="305"/>
+    <line x1="250" y1="260" x2="250" y2="305"/>
+    <line x1="320" y1="260" x2="320" y2="305"/>
+    <line x1="390" y1="260" x2="390" y2="305"/>
+    <line x1="460" y1="260" x2="460" y2="305"/>
+  </g>
+  <!-- legs -->
+  <rect x="90" y="340" width="14" height="40" fill="#3f260f"/>
+  <rect x="496" y="340" width="14" height="40" fill="#3f260f"/>
+  <!-- carpet on top -->
+  <rect x="95" y="235" width="410" height="30" rx="4" fill="url(#tp-carpet)"/>
+  <g stroke="#f3d48b" stroke-width="1.5" opacity="0.7" fill="none">
+    <rect x="105" y="241" width="390" height="18" rx="2"/>
+  </g>
+  <g fill="#f3d48b" opacity="0.6">
+    <circle cx="150" cy="250" r="3"/><circle cx="220" cy="250" r="3"/><circle cx="290" cy="250" r="3"/>
+    <circle cx="360" cy="250" r="3"/><circle cx="430" cy="250" r="3"/>
+  </g>
+  <!-- cushions -->
+  <ellipse cx="150" cy="228" rx="42" ry="20" fill="#3F8F87"/>
+  <ellipse cx="150" cy="222" rx="42" ry="18" fill="#4FB3A9"/>
+  <ellipse cx="260" cy="230" rx="38" ry="19" fill="#C1502E"/>
+  <ellipse cx="260" cy="224" rx="38" ry="17" fill="#d9683f"/>
+  <ellipse cx="410" cy="226" rx="44" ry="20" fill="#C9A15A"/>
+  <ellipse cx="410" cy="220" rx="44" ry="18" fill="#e0bd7c"/>
+  <!-- low table with tea -->
+  <rect x="290" y="270" width="70" height="8" rx="3" fill="#3f260f"/>
+  <rect x="300" y="278" width="8" height="22" fill="#3f260f"/>
+  <rect x="342" y="278" width="8" height="22" fill="#3f260f"/>
+  <ellipse cx="325" cy="268" rx="14" ry="6" fill="#e2d3a8"/>
+  <ellipse cx="325" cy="266" rx="10" ry="4" fill="#8fae5a"/>
+  <!-- lanterns -->
+  <g>
+    <line x1="90" y1="0" x2="90" y2="120" stroke="#3f260f" stroke-width="2"/>
+    <path d="M78,120 L102,120 L98,155 L82,155 Z" fill="#f3d48b" opacity="0.9"/>
+    <ellipse cx="90" cy="155" rx="30" ry="18" fill="#f3b25a" opacity="0.25"/>
+  </g>
+  <g>
+    <line x1="510" y1="0" x2="510" y2="110" stroke="#3f260f" stroke-width="2"/>
+    <path d="M498,110 L522,110 L518,142 L502,142 Z" fill="#f3d48b" opacity="0.9"/>
+    <ellipse cx="510" cy="142" rx="28" ry="16" fill="#f3b25a" opacity="0.25"/>
+  </g>
+</svg>

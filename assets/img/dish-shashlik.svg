@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <radialGradient id="sh-bg" cx="50%" cy="40%" r="75%">
+      <stop offset="0" stop-color="#3a2216"/>
+      <stop offset="1" stop-color="#1c130d"/>
+    </radialGradient>
+    <radialGradient id="sh-shadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#000" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sh-board" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a8794a"/>
+      <stop offset="1" stop-color="#7a5330"/>
+    </linearGradient>
+    <linearGradient id="sh-meat" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9a5330"/>
+      <stop offset="0.5" stop-color="#6e3620"/>
+      <stop offset="1" stop-color="#4a2416"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#sh-bg)"/>
+  <ellipse cx="200" cy="330" rx="150" ry="24" fill="url(#sh-shadow)"/>
+  <rect x="60" y="235" width="280" height="34" rx="8" fill="url(#sh-board)"/>
+  <rect x="60" y="235" width="280" height="6" rx="3" fill="#c79b6a" opacity="0.6"/>
+  <!-- skewer 1 -->
+  <g transform="rotate(-3 200 200)">
+    <line x1="70" y1="200" x2="330" y2="200" stroke="#cbb47a" stroke-width="4"/>
+    <g fill="url(#sh-meat)">
+      <rect x="95" y="182" width="34" height="36" rx="6"/>
+      <rect x="140" y="180" width="36" height="40" rx="6"/>
+      <rect x="188" y="182" width="34" height="36" rx="6"/>
+      <rect x="233" y="180" width="36" height="40" rx="6"/>
+      <rect x="280" y="182" width="34" height="36" rx="6"/>
+    </g>
+    <g fill="#2a1810" opacity="0.55">
+      <rect x="99" y="186" width="8" height="8" rx="2"/>
+      <rect x="150" y="190" width="9" height="9" rx="2"/>
+      <rect x="195" y="185" width="8" height="8" rx="2"/>
+      <rect x="245" y="192" width="9" height="9" rx="2"/>
+      <rect x="288" y="188" width="8" height="8" rx="2"/>
+    </g>
+    <!-- onion rings between -->
+    <g fill="none" stroke="#e7c9e0" stroke-width="3" opacity="0.85">
+      <circle cx="133" cy="200" r="10"/>
+      <circle cx="227" cy="200" r="10"/>
+    </g>
+  </g>
+  <!-- skewer 2 -->
+  <g transform="rotate(3 200 240)">
+    <line x1="75" y1="245" x2="325" y2="245" stroke="#cbb47a" stroke-width="4"/>
+    <g fill="url(#sh-meat)">
+      <rect x="100" y="227" width="34" height="36" rx="6"/>
+      <rect x="145" y="225" width="36" height="40" rx="6"/>
+      <rect x="193" y="227" width="34" height="36" rx="6"/>
+      <rect x="238" y="225" width="36" height="40" rx="6"/>
+      <rect x="283" y="227" width="34" height="36" rx="6"/>
+    </g>
+    <g fill="#2a1810" opacity="0.55">
+      <rect x="104" y="231" width="8" height="8" rx="2"/>
+      <rect x="155" y="235" width="9" height="9" rx="2"/>
+      <rect x="200" y="230" width="8" height="8" rx="2"/>
+      <rect x="250" y="237" width="9" height="9" rx="2"/>
+      <rect x="291" y="233" width="8" height="8" rx="2"/>
+    </g>
+    <g fill="none" stroke="#e7c9e0" stroke-width="3" opacity="0.85">
+      <circle cx="138" cy="245" r="10"/>
+      <circle cx="232" cy="245" r="10"/>
+    </g>
+  </g>
+  <!-- herb garnish -->
+  <path d="M290,255 Q305,235 325,250 Q308,248 290,255Z" fill="#5a7c3a"/>
+  <path d="M85,258 Q98,240 115,252 Q100,250 85,258Z" fill="#5a7c3a"/>
+</svg>
