@@ -1523,7 +1523,7 @@ window.initBuilderBoxScene = function initBuilderBoxScene(canvas, photoImgs) {
   camera.position.set(0, 1.9, camBaseZ);
   camera.lookAt(0, 0.1, 0);
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.8));
   const key = new THREE.DirectionalLight(0xffffff, 1.0);
   key.position.set(-3, 4, 5);
   scene.add(key);
@@ -1613,31 +1613,58 @@ window.initBuilderBoxScene = function initBuilderBoxScene(canvas, photoImgs) {
     return tex;
   }
 
-  function photoTexture(imgEl, name, hexColor, w, h) {
+  // Cuts the near-white studio background out of a product photo (real alpha,
+  // not just "drawn on a white card") so the ingredient shows up on the plate
+  // as its own silhouette — a round patty, a round tomato slice — instead of
+  // a labeled rectangle. Also returns the photo's own average color, used for
+  // a natural-toned edge instead of a bright, flat "game UI" category color.
+  // Cached per <img> since several menu rows can share one photo.
+  const cutoutCache = new WeakMap();
+  function cutout(imgEl) {
+    if (cutoutCache.has(imgEl)) return cutoutCache.get(imgEl);
+    const iw = imgEl.naturalWidth || imgEl.width;
+    const ih = imgEl.naturalHeight || imgEl.height;
+    const cnv = document.createElement('canvas');
+    cnv.width = iw; cnv.height = ih;
+    const ctx = cnv.getContext('2d');
+    ctx.drawImage(imgEl, 0, 0, iw, ih);
+    const frame = ctx.getImageData(0, 0, iw, ih);
+    const d = frame.data;
+    const WHITE_IN = 232, WHITE_OUT = 248; // feather the cutoff so edges anti-alias, not jag
+    let rs = 0, gs = 0, bs = 0, n = 0;
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i], g = d[i + 1], b = d[i + 2];
+      const whiteness = Math.min(r, g, b);
+      let a = 1;
+      if (whiteness > WHITE_IN) {
+        a = 1 - Math.min(1, (whiteness - WHITE_IN) / (WHITE_OUT - WHITE_IN));
+      }
+      d[i + 3] = Math.round(a * 255);
+      if (a > 0.6) { rs += r; gs += g; bs += b; n++; }
+    }
+    ctx.putImageData(frame, 0, 0);
+    const avg = n ? { r: rs / n, g: gs / n, b: bs / n } : { r: 200, g: 180, b: 150 };
+    const result = { canvas: cnv, avgColor: (Math.round(avg.r) << 16) | (Math.round(avg.g) << 8) | Math.round(avg.b) };
+    cutoutCache.set(imgEl, result);
+    return result;
+  }
+
+  // Pure photo, real cutout silhouette, no card border and no baked-in name
+  // label — the name is already shown in the chip strip above this scene,
+  // and stamping a colored banner across the food is what made it read as a
+  // game icon instead of an actual ingredient.
+  function photoTexture(imgEl, w, h) {
+    const { canvas: cut } = cutout(imgEl);
     const cnv = makeCanvas(w, h);
     const ctx = cnv.getContext('2d');
     const cw = cnv.width, ch = cnv.height;
-    ctx.fillStyle = '#faf6ec';
-    ctx.fillRect(0, 0, cw, ch);
-    // Contain-fit the photo, leaving a strip at the bottom for the name.
-    const labelH = ch * 0.2;
-    const photoArea = { x: cw * 0.04, y: ch * 0.03, w: cw * 0.92, h: ch - labelH - ch * 0.06 };
-    const iw = imgEl.naturalWidth || imgEl.width;
-    const ih = imgEl.naturalHeight || imgEl.height;
-    const scale = Math.min(photoArea.w / iw, photoArea.h / ih);
-    const dw = iw * scale, dh = ih * scale;
-    const dx = photoArea.x + (photoArea.w - dw) / 2;
-    const dy = photoArea.y + (photoArea.h - dh) / 2;
-    ctx.drawImage(imgEl, dx, dy, dw, dh);
-    const c = '#' + hexColor.toString(16).padStart(6, '0');
-    ctx.fillStyle = c;
-    ctx.fillRect(0, ch - labelH, cw, labelH);
-    ctx.fillStyle = 'rgba(255,255,255,0.95)';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    const { fontPx, lines } = fitText(ctx, name, cw - cw * 0.1, Math.round(labelH * 0.42), 10, 1);
-    ctx.font = `700 ${fontPx}px Arial, sans-serif`;
-    ctx.fillText(lines[0] || name, cw / 2, ch - labelH / 2);
+    const margin = 0.08;
+    const area = { x: cw * margin, y: ch * margin, w: cw * (1 - margin * 2), h: ch * (1 - margin * 2) };
+    const scale = Math.min(area.w / cut.width, area.h / cut.height);
+    const dw = cut.width * scale, dh = cut.height * scale;
+    const dx = area.x + (area.w - dw) / 2;
+    const dy = area.y + (area.h - dh) / 2;
+    ctx.drawImage(cut, dx, dy, dw, dh);
     const tex = new THREE.CanvasTexture(cnv);
     tex.colorSpace = THREE.SRGBColorSpace;
     return tex;
@@ -1647,21 +1674,29 @@ window.initBuilderBoxScene = function initBuilderBoxScene(canvas, photoImgs) {
   const pool = new Map();
 
   function ensureEntry(key, name, cat, dims, photoEl) {
-    const color = CAT_COLOR[cat] || 0x8a8a8a;
+    const catColor = CAT_COLOR[cat] || 0x8a8a8a;
+    const edgeColor = photoEl ? cutout(photoEl).avgColor : catColor;
     const label = name + '|' + dims.w + 'x' + dims.h + '|' + (photoEl ? photoEl.src : '');
     let e = pool.get(key);
     if (e) {
       if (e.label !== label) {
         e.frontMat.map.dispose();
-        e.frontMat.map = photoEl ? photoTexture(photoEl, name, color, dims.w, dims.h) : labelTexture(name, color, dims.w, dims.h);
+        e.frontMat.map = photoEl ? photoTexture(photoEl, dims.w, dims.h) : labelTexture(name, catColor, dims.w, dims.h);
+        e.frontMat.alphaTest = photoEl ? 0.35 : 0;
         e.frontMat.needsUpdate = true;
+        e.sideMat.color.setHex(edgeColor);
         e.label = label;
       }
       return e;
     }
-    const tex = photoEl ? photoTexture(photoEl, name, color, dims.w, dims.h) : labelTexture(name, color, dims.w, dims.h);
-    const frontMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.75, transparent: true, opacity: 0 });
-    const sideMat = new THREE.MeshStandardMaterial({ color, roughness: 0.85, transparent: true, opacity: 0 });
+    const tex = photoEl ? photoTexture(photoEl, dims.w, dims.h) : labelTexture(name, catColor, dims.w, dims.h);
+    const frontMat = new THREE.MeshStandardMaterial({
+      map: tex, roughness: 0.75, transparent: true, opacity: 0,
+      alphaTest: photoEl ? 0.35 : 0,
+    });
+    // A real ingredient's edge is a soft, muted version of its own color
+    // (crust, rind, cut surface) — not a saturated brand-color plastic tile.
+    const sideMat = new THREE.MeshStandardMaterial({ color: edgeColor, roughness: 0.9, transparent: true, opacity: 0 });
     const geo = new THREE.BoxGeometry(dims.w, dims.h, dims.d);
     const mesh = new THREE.Mesh(geo, [sideMat, sideMat, sideMat, sideMat, frontMat, sideMat]);
     mesh.position.set(STACK_X, 2.0, 0.2);
@@ -1673,10 +1708,22 @@ window.initBuilderBoxScene = function initBuilderBoxScene(canvas, photoImgs) {
 
   // Photo-bearing slabs get a chunkier, closer-to-square footprint so a
   // round food photo (bun, patty, tomato slice…) reads as that food instead
-  // of being squeezed into a thin horizontal streak.
+  // of being squeezed into a thin horizontal streak — and stay thin (small
+  // d) since a cutout ingredient is a slice, not a solid brick.
+  // Plain (no-photo) and photo variants share the same width within each
+  // role — mixing a wide text slab with a narrower photo slab in the same
+  // stack (very likely: e.g. a photographed cheese slice next to a
+  // jalapeño with no photo) left the wider one's edge sticking out to the
+  // sides of its narrower neighbors.
+  // Depth (thickness) is also kept close between the two variants — the
+  // old plain slabs were near-solid bricks (d≈1) while photo slabs are
+  // thin cutout slices (d≈0.2); under perspective a thick neighbor's own
+  // side face juts out past a thin one right next to it even at equal
+  // width, which is what actually caused the "sticking out" look, not
+  // width alone.
   const DIMS = {
-    bun: { plain: { w: 1.5, h: 0.24, d: 1.05 }, photo: { w: 1.15, h: 0.52, d: 1.05 } },
-    mid: { plain: { w: 1.32, h: 0.15, d: 0.95 }, photo: { w: 0.98, h: 0.44, d: 0.95 } },
+    bun: { plain: { w: 1.25, h: 0.24, d: 0.35 }, photo: { w: 1.25, h: 0.56, d: 0.35 } },
+    mid: { plain: { w: 1.05, h: 0.15, d: 0.22 }, photo: { w: 1.05, h: 0.46, d: 0.14 } },
     card: { w: 0.72, h: 0.72, d: 0.12 },
   };
 
@@ -1699,24 +1746,40 @@ window.initBuilderBoxScene = function initBuilderBoxScene(canvas, photoImgs) {
       return it.name + (it.qty > 1 ? ' ×' + it.qty : '');
     }
 
+    // A round cutout photo (bun, patty, tomato slice…) only fills the
+    // middle of its own bounding box — its corners are transparent — so
+    // stacking by the full box height leaves a gap that reads as "floating
+    // apart" rather than a real, compactly stacked sandwich. Advancing by
+    // a fraction of the height instead lets the visible food overlap like
+    // it actually would.
+    function advance(dims, hasPhoto) {
+      return hasPhoto ? dims.h * 0.5 : dims.h + 0.012;
+    }
+    // Each layer sits a hair closer to the camera than the one below —
+    // overlapping cutout shapes at an identical Z would otherwise z-fight
+    // (flicker between which one wins the depth test) instead of cleanly
+    // stacking front-to-back like real ingredients resting on each other.
+    let zi = 0;
+    const nextZ = () => 0.2 + zi++ * 0.05;
+
     if (bunIds.length) {
       const bun = items[bunIds[0]];
       const photo = photoImgs[bun.name];
       const dims = photo ? DIMS.bun.photo : DIMS.bun.plain;
       const key = bunIds[0] + '__bottom';
       const e = ensureEntry(key, labelFor(bun), 'buns', dims, photo);
-      e.target = { x: STACK_X, y: y + dims.h / 2, z: 0.2, opacity: 1 };
+      e.target = { x: STACK_X, y: y + dims.h / 2, z: nextZ(), opacity: 1 };
       seen.add(key);
-      y += dims.h + 0.012;
+      y += advance(dims, !!photo);
     }
     midIds.forEach((id) => {
       const it = items[id];
       const photo = photoImgs[it.name];
       const dims = photo ? DIMS.mid.photo : DIMS.mid.plain;
       const e = ensureEntry(id, labelFor(it), it.cat, dims, photo);
-      e.target = { x: STACK_X, y: y + dims.h / 2, z: 0.2, opacity: 1 };
+      e.target = { x: STACK_X, y: y + dims.h / 2, z: nextZ(), opacity: 1 };
       seen.add(id);
-      y += dims.h + 0.012;
+      y += advance(dims, !!photo);
     });
     if (bunIds.length) {
       const bun = items[bunIds[0]];
@@ -1724,7 +1787,7 @@ window.initBuilderBoxScene = function initBuilderBoxScene(canvas, photoImgs) {
       const dims = photo ? DIMS.bun.photo : DIMS.bun.plain;
       const key = bunIds[0] + '__top';
       const e = ensureEntry(key, labelFor(bun), 'buns', dims, photo);
-      e.target = { x: STACK_X, y: y + dims.h / 2, z: 0.2, opacity: 1 };
+      e.target = { x: STACK_X, y: y + dims.h / 2, z: nextZ(), opacity: 1 };
       seen.add(key);
     }
 
