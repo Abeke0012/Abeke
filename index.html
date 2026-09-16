@@ -830,6 +830,31 @@
   }
   @media (prefers-reduced-motion: reduce){ .sesame-field{ display:none; } }
 
+  /* --- Live 3D preview of the burger being built (progressive enhancement,
+     same WebGL-support/reduced-motion gate as the hero 3D scene; the text
+     chip strip below it always renders regardless, so nothing is lost when
+     this is unavailable) --- */
+  .builder-3d-wrap{
+    display: none;
+    position: relative;
+    width: 100%;
+    height: min(360px, 46vw);
+    min-height: 220px;
+    border-radius: 18px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #efe9da, #e2d9c2);
+    border: 1.5px solid rgba(23,23,26,0.08);
+    margin-bottom: 18px;
+  }
+  html.builder-3d .builder-3d-wrap{ display: block; }
+  .builder-3d-wrap canvas{ width:100%; height:100%; display:block; }
+  .builder-3d-wrap .builder-3d-hint{
+    position:absolute; left:16px; bottom:12px;
+    font-size:11.5px; font-weight:600; letter-spacing:.02em;
+    color: rgba(23,23,26,0.38);
+    pointer-events: none;
+  }
+
   /* --- Live burger preview strip in the menu --- */
   .burger-preview{
     display:flex; flex-wrap:wrap; gap:8px; align-items:center;
@@ -1129,6 +1154,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
         Начать новый бургер
       </button>
+    </div>
+    <div class="builder-3d-wrap" id="builder3dWrap">
+      <canvas id="builderCanvas3d"></canvas>
+      <span class="builder-3d-hint">Каждый тап ниже — новый слой на тарелке</span>
     </div>
     <div class="burger-preview" id="burgerPreview"><span class="bp-empty">Пока ничего не выбрано — начните с булочки</span></div>
     <div class="menu-tabs" id="menuTabs" role="tablist">
@@ -1459,6 +1488,212 @@ window.initBurgerScene = function initBurgerScene(canvas, imgs) {
 
   resize();
   return { render, resize };
+};
+</script>
+
+<script>// Live 3D preview of the burger currently being built in the menu section.
+// initBuilderBoxScene(canvas) returns { updateComposition(burger), resize() }.
+// `burger` is { items: { id: { name, price, qty, cat } } } — the exact shape
+// already used by the existing order-builder (see getActiveBurger()).
+window.initBuilderBoxScene = function initBuilderBoxScene(canvas) {
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
+  const camBaseZ = 5.4;
+  camera.position.set(0, 1.9, camBaseZ);
+  camera.lookAt(0, 0.1, 0);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+  const key = new THREE.DirectionalLight(0xffffff, 1.0);
+  key.position.set(-3, 4, 5);
+  scene.add(key);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.35);
+  fill.position.set(4, -1, 3);
+  scene.add(fill);
+
+  const rig = new THREE.Group();
+  scene.add(rig);
+
+  const plate = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.9, 1.95, 0.16, 40),
+    new THREE.MeshStandardMaterial({ color: 0x17171a, roughness: 0.9 })
+  );
+  plate.position.y = -0.55;
+  rig.add(plate);
+
+  const CAT_COLOR = {
+    buns: 0xd9a441, patties: 0xb23a30, ingredients: 0x4f9a52,
+    sauces: 0x8a5a2b, sides: 0x2b7ca0, drinks: 0x2b6fcd,
+  };
+  const STACK_X = -0.95;
+  const CARD_X0 = 0.35;
+
+  function wrapLines(ctx, text, maxWidth) {
+    const words = text.split(' ');
+    const lines = [];
+    let line = '';
+    words.forEach((w) => {
+      const test = line ? line + ' ' + w : w;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = w;
+      } else {
+        line = test;
+      }
+    });
+    if (line) lines.push(line);
+    return lines.slice(0, 3);
+  }
+
+  function labelTexture(name, hexColor) {
+    const cw = 320, ch = 180;
+    const cnv = document.createElement('canvas');
+    cnv.width = cw; cnv.height = ch;
+    const ctx = cnv.getContext('2d');
+    const c = '#' + hexColor.toString(16).padStart(6, '0');
+    ctx.fillStyle = c;
+    ctx.fillRect(0, 0, cw, ch);
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.font = '700 30px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const lines = wrapLines(ctx, name, cw - 36);
+    const lh = 34;
+    const startY = ch / 2 - ((lines.length - 1) * lh) / 2;
+    lines.forEach((l, i) => ctx.fillText(l, cw / 2, startY + i * lh));
+    const tex = new THREE.CanvasTexture(cnv);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }
+
+  // key -> { mesh, frontMat, sideMat, target:{x,y,z,ry,opacity}, removing }
+  const pool = new Map();
+
+  function ensureEntry(key, label, color, w, h, d) {
+    let e = pool.get(key);
+    if (e) {
+      if (e.label !== label) {
+        e.frontMat.map.dispose();
+        e.frontMat.map = labelTexture(label, color);
+        e.frontMat.needsUpdate = true;
+        e.label = label;
+      }
+      return e;
+    }
+    const tex = labelTexture(label, color);
+    const frontMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.75, transparent: true, opacity: 0 });
+    const sideMat = new THREE.MeshStandardMaterial({ color, roughness: 0.85, transparent: true, opacity: 0 });
+    const geo = new THREE.BoxGeometry(w, h, d);
+    const mesh = new THREE.Mesh(geo, [sideMat, sideMat, sideMat, sideMat, frontMat, sideMat]);
+    mesh.position.set(STACK_X, 2.0, 0.2);
+    rig.add(mesh);
+    e = { mesh, frontMat, sideMat, label, target: { x: STACK_X, y: 2.0, z: 0.2, ry: 0, opacity: 1 }, removing: false };
+    pool.set(key, e);
+    return e;
+  }
+
+  let targetCamZ = camBaseZ;
+
+  function updateComposition(burger) {
+    const items = burger ? burger.items : {};
+    const ids = Object.keys(items);
+    // NB: item objects don't carry their own id (it's only the dict key in
+    // `items`), so every helper below threads the id through explicitly
+    // instead of reading a non-existent `.id` field off the item.
+    const idsByCat = (c) => ids.filter((id) => items[id].cat === c);
+    const bunIds = idsByCat('buns');
+    const midIds = [...idsByCat('patties'), ...idsByCat('ingredients'), ...idsByCat('sauces')];
+
+    const seen = new Set();
+    let y = -0.47;
+    const BUN_H = 0.24, MID_H = 0.15;
+
+    if (bunIds.length) {
+      const bun = items[bunIds[0]];
+      const key = bunIds[0] + '__bottom';
+      const e = ensureEntry(key, bun.name + (bun.qty > 1 ? ' ×' + bun.qty : ''), CAT_COLOR.buns, 1.5, BUN_H, 1.05);
+      e.target = { x: STACK_X, y: y + BUN_H / 2, z: 0.2, ry: 0, opacity: 1 };
+      seen.add(key);
+      y += BUN_H + 0.012;
+    }
+    midIds.forEach((id) => {
+      const it = items[id];
+      const e = ensureEntry(id, it.name + (it.qty > 1 ? ' ×' + it.qty : ''), CAT_COLOR[it.cat] || 0x8a8a8a, 1.32, MID_H, 0.95);
+      e.target = { x: STACK_X, y: y + MID_H / 2, z: 0.2, ry: 0, opacity: 1 };
+      seen.add(id);
+      y += MID_H + 0.012;
+    });
+    if (bunIds.length) {
+      const bun = items[bunIds[0]];
+      const key = bunIds[0] + '__top';
+      const e = ensureEntry(key, bun.name + (bun.qty > 1 ? ' ×' + bun.qty : ''), CAT_COLOR.buns, 1.5, BUN_H, 1.05);
+      e.target = { x: STACK_X, y: y + BUN_H / 2, z: 0.2, ry: 0, opacity: 1 };
+      seen.add(key);
+    }
+
+    const accIds = [...idsByCat('sides'), ...idsByCat('drinks')];
+    accIds.forEach((id, i) => {
+      const it = items[id];
+      const col = i % 2, row = Math.floor(i / 2);
+      const e = ensureEntry(id, it.name + (it.qty > 1 ? ' ×' + it.qty : ''), CAT_COLOR[it.cat] || 0x8a8a8a, 0.72, 0.72, 0.12);
+      e.target = {
+        x: CARD_X0 + col * 0.86,
+        y: -0.47 + 0.36,
+        z: -0.55 + row * 0.86,
+        ry: 0,
+        opacity: 1,
+      };
+      seen.add(id);
+    });
+
+    pool.forEach((e, key) => {
+      if (!seen.has(key)) {
+        e.target = { ...e.target, y: e.target.y + 0.5, opacity: 0 };
+        e.removing = true;
+      } else {
+        e.removing = false;
+      }
+    });
+
+    const totalCount = seen.size;
+    targetCamZ = camBaseZ + Math.max(0, totalCount - 4) * 0.18;
+  }
+
+  let raf = null;
+  function animate() {
+    raf = requestAnimationFrame(animate);
+    pool.forEach((e, key) => {
+      const m = e.mesh;
+      m.position.x += (e.target.x - m.position.x) * 0.16;
+      m.position.y += (e.target.y - m.position.y) * 0.16;
+      m.position.z += (e.target.z - m.position.z) * 0.16;
+      const op = e.frontMat.opacity + (e.target.opacity - e.frontMat.opacity) * 0.14;
+      e.frontMat.opacity = op;
+      e.sideMat.opacity = op;
+      if (e.removing && op < 0.015) {
+        rig.remove(m);
+        m.geometry.dispose();
+        pool.delete(key);
+      }
+    });
+    camera.position.z += (targetCamZ - camera.position.z) * 0.08;
+    rig.rotation.y = Math.sin(Date.now() * 0.00025) * 0.12;
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  function resize() {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+
+  return { updateComposition, resize };
 };
 </script>
 
@@ -2129,6 +2364,33 @@ window.initBurgerScene = function initBurgerScene(canvas, imgs) {
   const _origRenderCart = renderCart;
   renderCart = function () { _origRenderCart(); updateBurgerPreview(); };
   updateBurgerPreview();
+
+  // --- Live 3D preview: same burger the chip strip above shows, as a real
+  // WebGL scene that grows a layer every time a row is tapped. Unlike the
+  // hero scene this runs on mobile too (it's a much lighter scene, and the
+  // menu is exactly where phone visitors actually order from).
+  let builderScene3d = null;
+  const builderCanvas3d = document.getElementById('builderCanvas3d');
+  if (builderCanvas3d && window.THREE && typeof window.initBuilderBoxScene === 'function' &&
+      !reduceMotion && supportsWebGL()) {
+    try {
+      builderScene3d = window.initBuilderBoxScene(builderCanvas3d);
+      document.documentElement.classList.add('builder-3d');
+      window.addEventListener('resize', () => builderScene3d && builderScene3d.resize());
+    } catch (e) {
+      builderScene3d = null;
+      document.documentElement.classList.remove('builder-3d');
+      console.warn('3D builder scene failed to init; the chip list above still works.', e);
+    }
+  }
+  if (builderScene3d) {
+    const _prevUpdateBurgerPreview = updateBurgerPreview;
+    updateBurgerPreview = function () {
+      _prevUpdateBurgerPreview();
+      builderScene3d.updateComposition(getActiveBurger());
+    };
+    builderScene3d.updateComposition(getActiveBurger());
+  }
 
   // --- Open/closed status (hours: daily 11:00–05:00) ---
   (function initOpenStatus(){
