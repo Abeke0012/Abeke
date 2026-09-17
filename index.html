@@ -711,6 +711,57 @@
     text-decoration: underline;
   }
 
+  /* ---------- ORDER CONFIRMATION MODAL ---------- */
+  .order-modal{
+    position: fixed; inset: 0; z-index: 300;
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .order-modal.open{ display: flex; }
+  .order-modal-backdrop{
+    position:absolute; inset:0;
+    background: rgba(11,11,12,0.72);
+    backdrop-filter: blur(4px);
+  }
+  .order-modal-card{
+    position: relative;
+    background: var(--paper); color: var(--ink);
+    border-radius: 22px;
+    max-width: 400px; width: 100%;
+    padding: 22px 26px 28px;
+    box-shadow: 0 40px 90px rgba(0,0,0,0.45);
+    text-align: center;
+    animation: orderCardIn .45s cubic-bezier(.2,1.2,.4,1);
+  }
+  @keyframes orderCardIn{
+    from{ transform: scale(0.9) translateY(24px); opacity: 0; }
+    to{ transform: none; opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce){ .order-modal-card{ animation: none; } }
+  .order-modal-close{
+    position: absolute; top: 14px; right: 14px;
+    background: none; border: none; font-size: 18px; line-height:1;
+    color: rgba(23,23,26,0.45); cursor: pointer; padding: 6px;
+  }
+  .order-modal-scene-wrap{
+    width: 100%; height: 190px; margin-bottom: 6px;
+    border-radius: 14px; overflow: hidden;
+    background: linear-gradient(180deg, #efe9da, #e2d9c2);
+  }
+  .order-modal-scene-wrap canvas{ width:100%; height:100%; display:block; }
+  .order-modal-kicker{ font-size:12px; font-weight:700; letter-spacing:.08em; color: var(--red); }
+  .order-modal-number{ font-family:'Anton', sans-serif; font-size: 34px; margin-top:6px; letter-spacing:0.01em; }
+  .order-modal-eta, .order-modal-total{ margin-top:8px; font-size:14.5px; color: rgba(23,23,26,0.7); }
+  .order-modal-total strong{ color: var(--red-dark); }
+  .order-modal-info .btn{ width:100%; margin-top:16px; }
+  .order-modal-done{
+    display:block; width:100%; margin-top:10px;
+    background:none; border:1.5px solid rgba(23,23,26,0.15); border-radius:999px;
+    padding:12px; font-family:'Work Sans',sans-serif; font-weight:700; font-size:13.5px;
+    color: var(--ink); cursor:pointer;
+  }
+  @media (max-width: 480px){ .order-modal-scene-wrap{ height:150px; } }
+
   /* ---------- FOOTER ---------- */
   footer{ background: var(--black); padding: 60px 0 30px; }
   footer .wrap{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap: 24px; }
@@ -1268,6 +1319,22 @@
     <button class="cart-clear" id="cartClear" type="button">Очистить корзину</button>
   </div>
 </aside>
+
+<div class="order-modal" id="orderModal" aria-hidden="true">
+  <div class="order-modal-backdrop" id="orderModalBackdrop"></div>
+  <div class="order-modal-card" role="dialog" aria-modal="true" aria-label="Заказ принят">
+    <button class="order-modal-close" id="orderModalClose" type="button" aria-label="Закрыть">✕</button>
+    <div class="order-modal-scene-wrap"><canvas id="orderModalCanvas"></canvas></div>
+    <div class="order-modal-info">
+      <span class="order-modal-kicker">ЗАКАЗ ПРИНЯТ</span>
+      <h3 class="order-modal-number" id="orderModalNumber">SELF-0000</h3>
+      <p class="order-modal-eta">Будет готов к <strong id="orderModalTime">--:--</strong></p>
+      <p class="order-modal-total">Итого: <strong id="orderModalSum">0 тг</strong></p>
+      <a href="#" class="btn btn-primary btn-order" id="orderModalWa" target="_blank" rel="noopener">Написать в WhatsApp</a>
+      <button class="order-modal-done" id="orderModalDone" type="button">Продолжить на сайте</button>
+    </div>
+  </div>
+</div>
 
 <!-- Three.js (r160, MIT license) inlined for a fully self-contained,
      offline-friendly page — powers the optional 3D burger/box scene
@@ -1860,6 +1927,158 @@ window.initBuilderBoxScene = function initBuilderBoxScene(canvas, photoImgs) {
   resize();
 
   return { updateComposition, resize };
+};
+</script>
+
+<script>// Small, one-shot 3D scene for the order-confirmation modal: a branded box,
+// already packed, with its lid swinging shut once per play() call. Not
+// scroll-linked (there's no scroll inside a modal) — driven by real time
+// instead, same math as the hero scene's box just replayed on demand.
+window.initOrderBoxScene = function initOrderBoxScene(canvas, imgs) {
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+  camera.position.set(0, 2.5, 5.6);
+  camera.lookAt(0, -0.3, 0);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+  const key = new THREE.DirectionalLight(0xffffff, 1.0);
+  key.position.set(-3, 4, 5);
+  scene.add(key);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.35);
+  fill.position.set(4, -1, 3);
+  scene.add(fill);
+
+  const loader = new THREE.TextureLoader();
+  const box = new THREE.Group();
+  scene.add(box);
+
+  const BOX_W = 3.2, BOX_D = 2.4, WALL_H = 0.32;
+  const trayMat = new THREE.MeshStandardMaterial({ color: 0x17171a, roughness: 0.9 });
+  const trayBottom = new THREE.Mesh(new THREE.BoxGeometry(BOX_W, 0.12, BOX_D), trayMat);
+  trayBottom.position.y = -WALL_H / 2;
+  box.add(trayBottom);
+  const wallGeoLR = new THREE.BoxGeometry(0.1, WALL_H, BOX_D);
+  const wallGeoFB = new THREE.BoxGeometry(BOX_W, WALL_H, 0.1);
+  [[-BOX_W / 2, 0, wallGeoLR], [BOX_W / 2, 0, wallGeoLR], [0, BOX_D / 2, wallGeoFB], [0, -BOX_D / 2, wallGeoFB]]
+    .forEach(([x, z, geo]) => {
+      const m = new THREE.Mesh(geo, trayMat);
+      m.position.set(x, 0, z);
+      box.add(m);
+    });
+
+  function slotCard(src, w, h, x, z) {
+    const tex = loader.load(src);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const mat = new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6 });
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
+    m.rotation.x = -Math.PI / 2;
+    m.position.set(x, -WALL_H / 2 + 0.08, z);
+    return m;
+  }
+  if (imgs.boxBurger) box.add(slotCard(imgs.boxBurger, 1.46, 1.2, -0.75, 0));
+  if (imgs.fries) box.add(slotCard(imgs.fries, 0.62, 0.8, 0.85, -0.5));
+  if (imgs.drink) box.add(slotCard(imgs.drink, 0.24, 0.8, 0.85, 0.55));
+
+  const lidPivot = new THREE.Object3D();
+  lidPivot.position.set(0, WALL_H / 2, -BOX_D / 2);
+  box.add(lidPivot);
+
+  function makeLidTopTexture() {
+    const cw = 640, ch = 480;
+    const cnv = document.createElement('canvas');
+    cnv.width = cw; cnv.height = ch;
+    const ctx = cnv.getContext('2d');
+    const grad = ctx.createLinearGradient(0, 0, cw * 0.3, ch);
+    grad.addColorStop(0, '#1a1a1c');
+    grad.addColorStop(1, '#0b0b0c');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, cw, ch);
+    const cx = cw / 2, badgeY = ch * 0.36, r = 46;
+    ctx.fillStyle = '#d62828';
+    ctx.beginPath();
+    ctx.arc(cx, badgeY, r, 0, Math.PI * 2);
+    ctx.fill();
+    const star = [[12, 2], [14.4, 8.9], [21, 11], [14.4, 13.1], [12, 20], [9.6, 13.1], [3, 11], [9.6, 8.9]];
+    const s = (r * 1.5) / 24;
+    ctx.fillStyle = '#f4efe3';
+    ctx.beginPath();
+    star.forEach(([sx, sy], i) => {
+      const px = cx + (sx - 12) * s, py = badgeY + (sy - 12) * s;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    });
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#f4efe3';
+    ctx.textAlign = 'center';
+    ctx.font = '700 64px "Arial Black", Arial, sans-serif';
+    ctx.fillText('SELF', cx, ch * 0.62);
+    ctx.fillStyle = 'rgba(244,239,227,0.55)';
+    ctx.font = '600 15px Arial, sans-serif';
+    ctx.fillText('M A D E   F R E S H .   M A D E   Y O U R S .', cx, ch * 0.72);
+    const tex = new THREE.CanvasTexture(cnv);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }
+  const lidSideMat = new THREE.MeshStandardMaterial({ color: 0x0b0b0c, roughness: 0.6 });
+  const lidTopMat = new THREE.MeshStandardMaterial({ map: makeLidTopTexture(), roughness: 0.5 });
+  const lidMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(BOX_W, 0.1, BOX_D),
+    [lidSideMat, lidSideMat, lidTopMat, lidSideMat, lidSideMat, lidSideMat]
+  );
+  lidMesh.position.set(0, 0, BOX_D / 2);
+  lidPivot.add(lidMesh);
+
+  const OPEN = -Math.PI * 0.58;
+  lidPivot.rotation.x = OPEN;
+
+  function smoothstep(e0, e1, x) {
+    if (e0 === e1) return x < e0 ? 0 : 1;
+    let t = (x - e0) / (e1 - e0);
+    t = Math.min(1, Math.max(0, t));
+    return t * t * (3 - 2 * t);
+  }
+
+  function renderFrame() {
+    renderer.render(scene, camera);
+  }
+  renderFrame();
+
+  let rafId = null;
+  function play(durationMs) {
+    durationMs = durationMs || 2200;
+    if (rafId) cancelAnimationFrame(rafId);
+    lidPivot.rotation.x = OPEN;
+    box.rotation.y = 0;
+    const start = performance.now();
+    function frame(now) {
+      const t = Math.min(1, (now - start) / durationMs);
+      const lidT = smoothstep(0.32, 0.85, t);
+      lidPivot.rotation.x = OPEN * (1 - lidT);
+      box.rotation.y = Math.sin(t * Math.PI) * 0.18;
+      renderFrame();
+      if (t < 1) {
+        rafId = requestAnimationFrame(frame);
+      } else {
+        rafId = null;
+      }
+    }
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function resize() {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderFrame();
+  }
+  resize();
+
+  return { play, resize };
 };
 </script>
 
@@ -2719,6 +2938,72 @@ window.initBuilderBoxScene = function initBuilderBoxScene(canvas, photoImgs) {
         setTimeout(() => el.remove(), dur + 50);
       }
     });
+  })();
+
+  // --- Order confirmation modal: a mini 3D "receipt" — the box packs and
+  // the lid closes with an order number and ready time, instead of the
+  // click just silently opening WhatsApp in a background tab. ---
+  (function initOrderModal(){
+    const checkoutBtn = document.getElementById('cartCheckout');
+    const modal = document.getElementById('orderModal');
+    const canvas = document.getElementById('orderModalCanvas');
+    if (!checkoutBtn || !modal || !canvas) return;
+
+    let orderScene = null;
+    if (window.THREE && typeof window.initOrderBoxScene === 'function' &&
+        !reduceMotion && supportsWebGL()) {
+      try {
+        orderScene = window.initOrderBoxScene(canvas, {
+          boxBurger: document.querySelector('#combo .slot-burger img')?.src,
+          fries: document.querySelector('#combo .slot-fries .fries-box-photo img')?.src,
+          drink: document.querySelector('#combo .slot-drink img')?.src,
+        });
+      } catch (e) {
+        orderScene = null;
+        console.warn('Order confirmation 3D scene failed to init.', e);
+      }
+    }
+
+    function openModal() {
+      const sumText = document.getElementById('cartTotalSum').textContent;
+      document.getElementById('orderModalSum').textContent = sumText;
+      const orderNum = 'SELF-' + (1000 + Math.floor(Math.random() * 9000));
+      document.getElementById('orderModalNumber').textContent = orderNum;
+      const readyMin = 25 + Math.floor(Math.random() * 16);
+      const ready = new Date(Date.now() + readyMin * 60000);
+      const hh = String(ready.getHours()).padStart(2, '0');
+      const mm = String(ready.getMinutes()).padStart(2, '0');
+      document.getElementById('orderModalTime').textContent = `${hh}:${mm}`;
+      const waLink = document.getElementById('orderModalWa');
+      waLink.href = checkoutBtn.href;
+
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      if (orderScene) {
+        requestAnimationFrame(() => {
+          orderScene.resize();
+          orderScene.play(2200);
+        });
+      } else {
+        // No WebGL / reduced-motion: an empty canvas would just be a blank
+        // rectangle, so skip reserving space for it — the modal still works
+        // as a plain confirmation card, no 3D required.
+        canvas.parentElement.style.display = 'none';
+      }
+    }
+    function closeModal() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    checkoutBtn.addEventListener('click', openModal);
+    document.getElementById('orderModalClose').addEventListener('click', closeModal);
+    document.getElementById('orderModalBackdrop').addEventListener('click', closeModal);
+    document.getElementById('orderModalDone').addEventListener('click', closeModal);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+    });
+    window.addEventListener('resize', () => { if (orderScene) orderScene.resize(); });
   })();
 </script>
 </body>
