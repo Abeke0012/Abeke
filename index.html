@@ -550,6 +550,16 @@
   .menu-table tr:hover td{ background: rgba(214,40,40,0.04); }
   .menu-table td:last-child{ font-weight:700; color: var(--red-dark); text-align:right; white-space:nowrap; }
   .menu-table td:nth-child(2){ color: rgba(23,23,26,0.5); white-space:nowrap; }
+  .menu-table td:first-child{ display:flex; align-items:center; gap:12px; }
+  /* Real photo thumbnail for the ~15 rows that have one — the same cutout
+     source used by the 3D preview, just shown flat here since a table row
+     has no depth to show off. */
+  .row-thumb{
+    width: 34px; height: 34px; border-radius: 8px; object-fit: cover;
+    background: #f4efe3; flex-shrink: 0;
+    box-shadow: inset 0 0 0 1px rgba(23,23,26,0.08);
+  }
+  @media (max-width: 560px){ .row-thumb{ width:28px; height:28px; border-radius:7px; } }
 
   .menu-subtabs{ display:flex; gap:8px; margin-bottom: 18px; }
   .menu-subtab{
@@ -2160,6 +2170,34 @@ window.initBuilderBoxScene = function initBuilderBoxScene(canvas, photoImgs) {
     return n.toLocaleString('ru-RU') + ' тг';
   }
 
+  // A handful of menu rows have a real product photo (hidden <img> stash
+  // in the page, plus a couple reused from photos already embedded
+  // elsewhere); everything else — most of the 56-item menu — has none.
+  // Shared by the row thumbnails right below and the 3D preview further
+  // down, so there's exactly one place that says which rows have a photo.
+  const byId = (id) => document.getElementById(id);
+  const photoByName = {
+    'Классическая с кунжутом': byId('ing-bun-sesame'),
+    'Бриошь': byId('ing-bun-brioche'),
+    'Говяжья котлета': byId('ing-patty-beef'),
+    'Куриная котлета': byId('ing-patty-chicken'),
+    'Куриное филе': byId('ing-patty-chicken'),
+    'Сыр': byId('ing-cheese'),
+    'Айсберг': byId('ing-lettuce'),
+    'Помидор': byId('ing-tomato'),
+    'Лук': byId('ing-onion'),
+    'Красный лук': byId('ing-onion'),
+    'Луковые кольца': byId('ing-onion'),
+    'BBQ': byId('ing-sauce-bbq'),
+    'Сливочно-сырный': byId('ing-sauce-cheese'),
+    'Сырный': byId('ing-sauce-cheese'),
+    'Ранч': byId('ing-sauce-mayo'),
+  };
+  const drinkImgSrc = document.querySelector('#combo .slot-drink img');
+  if (drinkImgSrc) photoByName['Coca-Cola'] = drinkImgSrc;
+  const friesImgSrc = document.querySelector('#friesItem .fries-photo img');
+  if (friesImgSrc) photoByName['Картофель фри'] = friesImgSrc;
+
   // Wire every row inside every menu table (including drink sub-panels) as a
   // tappable "add to my burger" control.
   document.querySelectorAll('.menu-panel').forEach((panel) => {
@@ -2176,6 +2214,15 @@ window.initBuilderBoxScene = function initBuilderBoxScene(canvas, photoImgs) {
       tr.dataset.portion = portion;
       tr.dataset.price = String(price);
       tr.dataset.cat = cat;
+
+      const photoEl = photoByName[name];
+      if (photoEl) {
+        const thumb = document.createElement('img');
+        thumb.className = 'row-thumb';
+        thumb.src = photoEl.src;
+        thumb.alt = '';
+        cells[0].prepend(thumb);
+      }
 
       const qtyBadge = document.createElement('span');
       qtyBadge.className = 'row-qty';
@@ -2530,31 +2577,9 @@ window.initBuilderBoxScene = function initBuilderBoxScene(canvas, photoImgs) {
   if (builderCanvas3d && window.THREE && typeof window.initBuilderBoxScene === 'function' &&
       !reduceMotion && supportsWebGL()) {
     try {
-      // A handful of menu rows have a real product photo (hidden <img>
-      // stash below); everything else — most of the 56-item menu — still
-      // gets the color+name label the scene already falls back to.
-      const byId = (id) => document.getElementById(id);
-      const photoByName = {
-        'Классическая с кунжутом': byId('ing-bun-sesame'),
-        'Бриошь': byId('ing-bun-brioche'),
-        'Говяжья котлета': byId('ing-patty-beef'),
-        'Куриная котлета': byId('ing-patty-chicken'),
-        'Куриное филе': byId('ing-patty-chicken'),
-        'Сыр': byId('ing-cheese'),
-        'Айсберг': byId('ing-lettuce'),
-        'Помидор': byId('ing-tomato'),
-        'Лук': byId('ing-onion'),
-        'Красный лук': byId('ing-onion'),
-        'Луковые кольца': byId('ing-onion'),
-        'BBQ': byId('ing-sauce-bbq'),
-        'Сливочно-сырный': byId('ing-sauce-cheese'),
-        'Сырный': byId('ing-sauce-cheese'),
-        'Ранч': byId('ing-sauce-mayo'),
-      };
-      const drinkImg = document.querySelector('#combo .slot-drink img');
-      if (drinkImg) photoByName['Coca-Cola'] = drinkImg;
-      const friesImg = document.querySelector('#friesItem .fries-photo img');
-      if (friesImg) photoByName['Картофель фри'] = friesImg;
+      // photoByName is the shared map defined above the row-wiring loop —
+      // same photos, same rows, whether shown as a table thumbnail or a
+      // 3D slab.
       // Order matters: the canvas is display:none until the class below is
       // added, so the renderer's first internal resize() (run inside
       // initBuilderBoxScene) sees 0×0 and keeps Three.js's tiny default
