@@ -239,16 +239,11 @@
   /* ---------- THE STACK (pinned scroll-jack) ---------- */
   .stack{ background: var(--paper); color: var(--ink); }
   .stack-scrollspace{ position: relative; height: 480vh; }
-  @media (max-width: 860px){ .stack-scrollspace{ height: auto; } }
   @media (prefers-reduced-motion: reduce){ .stack-scrollspace{ height: auto; } }
   .stack-pin{
     position: sticky; top: 0; height: 100vh;
     display:flex; align-items:center; overflow: hidden;
   }
-  /* Mobile drops the pinned scroll-jack entirely: the rig renders as a plain
-     static list further down (see the .rig-layer / .burger-rig rules below),
-     so there's nothing left to pin or reserve extra scroll height for. */
-  @media (max-width: 860px){ .stack-pin{ position: static; height: auto; padding: 90px 0; overflow: visible; } }
   @media (prefers-reduced-motion: reduce){ .stack-pin{ position: static; height: auto; padding: 110px 0; overflow: visible; } }
   .stack-inner{ display:grid; grid-template-columns: 0.85fr 1.15fr; gap: 60px; align-items:center; width:100%; }
   @media (max-width: 860px){ .stack-inner{ grid-template-columns: 1fr; } }
@@ -258,6 +253,11 @@
   .stack-head .divider{ width: 64px; height: 4px; background: var(--red); margin: 26px 0; border-radius: 2px; }
 
   .stack-visual{ position:relative; display:flex; justify-content:center; perspective: 1300px; }
+  /* Header and visual stack vertically on narrow screens (see .stack-inner
+     below), so the visual gets its own clipped, fixed-height box — otherwise
+     the exploding layers/tags would paint up over the heading text above,
+     since transforms move content without affecting grid row sizing. */
+  @media (max-width: 860px){ .stack-visual{ height: 58vh; align-items:center; overflow:hidden; } }
 
   .burger-rig{
     position: relative;
@@ -304,16 +304,9 @@
   .layer-tag .tag-line{ width: 34px; height: 1.5px; background: rgba(23,23,26,0.35); display:block; }
   .layer-tag .tag-text{ font-size: 13.5px; font-weight:700; }
   @media (max-width: 860px){
-    .layer-tag{ position:static; transform:none; opacity:1 !important; margin-top:6px; }
-    .layer-tag .tag-line{ display:none; }
-    .rig-layer{ position: static; width: 100%; height: auto; margin: 0 auto 10px; }
-    .rig-layer[data-i="0"] .rig-photo{ aspect-ratio: 620 / 150.35; }
-    .rig-layer[data-i="1"] .rig-photo{ aspect-ratio: 620 / 76.65; }
-    .rig-layer[data-i="2"] .rig-photo{ aspect-ratio: 620 / 70.74; }
-    .rig-layer[data-i="3"] .rig-photo{ aspect-ratio: 620 / 91.39; }
-    .rig-layer[data-i="4"] .rig-photo{ aspect-ratio: 620 / 120.87; }
-    .rig-photo{ width: 100%; height: auto; }
-    .burger-rig{ height:auto; aspect-ratio:auto; display:flex; flex-direction:column; align-items:center; width:min(300px,70vw); }
+    .layer-tag{ white-space: normal; max-width: 34vw; gap:8px; }
+    .layer-tag .tag-text{ font-size: 12px; line-height:1.3; }
+    .layer-tag .tag-line{ width: 20px; flex-shrink:0; }
   }
 
   .side-item{
@@ -338,7 +331,6 @@
   .side-item span{ font-size:12.5px; font-weight:700; background: var(--ink); color: var(--paper); padding:6px 12px; border-radius:999px; }
   .side-item.fries{ left: -14%; }
   .side-item.drink{ right: -14%; }
-  @media (max-width: 860px){ .side-item{ display:none; } }
 
   /* The box that the assembled burger shrinks into and disappears behind,
      right at the tail of the same pinned scroll-jack — driven frame-by-frame
@@ -361,7 +353,6 @@
     opacity: 0;
     transform: translateY(-60%) scale(0.85);
   }
-  @media (max-width: 860px){ .mega-box{ display:none; } }
   @media (prefers-reduced-motion: reduce){ .mega-box{ display:none; } }
 
   /* Real WebGL 3D scene (progressive enhancement) — hidden until JS confirms
@@ -1942,17 +1933,6 @@ window.initBuilderBoxScene = function initBuilderBoxScene(canvas, photoImgs) {
   }
 
   function applyStackFrame(p, rigHeight) {
-    // On narrow viewports the rig switches to a plain static stack (see the
-    // 860px media query) — captions sit as normal text under each photo, and
-    // there's no pin/box stage at all. Skip the transform/opacity juggling.
-    if (window.matchMedia('(max-width: 860px)').matches) {
-      rigLayers.forEach((el) => { el.style.transform = ''; });
-      layerTags.forEach((el) => { el.style.transform = ''; el.style.opacity = ''; });
-      if (friesItem) { friesItem.style.opacity = ''; friesItem.style.transform = ''; }
-      if (drinkItem) { drinkItem.style.opacity = ''; drinkItem.style.transform = ''; }
-      return;
-    }
-
     const explodeT = p < 0.20
       ? smoothstep(0.00, 0.14, p)
       : 1 - smoothstep(0.20, 0.34, p);
