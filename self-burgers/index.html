@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SELF BURGERS — Built like SELF.</title>
+<meta name="description" content="Double smashed. Double cheese. Zero excuses. Smash burgers, fries and overtime shakes." />
+<meta name="theme-color" content="#0d0d0d" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+/* ═══════════════ Tokens ═══════════════ */
+:root {
+  --dark: #0d0d0d;
+  --light: #ececec;
+  --white: #fff;
+  --accent: #FF5A1F;
+  --accent-dark: #e24610;
+  --red: #D7263D;
+  --ink: #111;
+  --gap: 24px;
+  --margin: 40px;
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --header-h: 64px;
+  /* Print texture: 8% dark specks (for light type) and 8% light specks (for dark type). */
+  --noise-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 14 -8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
+  --noise-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 14 -8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
+}
+
+/* ═══════════════ Reset ═══════════════ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { overscroll-behavior: none; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--dark); color: var(--white);
+  font-family: "Inter", system-ui, sans-serif; font-size: 15px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+img, video { display: block; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* ═══════════════ Type ═══════════════ */
+.anton { font-family: "Anton", Impact, "Arial Narrow", sans-serif; font-weight: 400; text-transform: uppercase; letter-spacing: -0.01em; line-height: 0.88; }
+.label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; color: var(--accent); }
+/* Textured headline. Once split, the texture moves onto each char so hidden chars take it with them. */
+.tex, .tex.is-split .reveal-char { background: var(--white) var(--noise-dark); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.tex--dark, .tex--dark.is-split .reveal-char { background: var(--ink) var(--noise-light); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.tex.is-split, .tex--dark.is-split { background: none; }
+
+/* ═══════════════ Buttons ═══════════════ */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 22px; border-radius: 999px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; transition: transform .35s var(--ease-expo), background-color .25s var(--ease-expo), color .25s var(--ease-expo), border-color .25s var(--ease-expo); }
+.btn--fill { background: var(--accent); color: var(--white); }
+.btn--fill:hover { background: var(--accent-dark); transform: scale(1.04); }
+.btn--ghost { border: 1px solid currentColor; }
+.btn--ghost:hover { background: var(--white); color: var(--ink); border-color: var(--white); }
+.btn--sm { height: 36px; padding: 0 16px; font-size: 12px; }
+.btn--ink { border: 1px solid var(--ink); color: var(--ink); }
+.btn--ink:hover { background: var(--ink); color: var(--white); }
+
+/* ═══════════════ Preloader ═══════════════ */
+.preloader { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 300; pointer-events: none; transition: opacity .5s var(--ease-expo); }
+.preloader__bar { height: 100%; width: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left center; transition: transform .4s var(--ease-expo); }
+.preloader.is-done { opacity: 0; }
+
+/* ═══════════════ Header ═══════════════ */
+.header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--header-h); padding-inline: var(--margin); display: flex; align-items: center; justify-content: space-between; color: var(--white); background: transparent; transition: background-color .4s var(--ease-expo), color .4s var(--ease-expo), backdrop-filter .4s var(--ease-expo); }
+.header--light { background: rgba(255, 255, 255, 0.85); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: var(--ink); }
+.logo { display: inline-flex; align-items: center; gap: 10px; }
+.logo__badge { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: var(--white); display: grid; place-items: center; font-size: 14px; line-height: 1; }
+.logo__word { font-family: "Anton", Impact, sans-serif; font-size: 18px; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1; }
+.header__right { display: flex; align-items: center; gap: 32px; }
+.nav { display: flex; gap: 32px; }
+.nav a { font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; opacity: .9; transition: opacity .2s; }
+.nav a:hover { opacity: 1; color: var(--accent); }
+.header .btn--fill { height: auto; padding: 10px 20px; }
+
+/* ═══════════════ Story ═══════════════ */
+.story { position: relative; /* height set from the timeline constants in JS */ height: 2000vh; }
+.stage { position: sticky; top: 0; height: 100vh; overflow: hidden; background: var(--dark); }
+.stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: opacity, filter; opacity: 0; background: var(--dark); }
+.stage video.v1 { opacity: 1; }
+.stage__grad { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0, 0, 0, .55), transparent 40%); pointer-events: none; will-change: opacity; }
+.stage__fade { position: absolute; inset: 0; background: var(--light); opacity: 0; pointer-events: none; will-change: opacity; z-index: 20; }
+
+.layer { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--gap); padding-inline: var(--margin); pointer-events: none; z-index: 10; }
+.layer a, .layer button { pointer-events: auto; }
+.box { grid-row: 1; }
+.layer--hero .box { grid-column: 1 / 7; align-self: end; padding-bottom: 64px; will-change: transform; }
+.layer--hero h1 { font-size: clamp(64px, 9vw, 150px); margin-top: 16px; }
+.hero__ctas { display: flex; gap: 12px; margin-top: 28px; }
+.hero__caption { margin-top: 18px; font-size: 14px; opacity: .7; }
+.reveal-active .hero__caption.reveal-block { opacity: .7; }
+
+.layer--smash .box { grid-column: 9 / 13; align-self: center; }
+.layer--smash h2 { font-size: 72px; }
+.story-p { font-size: 15px; line-height: 1.55; max-width: 320px; margin-top: 20px; }
+.layer--smash .story-p { color: rgba(255, 255, 255, .85); }
+
+.layer--callouts { display: block; }
+.callout { position: absolute; left: 62%; display: flex; align-items: center; gap: 14px; color: var(--ink); transform: translateY(-50%); }
+.callout__line { width: 60px; height: 1px; background: var(--ink); transform: scaleX(0); transform-origin: left center; transition: transform .6s var(--ease-expo); flex: none; }
+.callout.reveal-active .callout__line { transform: scaleX(1); }
+.callout.reveal-exit .callout__line { transform: scaleX(0); transition-duration: .3s; }
+.callout__title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.callout__sub { font-size: 12px; opacity: .6; }
+.callout.reveal-active .callout__sub.reveal-block { opacity: .6; }
+
+.layer--stack .box { grid-column: 1 / 5; align-self: start; margin-top: 45vh; transform: translateY(-50%); color: var(--ink); }
+.layer--stack h2 { font-size: 88px; }
+.layer--stack .story-p { color: rgba(17, 17, 17, .8); }
+
+.layer--combo .box { grid-column: 9 / 13; align-self: end; margin-bottom: 18vh; }
+.layer--combo h2, .layer--shakes h2 { font-size: 64px; }
+.layer--combo .story-p, .layer--shakes .story-p { font-size: 14px; color: rgba(255, 255, 255, .85); }
+.price { width: fit-content; display: inline-block; margin-top: 18px; padding: 8px 16px; border-radius: 999px; background: var(--accent); color: var(--white); font-weight: 700; font-size: 15px; letter-spacing: .02em; }
+.layer--shakes .box { grid-column: 1 / 5; align-self: end; margin-bottom: 22vh; }
+
+/* ═══════════════ Reveal system ═══════════════ */
+.reveal-word, .reveal-char, .reveal-block { display: inline-block; opacity: 0; filter: blur(10px); transform: translate3d(0, 30px, 0); will-change: opacity, transform, filter; transition: opacity .3s var(--ease-expo), filter .3s var(--ease-expo), transform .3s var(--ease-expo); }
+.reveal-block { display: block; }
+.hero__ctas.reveal-block { display: flex; }
+.reveal-wordwrap { display: inline-block; white-space: nowrap; }
+.reveal-active .reveal-word, .reveal-active .reveal-char, .reveal-active .reveal-block, .reveal-active.reveal-block {
+  opacity: 1; filter: blur(0); transform: translate3d(0, 0, 0);
+  transition: opacity .5s var(--ease-expo), filter .5s var(--ease-expo), transform .5s var(--ease-expo);
+  transition-delay: calc(var(--i, 0) * var(--stagger, 0.04s));
+}
+.reveal-exit .reveal-word, .reveal-exit .reveal-char, .reveal-exit .reveal-block, .reveal-exit.reveal-block {
+  opacity: 0; filter: blur(9px); transform: translate3d(0, -28px, 0);
+  transition: opacity .3s var(--ease-expo), filter .3s var(--ease-expo), transform .3s var(--ease-expo);
+  transition-delay: calc(var(--i, 0) * 0.008s);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-word, .reveal-char, .reveal-block { filter: none !important; transform: none !important; transition-duration: .01s !important; transition-delay: 0s !important; }
+}
+
+/* ═══════════════ Lineup ═══════════════ */
+.lineup { position: relative; background: var(--light); color: var(--ink); padding: 160px var(--margin) 120px; }
+.lineup__title { text-align: center; font-size: clamp(80px, 14vw, 240px); }
+.lineup__sub { text-align: center; font-size: 16px; opacity: .6; margin: 24px 0 96px; }
+.row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+.row + .row { margin-top: 96px; }
+.row__label { grid-column: 1 / -1; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--accent); margin-bottom: 4px; }
+.card { display: flex; flex-direction: column; opacity: 0; transform: translate3d(0, 40px, 0); filter: blur(8px); transition: opacity .8s var(--ease-expo), transform .8s var(--ease-expo), filter .8s var(--ease-expo); transition-delay: calc(var(--i, 0) * 0.08s); }
+.card.is-in { opacity: 1; transform: none; filter: blur(0); }
+.card__media { position: relative; aspect-ratio: 4 / 3; border-radius: 6px; overflow: hidden; background: #1a1a1a; }
+.card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .9s var(--ease-expo); }
+.card:hover .card__media img, .card:hover .card__ph { transform: scale(1.06); }
+.card__ph { position: absolute; inset: 0; display: grid; place-items: center; font-size: 64px; background: radial-gradient(120% 90% at 30% 20%, #2a2a2a 0%, #141414 55%, #0a0a0a 100%); transition: transform .9s var(--ease-expo); }
+.card__name { font-size: 34px; margin-top: 22px; }
+.card__desc { font-size: 13px; opacity: .6; margin-top: 10px; min-height: 2.8em; }
+.sizes { margin: 18px 0 20px; font-size: 13px; }
+.sizes li { display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid rgba(17, 17, 17, .15); }
+.sizes li:last-child { border-bottom: 1px solid rgba(17, 17, 17, .15); }
+.sizes span:last-child { font-weight: 600; font-variant-numeric: tabular-nums; }
+.card .btn { align-self: flex-start; margin-top: auto; }
+
+/* ═══════════════ Footer ═══════════════ */
+.footer { background: var(--dark); color: var(--white); padding: 80px var(--margin); overflow: hidden; }
+.footer__mark { font-size: 12vw; white-space: nowrap; line-height: .85; display: block; text-align: center; }
+.footer__row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px 32px; margin-top: 48px; font-size: 13px; }
+.footer__row > * { opacity: .6; }
+.footer__social { display: flex; gap: 20px; }
+.footer__social a:hover { color: var(--accent); opacity: 1; }
+
+/* ═══════════════ Dev grid ═══════════════ */
+.devgrid { position: fixed; inset: 0; z-index: 400; display: none; grid-template-columns: repeat(12, 1fr); column-gap: var(--gap); padding-inline: var(--margin); pointer-events: none; }
+.devgrid.on { display: grid; }
+.devgrid span { background: rgba(255, 0, 0, .1); }
+
+/* ═══════════════ Responsive ═══════════════ */
+@media (max-width: 768px) {
+  :root { --margin: 16px; --gap: 12px; }
+  .nav { display: none; }
+  .stage video { object-position: center; }
+  .layer .box { grid-column: 1 / -1 !important; align-self: end !important; margin: 0 0 12vh !important; padding-bottom: 0 !important; }
+  .layer--stack .box { transform: none; }
+  .layer--hero h1 { font-size: 56px; }
+  .layer--smash h2, .layer--stack h2, .layer--combo h2, .layer--shakes h2 { font-size: 44px; }
+  .story-p { max-width: none; }
+  .hero__ctas { flex-wrap: wrap; }
+  .layer--callouts { top: auto; bottom: 12vh; left: var(--margin); right: var(--margin); inset-inline: var(--margin); height: auto; display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; }
+  .callout { position: static; transform: none; gap: 0; }
+  .callout__line { display: none; }
+  .callout__title, .callout__sub { font-size: 11px; }
+  .callout__text { display: flex; gap: 8px; flex-wrap: wrap; }
+  .row { grid-template-columns: 1fr; gap: 56px; }
+  .lineup { padding-top: 120px; }
+}
+@media (max-width: 480px) {
+  .layer--hero h1 { font-size: 44px; }
+  .lineup__title { font-size: 72px; }
+}
+</style>
+</head>
+<body>
+<div class="preloader" data-preloader><div class="preloader__bar" data-preloader-bar></div></div>
+<div class="devgrid" data-devgrid aria-hidden="true"></div>
+
+<!-- ═══════════════ Header ═══════════════ -->
+<header class="header" data-header>
+  <a href="#top" class="logo" aria-label="SELF BURGERS home">
+    <span class="logo__badge" aria-hidden="true">★</span>
+    <span class="logo__word" data-bind="brand"></span>
+  </a>
+  <div class="header__right">
+    <nav class="nav" aria-label="Primary" data-nav></nav>
+    <a href="#lineup" class="btn btn--fill" data-bind="orderCta"></a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- ═══════════════ Scroll story ═══════════════ -->
+  <section class="story" data-story aria-label="The SELF BURGERS story">
+    <div class="stage">
+      <video class="v4" data-video="3" muted playsinline preload="auto" aria-hidden="true"></video>
+      <video class="v3" data-video="2" muted playsinline preload="auto" aria-hidden="true"></video>
+      <video class="v2" data-video="1" muted playsinline preload="auto" aria-hidden="true"></video>
+      <video class="v1" data-video="0" muted playsinline preload="auto" aria-hidden="true"></video>
+      <div class="stage__grad" data-grad></div>
+
+      <!-- A. Hero -->
+      <div class="layer layer--hero" data-layer="hero">
+        <div class="box" data-hero-box>
+          <p class="label reveal-block" data-bind="hero.label"></p>
+          <h1 class="anton tex" data-bind-html="hero.title" data-split="chars"></h1>
+          <div class="hero__ctas reveal-block">
+            <a href="#lineup" class="btn btn--fill" data-bind="hero.primary"></a>
+            <a href="#lineup" class="btn btn--ghost" data-bind="hero.secondary"></a>
+          </div>
+          <p class="hero__caption reveal-block" data-bind="hero.caption"></p>
+        </div>
+      </div>
+
+      <!-- B. Smashed to order -->
+      <div class="layer layer--smash" data-layer="smash">
+        <div class="box">
+          <h2 class="anton tex" data-bind-html="smash.title" data-split="chars"></h2>
+          <p class="story-p" data-bind="smash.body" data-split="words"></p>
+        </div>
+      </div>
+
+      <!-- C. Ingredient callouts -->
+      <div class="layer layer--callouts" data-callouts aria-label="Ingredients"></div>
+
+      <!-- D. The stack -->
+      <div class="layer layer--stack" data-layer="stack">
+        <div class="box">
+          <h2 class="anton tex--dark" data-bind-html="stack.title" data-split="chars"></h2>
+          <p class="story-p" data-bind="stack.body" data-split="words"></p>
+        </div>
+      </div>
+
+      <!-- E. Game day combo -->
+      <div class="layer layer--combo" data-layer="combo">
+        <div class="box">
+          <h2 class="anton tex" data-bind-html="combo.title" data-split="chars"></h2>
+          <p class="story-p" data-bind="combo.body" data-split="words"></p>
+          <span class="price reveal-block" data-bind="combo.price"></span>
+        </div>
+      </div>
+
+      <!-- F. Overtime shakes -->
+      <div class="layer layer--shakes" data-layer="shakes">
+        <div class="box">
+          <h2 class="anton tex" data-bind-html="shakes.title" data-split="chars"></h2>
+          <p class="story-p" data-bind="shakes.body" data-split="words"></p>
+        </div>
+      </div>
+
+      <div class="stage__fade" data-stage-fade></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ The Lineup ═══════════════ -->
+  <section class="lineup" id="lineup" data-lineup aria-labelledby="lineup-title">
+    <h2 class="anton tex--dark lineup__title" id="lineup-title" data-bind="lineup.title" data-lineup-title></h2>
+    <p class="lineup__sub" data-bind="lineup.sub"></p>
+    <div class="row" data-row="burgers"></div>
+    <div class="row" data-row="sides"></div>
+  </section>
+</main>
+
+<!-- ═══════════════ Footer ═══════════════ -->
+<footer class="footer" data-footer>
+  <span class="anton tex footer__mark" data-bind="brand" aria-hidden="true"></span>
+  <div class="footer__row">
+    <p data-bind="footer.address"></p>
+    <p data-bind="footer.hours"></p>
+    <ul class="footer__social" data-social></ul>
+    <p data-bind="footer.copyright"></p>
+  </div>
+</footer>
+
+<script type="module">
+/* ═════════════════════════════════════════════════════════════
+   CONFIG — every brand name, line of copy, asset path and timing
+   constant lives here. Edit freely.
+   ═════════════════════════════════════════════════════════════ */
+const CONFIG = {
+  brand: "SELF BURGERS",
+  tagline: "Built like SELF.",
+  orderCta: "Order now",
+  nav: [
+    { label: "Menu", href: "#lineup" },
+    { label: "Combos", href: "#lineup" },
+    { label: "Locations", href: "#footer" },
+    { label: "About", href: "#top" },
+  ],
+  videos: [
+    "/videos/hero.mp4",    // VIDEO_1_URL
+    "/videos/explode.mp4", // VIDEO_2_URL
+    "/videos/combo.mp4",   // VIDEO_3_URL
+    "/videos/box.mp4",     // VIDEO_4_URL
+  ],
+  hero: {
+    label: "★ SMASHED FRESH DAILY",
+    title: "BUILT LIKE<br>SELF.",
+    primary: "Order now",
+    secondary: "See the menu",
+    caption: "Double smashed. Double cheese. Zero excuses.",
+  },
+  smash: {
+    title: "SMASHED<br>TO ORDER",
+    body: "Two 100% beef patties smashed thin on a screaming-hot griddle for crispy lace edges, stacked with melted cheddar, bacon, grilled onions and house sauce.",
+  },
+  callouts: [
+    { title: "BUTTER-TOASTED BUN", sub: "Brioche, toasted on the flat-top", top: 22 },
+    { title: "CHEDDAR, TWICE", sub: "Two slices melted to the edge", top: 36 },
+    { title: "APPLEWOOD BACON", sub: "Thick-cut, extra crispy", top: 50 },
+    { title: "SMASHED PATTY", sub: "Fresh beef, lace-crispy edges", top: 64 },
+    { title: "SELF SAUCE", sub: "Secret recipe. Don't ask.", top: 78 },
+  ],
+  stack: {
+    title: "THE STACK",
+    body: "Burger. Fries. Shake. The starting five of lunch — minus two.",
+  },
+  combo: {
+    title: "GAME DAY<br>COMBO",
+    body: "Burger, sauces, fries and a cookie shake packed hot for pickup or delivery.",
+    price: "$18.99",
+  },
+  shakes: {
+    title: "OVERTIME<br>SHAKES",
+    body: "Oreo, Biscoff and strawberry shakes blended thick for the final buzzer.",
+  },
+  lineup: {
+    title: "THE LINEUP.",
+    sub: "Pick your player.",
+    addLabel: "Add to order",
+    burgersLabel: "Burgers",
+    sidesLabel: "Sides & Shakes",
+    burgers: [
+      { name: "FREE THROW SHOT BURGER", desc: "Single smash, American cheese, pickles, SELF sauce.", img: "/images/burger-1.jpg", // IMG_1
+        sizes: [["Single", "$7.46"], ["Double", "$10.34"], ["Triple", "$13.79"]] },
+      { name: "LAYUP BURGER", desc: "Bacon, cheddar, grilled onions, BBQ glaze.", img: "/images/burger-2.jpg", // IMG_2
+        sizes: [["Single", "$9.19"], ["Double", "$13.79"], ["Triple", "$16.69"]] },
+      { name: "HOOK SHOT BURGER", desc: "Jalapeños, pepper jack, crispy onions, chipotle mayo.", img: "/images/burger-3.jpg", // IMG_3
+        sizes: [["Single", "$14.04"], ["Double", "$19.54"], ["Triple", "$22.10"]] },
+    ],
+    sides: [
+      { name: "TIMEOUT FRIES", desc: "Skin-on, sea salt.", img: "/images/fries.jpg", emoji: "🍟", // IMG_4
+        sizes: [["Regular", "$3.16"], ["Large", "$4.49"]] },
+      { name: "SELF LOADED FRIES", desc: "Cheese sauce, bacon, pickles, SELF sauce.", img: "/images/loaded-fries.jpg", emoji: "🍟", // IMG_5
+        sizes: [["One size", "$6.99"]] },
+      { name: "OVERTIME MILKSHAKES", desc: "Oreo / Biscoff / Strawberry.", img: "/images/shakes.jpg", emoji: "🥤", // IMG_6
+        sizes: [["Regular", "$5.99"], ["Large", "$6.99"]] },
+    ],
+  },
+  footer: {
+    address: "123 Main Street, Your City",
+    hours: "Mon–Sun 11:00–23:00",
+    social: [
+      { label: "Instagram", href: "https://instagram.com" },
+      { label: "TikTok", href: "https://tiktok.com" },
+      { label: "X", href: "https://x.com" },
+    ],
+    copyright: "© 2026",
+  },
+  /* Timeline, in viewport heights. Boundaries are derived from these. */
+  timeline: { SCRUB1: 3, FADE1: 1.5, SCRUB2: 5, FADE2: 1.5, SCRUB3: 4, FADE3: 1.5, SCRUB4: 3, END: 0.5 },
+  /* Scrub engine. */
+  scrub: { lerp: 0.09, minDrift: 0.02, minSeekGap: 30 },
+  preloaderFallback: 6000,
+};
+
+/* ═════════════════════════════ Helpers ═════════════════════════════ */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+const prog = (t, a, b) => clamp01((t - a) / (b - a));
+const get = (path) => path.split(".").reduce((o, k) => o?.[k], CONFIG);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+/* ═════════════════════════════ Bind copy ═════════════════════════════ */
+$$("[data-bind]").forEach((el) => { el.textContent = get(el.dataset.bind); });
+$$("[data-bind-html]").forEach((el) => { el.innerHTML = get(el.dataset.bindHtml); });
+document.title = `${CONFIG.brand} — ${CONFIG.tagline}`;
+$("[data-nav]").innerHTML = CONFIG.nav.map((n) => `<a href="${esc(n.href)}">${esc(n.label)}</a>`).join("");
+$("[data-social]").innerHTML = CONFIG.footer.social.map((s) => `<li><a href="${esc(s.href)}" target="_blank" rel="noopener">${esc(s.label)}</a></li>`).join("");
+$("[data-footer]").id = "footer";
+
+$("[data-callouts]").innerHTML = CONFIG.callouts.map((c, i) => `
+  <div class="callout" data-callout="${i}" style="top:${c.top}%">
+    <span class="callout__line" aria-hidden="true"></span>
+    <div class="callout__text">
+      <p class="callout__title reveal-block" style="--i:0">${esc(c.title)}</p>
+      <p class="callout__sub reveal-block" style="--i:1">${esc(c.sub)}</p>
+    </div>
+  </div>`).join("");
+
+/* ═════════════════════════════ Reveal system ═════════════════════════════ */
+/**
+ * Splits an element's text into words or chars, each an inline-block span
+ * carrying --i. Line breaks (<br>) are kept. The element gets --stagger.
+ */
+function splitReveal(el, mode = "words", stagger = mode === "chars" ? 0.025 : 0.04) {
+  const nodes = [...el.childNodes];
+  el.textContent = "";
+  el.style.setProperty("--stagger", `${stagger}s`);
+  el.setAttribute("aria-label", nodes.map((n) => (n.nodeType === 3 ? n.textContent : " ")).join("").replace(/\s+/g, " ").trim());
+  let i = 0;
+  for (const node of nodes) {
+    if (node.nodeType !== 3) { el.appendChild(node.cloneNode(true)); continue; }
+    const parts = node.textContent.split(/(\s+)/);
+    for (const part of parts) {
+      if (!part) continue;
+      if (/^\s+$/.test(part)) { el.appendChild(document.createTextNode(" ")); continue; }
+      if (mode === "chars") {
+        const wrap = document.createElement("span");
+        wrap.className = "reveal-wordwrap";
+        wrap.setAttribute("aria-hidden", "true");
+        for (const ch of part) {
+          const s = document.createElement("span");
+          s.className = "reveal-char";
+          s.textContent = ch;
+          s.style.setProperty("--i", i++);
+          wrap.appendChild(s);
+        }
+        el.appendChild(wrap);
+      } else {
+        const s = document.createElement("span");
+        s.className = "reveal-word";
+        s.setAttribute("aria-hidden", "true");
+        s.textContent = part;
+        s.style.setProperty("--i", i++);
+        el.appendChild(s);
+      }
+    }
+  }
+  el.classList.add("is-split");
+  return i;
+}
+$$("[data-split]").forEach((el) => splitReveal(el, el.dataset.split));
+
+/* Blocks inside a layer: number the non-split pieces after the split ones so they arrive last. */
+$$(".layer .box").forEach((box) => {
+  let order = 0;
+  for (const child of box.children) {
+    if (child.classList.contains("reveal-block")) child.style.setProperty("--i", order);
+    order += child.dataset.split ? 3 : 1;
+  }
+  box.style.setProperty("--stagger", "0.06s");
+});
+
+/** Three-state toggle: before the range → hidden, inside → active, after → exit. */
+function setState(el, state) {
+  if (el._state === state) return;
+  el._state = state;
+  el.classList.toggle("reveal-active", state === "active");
+  el.classList.toggle("reveal-exit", state === "exit");
+}
+const rangeState = (t, a, b) => (t < a ? "hidden" : t <= b ? "active" : "exit");
+
+/* ═════════════════════════════ Lineup ═════════════════════════════ */
+const cardHTML = (item, i, fallbackEmoji) => `
+  <article class="card" style="--i:${i}">
+    <div class="card__media">
+      <img src="${esc(item.img)}" alt="${esc(item.name)}" loading="lazy" decoding="async" data-fallback="${esc(item.emoji || fallbackEmoji)}" />
+    </div>
+    <h3 class="anton card__name">${esc(item.name)}</h3>
+    <p class="card__desc">${esc(item.desc)}</p>
+    <ul class="sizes">${item.sizes.map(([k, v]) => `<li><span>${esc(k)}</span><span>${esc(v)}</span></li>`).join("")}</ul>
+    <button type="button" class="btn btn--sm btn--ink">${esc(CONFIG.lineup.addLabel)}</button>
+  </article>`;
+$('[data-row="burgers"]').innerHTML = `<p class="row__label">${esc(CONFIG.lineup.burgersLabel)}</p>` + CONFIG.lineup.burgers.map((b, i) => cardHTML(b, i, "🍔")).join("");
+$('[data-row="sides"]').innerHTML = `<p class="row__label">${esc(CONFIG.lineup.sidesLabel)}</p>` + CONFIG.lineup.sides.map((b, i) => cardHTML(b, i, "🍔")).join("");
+/* Missing image → dark gradient block with an emoji. */
+$$(".card__media img").forEach((img) => {
+  const fail = () => {
+    const ph = document.createElement("div");
+    ph.className = "card__ph";
+    ph.setAttribute("role", "img");
+    ph.setAttribute("aria-label", img.alt);
+    ph.textContent = img.dataset.fallback || "🍔";
+    img.replaceWith(ph);
+  };
+  if (img.complete && img.naturalWidth === 0) fail();
+  else img.addEventListener("error", fail, { once: true });
+});
+const lineupTitle = $("[data-lineup-title]");
+splitReveal(lineupTitle, "chars", 0.025);
+new IntersectionObserver((entries, io) => {
+  for (const e of entries) if (e.isIntersecting) { lineupTitle.classList.add("reveal-active"); io.disconnect(); }
+}, { threshold: 0.3 }).observe(lineupTitle);
+const cardIO = new IntersectionObserver((entries) => {
+  for (const e of entries) if (e.isIntersecting) { e.target.classList.add("is-in"); cardIO.unobserve(e.target); }
+}, { threshold: 0.15 });
+$$(".card").forEach((c) => cardIO.observe(c));
+
+/* ═════════════════════════════ Timeline ═════════════════════════════ */
+const T = CONFIG.timeline;
+const B = {};
+{
+  let at = 0;
+  const seq = [["SCRUB1", "p1"], ["FADE1", "f1"], ["SCRUB2", "p2"], ["FADE2", "f2"], ["SCRUB3", "p3"], ["FADE3", "f3"], ["SCRUB4", "p4"], ["END", "end"]];
+  for (const [key, name] of seq) { B[name] = [at, at + T[key]]; at += T[key]; }
+  B.total = at;
+}
+const story = $("[data-story]");
+story.style.height = `${B.total * 100}vh`;
+
+/* ═════════════════════════════ Video scrub engine ═════════════════════════════ */
+const videoEls = CONFIG.videos.map((_, i) => $(`[data-video="${i}"]`));
+class Scrubber {
+  constructor(video) {
+    this.video = video;
+    this.target = 0;
+    this.current = 0;
+    this.lastSeek = 0;
+    this.active = true;
+  }
+  get duration() {
+    const d = this.video.duration;
+    return Number.isFinite(d) && d > 0 ? d : 0;
+  }
+  /** Sets the target from 0..1 of the clip. */
+  aim(p) { this.target = p * Math.max(0, this.duration - 0.04); }
+  step(now) {
+    const diff = this.target - this.current;
+    this.current = Math.abs(diff) < 0.001 ? this.target : this.current + diff * CONFIG.scrub.lerp;
+    const v = this.video;
+    if (!this.active || v.readyState < 1) return true;
+    const drift = Math.abs(v.currentTime - this.current);
+    if (drift > CONFIG.scrub.minDrift && now - this.lastSeek >= CONFIG.scrub.minSeekGap) {
+      if (typeof v.fastSeek === "function" && drift > 1) v.fastSeek(this.current);
+      else v.currentTime = this.current;
+      this.lastSeek = now;
+    }
+    return this.current === this.target && Math.abs(v.currentTime - this.target) <= CONFIG.scrub.minDrift;
+  }
+}
+const scrubbers = videoEls.map((v) => new Scrubber(v));
+let rafId = 0;
+const loop = (now) => {
+  let settled = true;
+  for (const s of scrubbers) if (s.active && !s.step(now)) settled = false;
+  rafId = settled ? 0 : requestAnimationFrame(loop);
+};
+const kick = () => { if (!rafId) rafId = requestAnimationFrame(loop); };
+
+/* Load + prime. iOS Safari will not paint a seek until the element has played once. */
+let loadedCount = 0;
+const bar = $("[data-preloader-bar]");
+const preloader = $("[data-preloader]");
+let pageReady = false;
+const markLoaded = () => {
+  loadedCount++;
+  bar.style.transform = `scaleX(${loadedCount / videoEls.length})`;
+  if (loadedCount >= videoEls.length) finishLoading();
+};
+function finishLoading() {
+  if (pageReady) return;
+  pageReady = true;
+  bar.style.transform = "scaleX(1)";
+  setTimeout(() => preloader.classList.add("is-done"), 250);
+  update();
+}
+videoEls.forEach((v, i) => {
+  let counted = false;
+  const once = () => { if (!counted) { counted = true; markLoaded(); } };
+  v.addEventListener("loadedmetadata", () => {
+    const p = v.play();
+    if (p && p.then) p.then(() => { v.pause(); update(); }).catch(() => {});
+    else v.pause();
+    update();
+  }, { once: true });
+  v.addEventListener("canplaythrough", once, { once: true });
+  v.addEventListener("error", once, { once: true });
+  v.src = CONFIG.videos[i];
+  v.load();
+});
+setTimeout(finishLoading, CONFIG.preloaderFallback);
+
+/* ═════════════════════════════ Scroll → timeline ═════════════════════════════ */
+const header = $("[data-header]");
+const grad = $("[data-grad]");
+const fade = $("[data-stage-fade]");
+const heroBox = $("[data-hero-box]");
+const layers = Object.fromEntries($$("[data-layer]").map((el) => [el.dataset.layer, el]));
+const callouts = $$("[data-callout]");
+const lineup = $("[data-lineup]");
+const footer = $("[data-footer]");
+const [v1, v2, v3, v4] = videoEls;
+const [s1, s2, s3, s4] = scrubbers;
+/* Each video's visible window, padded by one fade either side, decides whether it decodes. */
+const windows = [[B.p1[0], B.f1[1]], [B.f1[0], B.f2[1]], [B.f2[0], B.f3[1]], [B.f3[0], B.end[1]]];
+const PAD = Math.max(T.FADE1, T.FADE2, T.FADE3);
+
+let queued = false;
+const onScroll = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; update(); }); } };
+
+function update() {
+  const vh = window.innerHeight;
+  const rect = story.getBoundingClientRect();
+  const scrollable = rect.height - vh;
+  const t = clamp01(-rect.top / scrollable) * B.total;
+
+  // Phase progress.
+  const p1 = prog(t, ...B.p1), f1 = prog(t, ...B.f1);
+  const p2 = prog(t, ...B.p2), f2 = prog(t, ...B.f2);
+  const p3 = prog(t, ...B.p3), f3 = prog(t, ...B.f3);
+  const p4 = prog(t, ...B.p4), end = prog(t, ...B.end);
+
+  // Scrub targets (only these are set on scroll; the RAF loop does the seeking).
+  s1.aim(p1);
+  s2.aim(Math.min(1, p2 / 0.85));
+  s3.aim(p3);
+  s4.aim(p4);
+  scrubbers.forEach((s, i) => { s.active = t >= windows[i][0] - PAD && t <= windows[i][1] + PAD; });
+  kick();
+
+  // Video opacities.
+  v1.style.opacity = 1 - f1;
+  v1.style.filter = f1 > 0 ? `blur(${f1 * 40}px)` : "none";
+  v2.style.opacity = t < B.f2[0] ? f1 : 1 - f2;
+  v3.style.opacity = t < B.f3[0] ? f2 : 1 - f3;
+  v4.style.opacity = f3;
+
+  // Light phase: from 40% of the explode scrub until the box scene at 55% of the combo scrub.
+  const lightStart = B.p2[0] + 0.4 * T.SCRUB2;
+  const lightEnd = B.p3[0] + 0.55 * T.SCRUB3;
+  const inLight = t >= lightStart && t < lightEnd;
+  const gradOut = prog(t, B.p2[0] + 0.3 * T.SCRUB2, lightStart);
+  const gradIn = prog(t, lightEnd - 0.3, lightEnd);
+  grad.style.opacity = t < lightEnd - 0.3 ? 1 - gradOut : gradIn;
+  fade.style.opacity = end;
+
+  // A. Hero: after the preloader, visible for the first 70% of phase 1, then leaves word by word and drifts up.
+  setState(layers.hero, !pageReady ? "hidden" : p1 < 0.7 && t < B.p1[1] ? "active" : "exit");
+  heroBox.style.transform = `translate3d(0, ${-120 * prog(p1, 0.7, 1)}px, 0)`;
+  // B. Smashed to order: 0–30% of phase 2 (arrives during the fade into it).
+  setState(layers.smash, rangeState(t, B.f1[0] + 0.5 * T.FADE1, B.p2[0] + 0.3 * T.SCRUB2));
+  // C. Callouts: 45–95% of phase 2, staggered by 0.08 of phase progress.
+  callouts.forEach((el, i) => {
+    const a = B.p2[0] + (0.45 + i * 0.08) * T.SCRUB2;
+    setState(el, rangeState(t, a, B.p2[0] + 0.95 * T.SCRUB2));
+  });
+  // D. The stack: 5–45% of phase 3. E. Game day combo: 60–100%.
+  setState(layers.stack, rangeState(t, B.p3[0] + 0.05 * T.SCRUB3, B.p3[0] + 0.45 * T.SCRUB3));
+  setState(layers.combo, rangeState(t, B.p3[0] + 0.6 * T.SCRUB3, B.p3[1]));
+  // F. Overtime shakes: 20–90% of phase 4.
+  setState(layers.shakes, rangeState(t, B.p4[0] + 0.2 * T.SCRUB4, B.p4[0] + 0.9 * T.SCRUB4));
+
+  // Header: story phases while the stage is pinned, otherwise whatever section is under it.
+  let light;
+  if (rect.bottom > 32) light = inLight || end > 0.5;
+  else {
+    const f = footer.getBoundingClientRect();
+    light = !(f.top <= 32 && f.bottom > 32) && lineup.getBoundingClientRect().top <= 32;
+  }
+  header.classList.toggle("header--light", light);
+}
+window.addEventListener("scroll", onScroll, { passive: true });
+window.addEventListener("resize", onScroll);
+
+/* ═════════════════════════════ Anchors + dev grid ═════════════════════════════ */
+$$('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
+  const id = a.getAttribute("href");
+  const target = id.length > 1 && document.querySelector(id);
+  if (!target) return;
+  e.preventDefault();
+  window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY, behavior: "smooth" });
+}));
+const devgrid = $("[data-devgrid]");
+devgrid.innerHTML = "<span></span>".repeat(12);
+window.addEventListener("keydown", (e) => {
+  if ((e.key === "g" || e.key === "G") && !e.metaKey && !e.ctrlKey && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName)) devgrid.classList.toggle("on");
+});
+
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+window.scrollTo(0, 0);
+update();
+</script>
+</body>
+</html>
