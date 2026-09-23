@@ -608,7 +608,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
       <p class="fine discount" data-discount></p>
       <p class="fine hint-line" data-need>Нужны булочка и хотя бы одна котлета.</p>
       <div class="receipt-actions">
-        <button type="button" class="pill pill--filled" data-checkout disabled>ОФОРМИТЬ</button>
+        <button type="button" class="pill pill--filled" data-checkout disabled>ЗАКАЗАТЬ В WHATSAPP</button>
         <button type="button" class="reset fine" data-reset>СБРОСИТЬ</button>
       </div>
       <p class="fine copied" data-copied role="status"></p>
@@ -631,6 +631,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
       <dl class="contacts fine">
         <div><dt>АДРЕС</dt><dd>Астана, ул. Бұқарбай батыра, 22</dd></div>
         <div><dt>РЕЖИМ РАБОТЫ</dt><dd>Ежедневно, 11:00–05:00</dd></div>
+        <div><dt>WHATSAPP</dt><dd><a href="https://wa.me/77080080853" target="_blank" rel="noopener">+7 708 008 0853</a></dd></div>
         <div><dt>САМОВЫВОЗ</dt><dd>Готовность за 20 минут, скидка −10%</dd></div>
       </dl>
       <div class="ctas"><a href="#build" class="pill pill--filled" data-pill>САМОВЫВОЗ −10%</a><a href="#build" class="pill pill--outline" data-pill>ДОСТАВКА</a></div>
@@ -1518,6 +1519,7 @@ const MENU = [
     ]],
   ] },
 ];
+const WHATSAPP = "77080080853"; // +7 708 008 0853
 const COMBOS = [
   { photo: "card-burger.jpg", name: "Классика Self", items: ["bun-sesame", "beef", "cheese", "tomato", "iceberg", "red-onion", "bbq"] },
   { photo: "burger-exploded.jpg", name: "Кантри с курицей", items: ["bun-brioche", "fillet", "cheese", "iceberg", "tomato", "caramel-onion", "ranch"] },
@@ -1766,13 +1768,16 @@ const loadCombo = (c) => {
     renderOrder();
   }));
   $("[data-reset]").addEventListener("click", () => loadCombo({ items: [] }));
-  checkout.addEventListener("click", async () => {
+  checkout.addEventListener("click", () => {
     const items = lineItems();
     const sum = items.reduce((t, [it, q]) => t + it.price * q, 0);
     const pickup = order.mode === "pickup";
-    const text = [`SELF — мой заказ (${pickup ? "самовывоз" : "доставка"})`, ...items.map(([it, q]) => `• ${it.name} ${it.wt}${q > 1 ? ` × ${q}` : ""} — ${tg(it.price * q)} тг`), `Итого: ${tg(pickup ? Math.round(sum * 0.9) : sum)} тг`].join("\n");
-    try { await navigator.clipboard.writeText(text); copied.textContent = "Состав заказа скопирован — отправь его нам или назови на кассе."; }
-    catch { copied.textContent = "Состав заказа готов: назови его на кассе или курьеру."; }
+    const text = [`SELF — мой заказ (${pickup ? "самовывоз" : "доставка"})`, ...items.map(([it, q]) => `• ${it.name} ${it.wt}${q > 1 ? ` × ${q}` : ""} — ${tg(it.price * q)} тг`), `Итого: ${tg(pickup ? Math.round(sum * 0.9) : sum)} тг${pickup ? " (скидка 10% за самовывоз)" : ""}`, pickup ? "Заберу с ул. Бұқарбай батыра, 22" : "Адрес доставки: "].join("\n");
+    // The order goes straight to the SELF WhatsApp chat, ready to send.
+    const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
+    const win = window.open(url, "_blank", "noopener");
+    if (!win) location.href = url;
+    copied.textContent = "Открываем WhatsApp — останется нажать «Отправить».";
   });
   pill(checkout);
   pill($("[data-bar-go]"));
