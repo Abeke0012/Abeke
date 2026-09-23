@@ -1,0 +1,1415 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SELF — Smash Burgers, Built Like You</title>
+<meta name="description" content="Double smashed. Double cheese. Zero excuses. Order the Game Day Combo ahead and skip the line — open daily 11:00–23:00.">
+<meta name="theme-color" content="#0b0b0b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": { "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.mjs" } }
+</script>
+<style>
+:root {
+  --font-display: "Anton", "Impact", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+}
+:root {
+  /* Palette */
+  --raw-color-char-950: #0b0b0b;
+  --raw-color-char-900: #161514;
+  --raw-color-paper-50: #f1efec;
+  --raw-color-paper-100: #e6e3de;
+  --raw-color-ink-950: #111111;
+  --raw-color-white: #ffffff;
+  --raw-color-flame-500: #ff5a1f;
+  --raw-color-flame-600: #e64a12;
+  --raw-color-ketchup-600: #d7263d;
+  --raw-color-bun-400: #e8a04a;
+  --raw-color-cheese-400: #f5b82e;
+  --raw-color-patty-900: #3b2416;
+  --raw-color-sauce-500: #e0703a;
+  --raw-color-onion-500: #c98b4a;
+  --raw-color-bun-500: #d98e3e;
+  --raw-duration-fast: 150ms;
+  --raw-duration-normal: 250ms;
+  /* Type scale — board px / 16 */
+  --raw-font-size-fine: 0.75rem;
+  --raw-font-size-label: 0.875rem;
+  --raw-font-size-base: 1rem;
+  --raw-font-size-lede: 1.125rem;
+  --raw-font-size-card: 2.25rem;
+  --raw-font-size-chapter: 5rem;
+  --raw-font-size-display: 9.375rem;
+  --raw-font-size-lineup: 15rem;
+  --raw-font-size-footer-mark: 22rem;
+  --raw-font-size-count: 11rem;
+  --raw-font-size-display-phone: 3.5rem;
+  --raw-font-size-chapter-phone: 2.75rem;
+  --raw-font-size-lineup-phone: 4.5rem;
+  --raw-font-size-display-tablet: 6rem;
+  --raw-font-size-chapter-tablet: 3.75rem;
+  --raw-font-size-lineup-tablet: 9rem;
+  --raw-leading-display: 0.88;
+  --raw-leading-reveal: 1.1;
+  --raw-leading-copy: 1.35;
+  --raw-tracking-display: -0.005em;
+  --raw-tracking-label: 0.12em;
+  /* Board geometry (1440×800) */
+  --raw-size-gutter: 2.5rem;
+  --raw-size-header-y: 1.5rem;
+  --raw-size-header-h: 2.5rem;
+  --raw-size-hero-copy: 36rem;
+  --raw-size-hero-copy-y: 11.5rem;
+  --raw-size-chapter-copy: 26rem;
+  --raw-size-chapter-lede: 21rem;
+  --raw-size-callout-line: 3.5rem;
+  --raw-size-counter-x: 2.5rem;
+  --raw-size-dot: 0.375rem;
+  --raw-size-cta-h: 3rem;
+  --raw-size-card-h: 32rem;
+  --raw-size-card-media: 20rem;
+  --raw-size-footer-h: 30rem;
+  /* Story */
+  --raw-size-story-track: 900lvh;
+}
+:root {
+  --background: var(--raw-color-char-950);
+  --foreground: var(--raw-color-white);
+  --surface-inverse: var(--raw-color-paper-50);
+  --foreground-inverse: var(--raw-color-ink-950);
+  --accent: var(--raw-color-flame-500);
+  --accent-strong: var(--raw-color-flame-600);
+  --ease-entrance: cubic-bezier(0.2, 0, 0, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ink-noise-dark: none;  /* white ink on char — generated at boot */
+  --ink-noise-light: none; /* ink on paper — generated at boot */
+  --ink-noise: var(--ink-noise-dark);
+}
+body { background: var(--background); color: var(--foreground); font-family: var(--font-sans);
+       min-height: 100lvh; width: 100%; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+/* Root size */
+html { font-size: 16px; }
+@media (max-width: 1439.98px) { html { font-size: calc(16px - (1440px - 100vw) / 128.57); } }
+@media (max-width: 1023.98px) { html { font-size: 16px; } }
+@media (max-width: 639.98px) { html { font-size: 4.444444vw; } }
+
+/* Lenis */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* Reset */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+img { display: block; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+/* Type */
+.mono { font-family: var(--font-mono); }
+.label { font-family: var(--font-mono); font-size: var(--raw-font-size-label); text-transform: uppercase; letter-spacing: var(--raw-tracking-label); line-height: 1.3; }
+.fine { font-family: var(--font-mono); font-size: var(--raw-font-size-fine); text-transform: uppercase; letter-spacing: var(--raw-tracking-label); line-height: 1.3; }
+.display { font-family: var(--font-display); font-weight: 400; text-transform: uppercase; line-height: var(--raw-leading-display); letter-spacing: var(--raw-tracking-display); }
+.ink { color: transparent; background-color: currentColor; background-image: var(--ink-noise); background-size: 180px 180px; -webkit-background-clip: text; background-clip: text; }
+.on-paper { --ink-noise: var(--ink-noise-light); }
+.lede { font-family: var(--font-sans); font-size: var(--raw-font-size-lede); line-height: var(--raw-leading-copy); }
+
+/* Text engine */
+.te-lines { display: block; }
+.te-line { display: block; overflow: hidden; line-height: var(--raw-leading-reveal); margin: -0.1em 0; padding: 0.02em 0; }
+.te-line > span { display: block; white-space: nowrap; will-change: transform, opacity; }
+.te-words { display: flex; flex-wrap: wrap; column-gap: 0.28em; }
+.te-word { display: inline-block; white-space: pre; will-change: transform, opacity, filter; }
+.te-char { display: inline-block; }
+
+/* Digit roll */
+.dr { position: relative; display: inline-block; white-space: pre; }
+.dr-ghost { color: transparent; }
+.dr-cells { position: absolute; left: 0; right: 0; top: -0.35em; bottom: -0.35em; display: flex; }
+.dr-plain { flex: none; align-self: center; white-space: pre; }
+.dr-col { position: relative; flex: none; clip-path: inset(0); height: 100%; }
+.dr-col > .dr-sizer { visibility: hidden; display: flex; height: 100%; align-items: center; }
+.dr-stack { position: absolute; left: 0; right: 0; top: 0; height: 1000%; }
+.dr-stack > span { display: flex; height: 10%; align-items: center; justify-content: center; }
+
+/* Rules, dots */
+.rule { display: block; background: currentColor; }
+.rule-x { height: 1px; transform: scaleX(0); transform-origin: left center; }
+.rule-y { width: 1px; transform: scaleY(0); transform-origin: center top; }
+.dot { display: inline-block; flex: none; width: var(--raw-size-dot); height: var(--raw-size-dot); border-radius: 50%; background: var(--accent); }
+
+/* Underline link */
+.ul { position: relative; display: inline-block; }
+.ul-clip { position: relative; display: block; clip-path: inset(0); }
+.ul-real { display: block; }
+.ul-dup { position: absolute; inset: 0; display: block; transform: translateY(100%); }
+.ul-rule { position: absolute; left: 0; right: 0; bottom: -2px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: left center; }
+
+/* Pill CTA */
+.pill { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; height: var(--raw-size-cta-h); padding: 0 1.5rem; border-radius: 999px; font-family: var(--font-sans); font-weight: 600; font-size: var(--raw-font-size-label); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; transition: background-color var(--raw-duration-fast) var(--ease-entrance), color var(--raw-duration-fast) var(--ease-entrance); }
+.pill--filled { background: var(--accent); color: #fff; }
+.pill--filled:hover { background: var(--accent-strong); }
+.pill--outline { border: 1px solid currentColor; }
+.pill--compact { height: 2.25rem; padding: 0 1rem; }
+.pill-arrow { position: relative; width: 10px; height: 10px; overflow: hidden; flex: none; }
+.pill-arrow svg { position: absolute; inset: 0; }
+.pill-arrow svg + svg { transform: translateX(-190%); }
+
+/* Grain */
+.grain { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 90; mix-blend-mode: overlay; opacity: 0.07; image-rendering: pixelated; }
+
+/* Banner */
+.asset-banner { position: fixed; left: 1rem; right: 1rem; bottom: 1rem; z-index: 300; display: none; padding: 0.75rem 1rem; background: var(--accent); color: #fff; font-family: var(--font-mono); font-size: 12px; line-height: 1.5; }
+.asset-banner.on { display: block; }
+</style>
+<style>
+/* ═════ Header ═════ */
+.header { position: fixed; left: var(--raw-size-gutter); right: var(--raw-size-gutter); top: var(--raw-size-header-y); z-index: 50; height: var(--raw-size-header-h); display: flex; align-items: center; justify-content: space-between; font-family: var(--font-mono); font-size: var(--raw-font-size-fine); text-transform: uppercase; letter-spacing: var(--raw-tracking-label); color: #fff; transition: color var(--raw-duration-normal) var(--ease-entrance); opacity: 0; }
+.header.is-light { color: var(--raw-color-ink-950); }
+.header-mark { font-family: var(--font-display); font-size: 1.75rem; line-height: 1; letter-spacing: normal; text-transform: none; }
+.header-nav { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 3rem; }
+.header-right { display: flex; align-items: center; gap: 1.25rem; }
+.header-open { display: flex; align-items: center; gap: 0.5rem; }
+.header .pill { font-size: var(--raw-font-size-fine); }
+.toggle { display: none; position: relative; width: 2rem; height: 2rem; }
+.toggle span { position: absolute; left: 0.3rem; right: 0.3rem; height: 1.5px; background: currentColor; transition: transform var(--raw-duration-normal) var(--ease-entrance); }
+.toggle span:first-child { top: 0.75rem; }
+.toggle span:last-child { top: 1.2rem; }
+.toggle[aria-expanded="true"] span:first-child { transform: translateY(0.225rem) rotate(45deg); }
+.toggle[aria-expanded="true"] span:last-child { transform: translateY(-0.225rem) rotate(-45deg); }
+@media (max-width: 1023.98px) { .header-nav { display: none; } .toggle { display: block; } }
+@media (max-width: 639.98px) { .header-open { display: none; } }
+.panel { position: fixed; inset: 0; z-index: 45; background: var(--background); color: #fff; padding: 6rem 1.25rem 1.5rem; display: none; flex-direction: column; justify-content: space-between; }
+.panel.open { display: flex; }
+.panel ol { margin-top: 1.5rem; }
+.panel li a { display: flex; align-items: baseline; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,.15); font-family: var(--font-display); font-size: 2.75rem; text-transform: uppercase; line-height: 1; }
+.panel li a .fine { opacity: .5; }
+@media (min-width: 1024px) { .panel { display: none !important; } }
+
+/* ═════ Preloader ═════ */
+.preloader { position: fixed; inset: 0; z-index: 100; overflow: hidden; background: var(--background); color: #fff; padding: 2.5rem; clip-path: inset(0 0 0% 0); }
+.preloader .pl-count { margin-top: 0.75rem; font-family: var(--font-display); font-size: var(--raw-font-size-count); line-height: 1; font-variant-numeric: tabular-nums; }
+.preloader .pl-mark { position: absolute; left: 2.5rem; bottom: 2.5rem; font-family: var(--font-display); font-size: 1.75rem; }
+.preloader svg { position: absolute; right: 2.5rem; bottom: 2.5rem; height: 40vh; width: auto; overflow: visible; }
+@media (max-width: 639.98px) { .preloader { padding: 1.25rem; } .preloader .pl-mark { left: 1.25rem; bottom: 1.25rem; } .preloader svg { right: 1.25rem; bottom: 1.25rem; } .preloader .pl-count { font-size: 7rem; } }
+
+/* ═════ Story ═════ */
+.story { position: relative; height: var(--raw-size-story-track); background: var(--background); }
+@media (max-width: 639.98px) { .story { height: 760lvh; } }
+.stage { position: sticky; top: 0; height: 100lvh; width: 100%; overflow: hidden; }
+.stage-surface, .frames, .scrim, .veil { position: absolute; inset: 0; }
+.stage-surface { background: #0b0b0b; }
+.frames { z-index: 0; } /* own stacking context: the frames' z-order stays inside it */
+.scrim { z-index: 1; }
+.frame { position: absolute; left: 0; top: 0; transform-origin: 0 0; user-select: none; max-width: none; }
+.frame.is-video { width: 100%; height: 100%; object-fit: cover; transform: none; }
+.scrim { pointer-events: none; }
+.scrim > span { position: absolute; inset: 0; opacity: 0; }
+.scrim .s-left { background: linear-gradient(90deg, rgba(11,11,11,.78) 0%, rgba(11,11,11,.35) 38%, transparent 62%); }
+.scrim .s-bottom { background: linear-gradient(0deg, rgba(11,11,11,.7) 0%, transparent 45%); }
+/* Readability under right-hand and top-centred copy on busy frames. */
+.scrim .s-right { background: linear-gradient(270deg, rgba(11,11,11,.8) 0%, rgba(11,11,11,.4) 36%, transparent 60%); }
+.scrim .s-paper { display: none; background: linear-gradient(0deg, rgba(241,239,236,.96) 0%, rgba(241,239,236,.85) 40%, transparent 62%); }
+.scrim .s-top { background: radial-gradient(60% 55% at 50% 22%, rgba(11,11,11,.72) 0%, rgba(11,11,11,.35) 55%, transparent 80%); }
+.veil { background: var(--surface-inverse); opacity: 0; pointer-events: none; z-index: 20; }
+.copy, .callouts { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
+.copy a, .copy button, .callout { pointer-events: auto; }
+.chapter { position: absolute; top: 50%; width: var(--raw-size-chapter-copy); translate: 0 -50%; visibility: hidden; }
+.chapter.is-left { left: var(--raw-size-gutter); }
+.chapter.is-right { right: var(--raw-size-gutter); }
+.chapter.on-paper { color: var(--raw-color-ink-950); }
+.chapter .eyebrow { display: flex; align-items: center; gap: 0.75rem; color: var(--accent); }
+.chapter .eyebrow .rule { width: 32px; background: var(--accent); }
+.chapter h1, .chapter h2 { margin-top: 1.25rem; font-size: var(--raw-font-size-chapter); }
+.chapter .lede { margin-top: 1.25rem; max-width: var(--raw-size-chapter-lede); opacity: .75; }
+.chapter .meta { margin-top: 1.25rem; opacity: .6; }
+.chapter-hero { top: var(--raw-size-hero-copy-y); translate: 0 0; width: var(--raw-size-hero-copy); }
+.chapter-hero h1 { font-size: var(--raw-font-size-display); }
+.chapter-hero h1 > span[aria-hidden] > span { white-space: nowrap; } /* two lines, as set */
+.chapter-hero .ctas { display: flex; gap: 12px; margin-top: 2rem; flex-wrap: wrap; }
+.chapter-lid { left: 50%; top: 18%; translate: -50% 0; width: 40rem; text-align: center; }
+.chapter-lid .eyebrow { justify-content: center; }
+.chapter-lid .te-words { justify-content: center; }
+.chapter-lid .ctas { margin-top: 2rem; display: flex; justify-content: center; }
+.price-row { display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; }
+.price-pill { background: var(--accent); color: #fff; border-radius: 999px; padding: 0.5rem 1rem; font-family: var(--font-mono); font-weight: 700; font-size: var(--raw-font-size-base); }
+.scroll-hint { position: absolute; left: var(--raw-size-gutter); bottom: 40px; z-index: 10; display: flex; gap: 0.5rem; color: #fff; }
+.scroll-hint i { display: inline-block; font-style: normal; }
+
+.callout { position: absolute; left: 0; top: 0; display: flex; align-items: center; will-change: transform; color: var(--raw-color-ink-950); opacity: 0; }
+.callout .sq { position: absolute; left: -2.5px; top: -2.5px; width: 5px; height: 5px; background: var(--accent); transform: scale(0); }
+.callout .ln { width: var(--raw-size-callout-line); height: 1px; background: var(--raw-color-ink-950); transform: scaleX(0); transform-origin: left center; transition: height var(--raw-duration-fast); }
+.callout .tx { margin-left: 0.75rem; transform: translateY(-50%); position: absolute; left: var(--raw-size-callout-line); top: 0; white-space: nowrap; }
+.callout .tx b { display: block; font-family: var(--font-mono); font-size: var(--raw-font-size-label); font-weight: 700; text-transform: uppercase; letter-spacing: var(--raw-tracking-label); transition: color var(--raw-duration-fast); }
+.callout .tx small { display: block; font-family: var(--font-sans); font-size: var(--raw-font-size-fine); opacity: .55; }
+.callout .tx b, .callout .tx small { opacity: 0; transform: translateY(8px); }
+.callouts.has-hover .callout { opacity: .35 !important; transition: opacity var(--raw-duration-fast); }
+.callouts.has-hover .callout.is-hover { opacity: 1 !important; }
+.callout.is-hover .tx b { color: var(--accent); }
+.callout.is-hover .ln { height: 2px; }
+.callout-list { display: none; }
+
+.counter { position: absolute; right: var(--raw-size-counter-x); top: 50%; transform: translateY(-50%); z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; font-family: var(--font-mono); font-size: var(--raw-font-size-fine); color: #fff; transition: color var(--raw-duration-normal); }
+.counter.is-light { color: var(--raw-color-ink-950); }
+.counter .track { position: relative; width: 1px; height: 64px; background: currentColor; opacity: .4; }
+.counter .fill { position: absolute; inset: 0; background: currentColor; transform-origin: center top; transform: scaleY(0); }
+.progress { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; z-index: 10; background: var(--accent); transform-origin: left center; transform: scaleX(0); }
+
+@media (max-width: 1023.98px) {
+  .chapter, .chapter.is-left, .chapter.is-right, .chapter-hero { left: var(--raw-size-gutter); right: var(--raw-size-gutter); width: auto; top: auto; bottom: 12%; translate: 0 0; }
+  .chapter-lid { left: var(--raw-size-gutter); right: var(--raw-size-gutter); width: auto; top: 18%; bottom: auto; }
+  .chapter h1, .chapter h2 { font-size: var(--raw-font-size-chapter-tablet); }
+  .chapter-hero h1 { font-size: var(--raw-font-size-display-tablet); }
+  .scrim .s-left { background: linear-gradient(0deg, rgba(11,11,11,.8), transparent 55%); }
+  .scrim .s-right { background: linear-gradient(0deg, rgba(11,11,11,.8), transparent 55%); }
+  .scrim .s-paper { display: block; }
+}
+@media (max-width: 767.98px) {
+  .callouts .callout { display: none; }
+  .chapter[data-chapter="2"] { bottom: calc(12% + 6.5rem); } /* clear of the callout list */
+  .callout-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem 1rem; position: absolute; left: 0; right: 0; bottom: 0; padding: 4rem var(--raw-size-gutter) 1.25rem; background: linear-gradient(0deg, #f1efec 0%, rgba(241,239,236,.9) 55%, transparent); font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--raw-color-ink-950); opacity: 0; }
+}
+@media (max-width: 639.98px) {
+  :root { --raw-size-gutter: 1.25rem; }
+  .chapter h1, .chapter h2 { font-size: var(--raw-font-size-chapter-phone); }
+  .chapter-hero h1 { font-size: var(--raw-font-size-display-phone); }
+  .counter { display: none; }
+  .chapter .lede { font-size: var(--raw-font-size-base); }
+}
+
+/* ═════ Lineup ═════ */
+.lineup { position: relative; background: var(--surface-inverse); color: var(--foreground-inverse); padding: 10rem var(--raw-size-gutter) 8rem; --ink-noise: var(--ink-noise-light); }
+.lineup-title { text-align: center; font-size: var(--raw-font-size-lineup); }
+.lineup-title .te-line > span { display: flex; justify-content: center; }
+.lineup-title .te-char { display: inline-block; overflow: hidden; line-height: 1.1; }
+.lineup-title .te-char > span { display: inline-block; }
+.lineup-sub { text-align: center; margin-top: 1.5rem; opacity: .55; }
+.lineup-sub-rule { width: 120px; margin: 1rem auto 0; background: var(--raw-color-ink-950); }
+.grid { margin-top: 6rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.lean { perspective: 900px; }
+.lean-in { transform-style: preserve-3d; height: 100%; }
+.card { position: relative; height: var(--raw-size-card-h); border-radius: 6px; background: var(--raw-color-paper-100); overflow: hidden; display: flex; flex-direction: column; padding: 1.25rem; }
+.card-top { display: flex; justify-content: space-between; }
+.card-media { height: var(--raw-size-card-media); margin: 0.5rem -1.25rem 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.card-media > div { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.card-media img { max-width: 86%; max-height: 92%; object-fit: contain; }
+.card-name { font-size: var(--raw-font-size-card); margin-top: 0.5rem; }
+.card-desc { font-size: var(--raw-font-size-fine); opacity: .6; margin-top: 0.35rem; line-height: 1.4; }
+.card-price { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 0.75rem; }
+.card-price .p { font-family: var(--font-mono); font-weight: 700; font-size: var(--raw-font-size-label); }
+.sizes { display: flex; gap: 0.25rem; }
+.sizes button { font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; padding: 0.3rem 0.45rem; border-radius: 4px; border: 1px solid rgba(17,17,17,.25); }
+.sizes button.is-on { background: var(--raw-color-ink-950); color: #fff; border-color: var(--raw-color-ink-950); }
+.card .pill { width: 100%; margin-top: 0.75rem; }
+.more { display: flex; justify-content: flex-end; margin-top: 3rem; position: relative; }
+.more-slide { position: absolute; right: 2rem; bottom: 1rem; width: 360px; border-radius: 6px; overflow: hidden; pointer-events: none; opacity: 0; z-index: 0; }
+.more-slide img { width: 100%; display: block; }
+.more .pill { position: relative; z-index: 1; background: var(--surface-inverse); }
+@media (max-width: 1023.98px) { .grid { grid-template-columns: repeat(2, 1fr); } .lineup-title { font-size: var(--raw-font-size-lineup-tablet); } }
+@media (max-width: 639.98px) { .grid { grid-template-columns: 1fr; } .lineup-title { font-size: var(--raw-font-size-lineup-phone); } .card { height: 28rem; } .card-media { height: 14rem; } }
+
+/* ═════ Order band ═════ */
+.order { position: relative; overflow: hidden; background: var(--raw-color-char-900); padding: 8rem var(--raw-size-gutter); }
+.order-rule { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--raw-color-ketchup-600); transform: scaleX(0); transform-origin: left center; }
+.order-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+.order h2 { font-size: var(--raw-font-size-chapter); }
+.order .lede { margin-top: 1.5rem; opacity: .75; max-width: 26rem; }
+.order .ctas { display: flex; gap: 12px; margin-top: 2rem; flex-wrap: wrap; }
+.facts { display: flex; gap: 2rem; margin-bottom: 1rem; }
+.order-frame { position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 16 / 9; }
+.order-frame img { width: 100%; height: 100%; object-fit: cover; will-change: transform; }
+@media (max-width: 1023.98px) { .order-grid { grid-template-columns: 1fr; } .order h2 { font-size: var(--raw-font-size-chapter-tablet); } }
+@media (max-width: 639.98px) { .order h2 { font-size: var(--raw-font-size-chapter-phone); } .order { padding: 5rem var(--raw-size-gutter); } }
+
+/* ═════ Footer ═════ */
+.footer { position: relative; min-height: var(--raw-size-footer-h); background: var(--background); padding: 4rem var(--raw-size-gutter) 1.5rem; display: flex; flex-direction: column; overflow: hidden; }
+.footer-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.footer-cols .links { display: flex; gap: 1rem; flex-wrap: wrap; }
+.footer-rule { margin-top: 2rem; background: rgba(255,255,255,.15); }
+.footer-mark { margin-top: auto; font-size: var(--raw-font-size-footer-mark); line-height: 0.78; }
+.footer-mark .te-line { line-height: 0.95; }
+.footer-copy { text-align: right; opacity: .45; }
+@media (max-width: 639.98px) { .footer-cols { grid-template-columns: 1fr; } .footer-mark { font-size: 9rem; } }
+</style>
+</head>
+<body>
+<div class="asset-banner" data-banner role="alert"></div>
+<canvas class="grain" data-grain aria-hidden="true"></canvas>
+
+<!-- Preloader -->
+<div class="preloader" data-preloader aria-hidden="true">
+  <p class="fine" style="color:rgba(255,255,255,.45)">// SMASHING NOW</p>
+  <p class="pl-count" data-pl-count>000</p>
+  <span class="pl-mark">SELF</span>
+  <svg viewBox="0 0 160 160" fill="none">
+    <g data-layer="0"><path d="M28 128 Q28 140 40 140 H120 Q132 140 132 128 Z" fill="#d98e3e"/></g>
+    <g data-layer="1"><rect x="24" y="112" width="112" height="14" rx="7" fill="#3b2416"/></g>
+    <g data-layer="2"><path d="M22 108 H138 L128 118 L116 110 L100 120 L84 110 L68 120 L52 110 L36 118 Z" fill="#f5b82e"/></g>
+    <g data-layer="3"><rect x="30" y="98" width="100" height="8" rx="4" fill="#c98b4a"/></g>
+    <g data-layer="4"><rect x="26" y="90" width="108" height="6" rx="3" fill="#e0703a"/></g>
+    <g data-layer="5"><path d="M26 86 Q26 40 80 40 Q134 40 134 86 Z" fill="#e8a04a"/></g>
+  </svg>
+</div>
+
+<!-- Header -->
+<header class="header" data-header>
+  <a href="#top" aria-label="SELF home" class="header-mark">SELF</a>
+  <nav aria-label="Primary" class="header-nav" data-nav-clip>
+    <a href="#lineup" data-ul>Menu</a>
+    <a href="#combo" data-ul>Combos</a>
+    <a href="#order" data-ul>Locations</a>
+    <a href="#story" data-ul>Our Story</a>
+  </nav>
+  <div class="header-right" data-right-clip>
+    <span class="header-open"><span class="dot" data-pulse></span>OPEN · 11:00–23:00</span>
+    <a href="#order" class="pill pill--filled pill--compact" data-pill>ORDER NOW</a>
+    <button type="button" class="toggle" data-toggle aria-expanded="false" aria-controls="panel" aria-label="Open menu"><span></span><span></span></button>
+  </div>
+</header>
+<div class="panel" id="panel" data-panel data-lenis-prevent>
+  <div>
+    <p class="fine" style="opacity:.5">// NAVIGATION</p>
+    <ol>
+      <li><a href="#lineup"><span class="fine">01</span>Menu</a></li>
+      <li><a href="#combo"><span class="fine">02</span>Combos</a></li>
+      <li><a href="#order"><span class="fine">03</span>Locations</a></li>
+      <li><a href="#story"><span class="fine">04</span>Our Story</a></li>
+    </ol>
+  </div>
+  <a href="#order" class="pill pill--filled" data-pill>ORDER NOW</a>
+</div>
+
+<main id="top">
+<!-- 1 — Story -->
+<section id="story" class="story" aria-label="The SELF burger, layer by layer" data-header-theme="dark" data-story>
+  <div class="stage" data-stage>
+    <div class="stage-surface" data-stage-surface></div>
+    <div class="frames" data-frames></div>
+    <div class="scrim" data-scrim><span class="s-left"></span><span class="s-bottom"></span><span class="s-right"></span><span class="s-top"></span><span class="s-paper"></span></div>
+    <div class="copy" data-copy>
+      <!-- C1 Hero -->
+      <div class="chapter chapter-hero is-left" data-chapter="0">
+        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>SELF BURGERS · EST. 2026</p>
+        <h1 class="display ink" data-te="lines" data-delay="80">BUILT LIKE<br>SELF.</h1>
+        <p class="lede" data-te="words" data-delay="260" data-stagger="18">Two patties smashed thin on a screaming-hot griddle, melted American cheese, a toasted brioche bun. Double smashed. Double cheese. Zero excuses.</p>
+        <div class="ctas" data-rise="420">
+          <a href="#order" class="pill pill--filled" data-pill>ORDER NOW</a>
+          <a href="#lineup" class="pill pill--outline" data-pill>SEE THE MENU</a>
+        </div>
+      </div>
+      <!-- C2 Lift -->
+      <div class="chapter is-right" data-chapter="1">
+        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>01 — THE PATTY</p>
+        <h2 class="display ink" data-te="lines" data-delay="80">SMASHED<br>TO ORDER.</h2>
+        <p class="lede" data-te="words" data-delay="260">Fresh beef, pressed flat the second it hits the steel for lace-crisp edges and a juicy middle. Nothing waits under a lamp.</p>
+      </div>
+      <!-- C3 Explode -->
+      <div class="chapter is-left on-paper" data-chapter="2">
+        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>02 — THE BUILD</p>
+        <h2 class="display ink" data-te="lines" data-delay="80">SIX LAYERS.<br>ZERO FILLER.</h2>
+        <p class="lede" data-te="words" data-delay="260" data-name-hover>Every layer earns its place. Hover a name to see it.</p>
+      </div>
+      <!-- C4 Stack -->
+      <div class="chapter is-left on-paper" data-chapter="3">
+        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>03 — THE STARTING LINEUP</p>
+        <h2 class="display ink" data-te="lines" data-delay="80">THE STACK</h2>
+        <p class="lede" data-te="words" data-delay="260">Burger. Fries. Sauce. A cookie shake. The four that start every game.</p>
+        <p class="fine meta" data-rise="420">BURGER — 780 KCAL  ·  FRIES — 320  ·  SHAKE — 540</p>
+      </div>
+      <!-- C5 Combo -->
+      <div class="chapter is-right" data-chapter="4" id="combo">
+        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>04 — FOR THE WHOLE GAME</p>
+        <h2 class="display ink" data-te="lines" data-delay="80">GAME DAY<br>COMBO</h2>
+        <p class="lede" data-te="words" data-delay="260">Burger, sauces, fries and a SELF shake, packed hot in one box for pickup or delivery.</p>
+        <div class="price-row" data-rise="420"><span class="price-pill"><span data-dr="420">$18.99</span></span><span class="fine" style="opacity:.6">SAVE $4.20</span></div>
+      </div>
+      <!-- C6 Open box -->
+      <div class="chapter is-left" data-chapter="5">
+        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>05 — THE FINAL BUZZER</p>
+        <h2 class="display ink" data-te="lines" data-delay="80">OVERTIME<br>SHAKES</h2>
+        <p class="lede" data-te="words" data-delay="260">Oreo, Biscoff and strawberry, blended thick enough to stand a straw in.</p>
+      </div>
+      <!-- C7 Lid shut -->
+      <div class="chapter chapter-lid" data-chapter="6">
+        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>06 — PACKED</p>
+        <h2 class="display ink" data-te="lines" data-delay="80">MADE FRESH.<br>MADE BOLD.</h2>
+        <div class="ctas" data-rise="420"><a href="#order" class="pill pill--filled" data-pill>ORDER THE COMBO</a></div>
+      </div>
+    </div>
+    <div class="callouts" data-callouts></div>
+    <div class="callout-list" data-callout-list></div>
+    <p class="fine scroll-hint" data-hint>SCROLL TO BUILD <i data-hint-arrow>↓</i></p>
+    <aside class="counter" data-counter aria-hidden="true">
+      <span data-counter-num>01</span>
+      <span class="track"><span class="fill" data-counter-fill></span></span>
+      <span>/07</span>
+    </aside>
+    <div class="progress" data-progress></div>
+    <div class="veil" data-veil></div>
+  </div>
+</section>
+
+<!-- 2 — Lineup -->
+<section id="lineup" class="lineup" aria-label="Menu" data-header-theme="light">
+  <h2 class="display ink lineup-title" data-lineup-title>THE LINEUP.</h2>
+  <p class="label lineup-sub" data-inview-fade>PICK YOUR PLAYER</p>
+  <span class="rule rule-x lineup-sub-rule" data-rule-io></span>
+  <div class="grid" data-grid></div>
+  <div class="more">
+    <div class="more-slide" data-more-slide aria-hidden="true"><img src="./assets/combo-boxes.jpg" alt="" loading="lazy" decoding="async"></div>
+    <a href="#lineup" class="pill pill--outline" data-pill data-more>VIEW FULL MENU</a>
+  </div>
+</section>
+
+<!-- 3 — Order -->
+<section id="order" class="order" aria-label="Order" data-header-theme="dark">
+  <span class="order-rule" data-order-rule></span>
+  <div class="order-grid">
+    <div>
+      <h2 class="display ink" data-te-io="lines">HUNGRY?<br>ORDER AHEAD.</h2>
+      <p class="lede" data-te-io="words" data-delay="200">Skip the line. Your combo is on the counter in 8 minutes.</p>
+      <div class="ctas"><a href="#order" class="pill pill--filled" data-pill>ORDER PICKUP</a><a href="#order" class="pill pill--outline" data-pill>DELIVERY</a></div>
+    </div>
+    <div>
+      <div class="facts fine">
+        <span><span data-dr-io="0">08</span> MIN</span>
+        <span><span data-dr-io="120">100</span>% BEEF</span>
+        <span data-dr-io="240">11:00–23:00</span>
+      </div>
+      <div class="order-frame"><img data-order-img src="./assets/combo-closed.jpg" alt="A closed SELF BURGERS box on a steel counter" loading="lazy" decoding="async"></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- 4 — Footer -->
+<footer class="footer" data-header-theme="dark" aria-label="Footer">
+  <div class="footer-cols fine">
+    <p>128 GRIDIRON AVE</p>
+    <p>MON–SUN 11:00–23:00</p>
+    <p class="links"><a href="https://instagram.com" data-ul-rule>INSTAGRAM</a>·<a href="https://tiktok.com" data-ul-rule>TIKTOK</a>·<a href="#careers" data-ul-rule>CAREERS</a></p>
+  </div>
+  <span class="rule rule-x footer-rule" style="transform:none"></span>
+  <p class="display ink footer-mark" data-te-io="lines" aria-label="SELF">SELF</p>
+  <p class="fine footer-copy">© 2026 SELF BURGERS</p>
+</footer>
+
+<script type="module">
+import Lenis from "lenis";
+
+/* ═══════════════════ Constants ═══════════════════ */
+const ASSET_BASE = "./assets/";
+const VIDEO = null; // e.g. { hero: "assets/hero.mp4", explode: "assets/explode.mp4", combo: "assets/combo.mp4", box: "assets/box.mp4" }
+const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const hoverOff = () => window.innerWidth < 768;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
+const clamp01 = (v) => clamp(v, 0, 1);
+const lerp = (a, b, t) => a + (b - a) * t;
+
+/* ═══════════════════ Asset banner ═══════════════════ */
+const banner = $("[data-banner]");
+const failed = new Set();
+const reportFailure = (url) => {
+  if (failed.has(url)) return;
+  failed.add(url);
+  banner.innerHTML = [...failed].map((u) => `// ASSET FAILED — ${u.replace(/^.*?(assets\/)/, "$1")}`).join("<br>");
+  banner.classList.add("on");
+};
+
+/* ═══════════════════ Shared ticker ═══════════════════ */
+let lenis = null;
+const subs = new Set();
+let raf = 0;
+const loop = (time) => {
+  raf = subs.size || lenis ? requestAnimationFrame(loop) : 0;
+  lenis?.raf(time);
+  for (const s of [...subs].sort((a, b) => a.order - b.order)) {
+    if (time - s.last <= s.gap) continue;
+    s.last = time;
+    s.cb(time);
+  }
+};
+const wake = () => { if (!raf) raf = requestAnimationFrame(loop); };
+/** order: 0 readers, 1 writers. */
+const useLoop = (cb, gap = 0, order = 1) => { const s = { cb, gap, last: -Infinity, order }; subs.add(s); wake(); return () => subs.delete(s); };
+
+/* ═══════════════════ Page-ready store ═══════════════════ */
+const page = {
+  revealing: false, ready: false, fns: new Set(),
+  set(patch) { Object.assign(this, patch); for (const f of [...this.fns]) f(this); },
+};
+const whenReady = (fn, key = "ready") => {
+  if (page[key]) return fn();
+  const f = (s) => { if (s[key]) { page.fns.delete(f); fn(); } };
+  page.fns.add(f);
+};
+
+/* ═══════════════════ Easings + spring ═══════════════════ */
+const easings = {
+  linear: (t) => t,
+  easeOutCubic: (t) => 1 - Math.pow(1 - t, 3),
+  easeOutQuart: (t) => 1 - Math.pow(1 - t, 4),
+  easeInOutSine: (t) => -(Math.cos(Math.PI * t) - 1) / 2,
+  easeInOutCubic: (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+};
+const active = new Set();
+let springOff = null;
+const springTick = () => { for (const s of [...active]) s._step(); if (!active.size && springOff) { springOff(); springOff = null; } };
+class Spring {
+  constructor(x = 0, cfg = {}) {
+    this.x = x; this.v = 0; this.to = x; this.from = x;
+    this.cfg = { tension: 170, friction: 26, clamp: false, precision: 0.001, ...cfg };
+    this.onChange = null; this.onRest = null; this.startAt = 0; this.last = 0; this.loop = false;
+  }
+  static of(c) { return Array.isArray(c) ? { tension: c[0], friction: c[1] } : c; }
+  jump(x) { this.x = x; this.to = x; this.v = 0; active.delete(this); this.onChange?.(x); }
+  start(to, { delay = 0, config, loop = false } = {}) {
+    if (config) this.cfg = { ...this.cfg, ...Spring.of(config) };
+    this.from = this.x; this.to = to; this.loop = loop;
+    this.startAt = performance.now() + delay; this.last = 0;
+    active.add(this);
+    if (!springOff) springOff = useLoop(springTick, 0, 1);
+    return this;
+  }
+  stop() { active.delete(this); }
+  _step() {
+    const now = performance.now();
+    if (now < this.startAt) return;
+    const c = this.cfg;
+    if (c.duration !== undefined) {
+      const t = c.duration <= 0 ? 1 : clamp01((now - this.startAt) / c.duration);
+      this.x = lerp(this.from, this.to, (c.easing || easings.linear)(t));
+      this.onChange?.(this.x);
+      if (t >= 1) this._rest();
+      return;
+    }
+    const prev = this.last || now - 16;
+    this.last = now;
+    const steps = Math.max(1, Math.ceil(Math.min(64, now - prev)));
+    for (let i = 0; i < steps; i++) {
+      this.v += (-c.tension * 1e-6) * (this.x - this.to) - (c.friction * 1e-3) * this.v;
+      this.x += this.v;
+      if (c.clamp && (this.from < this.to ? this.x > this.to : this.x < this.to)) { this.x = this.to; this.v = 0; break; }
+    }
+    if (Math.abs(this.v) < c.precision / 10 && Math.abs(this.x - this.to) < c.precision) { this.x = this.to; this.v = 0; this.onChange?.(this.x); this._rest(); return; }
+    this.onChange?.(this.x);
+  }
+  _rest() {
+    if (this.loop) { [this.from, this.to] = [this.to, this.from]; this.startAt = performance.now(); this.last = 0; return; }
+    active.delete(this);
+    const f = this.onRest; f?.(this.x);
+  }
+}
+const dur = (ms, e = "easeOutCubic") => ({ duration: ms, easing: easings[e] });
+
+/* ═══════════════════ Style mixing ═══════════════════ */
+const NUM = /-?\d*\.?\d+(?:e-?\d+)?/g;
+const lerpValue = (a, b, p) => {
+  if (typeof a === "number" && typeof b === "number") return lerp(a, b, p);
+  const bs = String(b).match(NUM) || [];
+  let i = 0;
+  return String(a).replace(NUM, (m) => String(+lerp(parseFloat(m), parseFloat(bs[i++] ?? m), p).toFixed(4)));
+};
+const unit = (v, u) => (typeof v === "number" ? `${v}${u}` : v);
+const write = (el, s) => {
+  const st = el.style;
+  if (s.opacity !== undefined) st.opacity = s.opacity;
+  if (s.filter !== undefined) st.filter = s.filter;
+  if (s.clipPath !== undefined) { st.clipPath = s.clipPath; st.webkitClipPath = s.clipPath; }
+  if (s.transform !== undefined) { st.transform = s.transform; return; }
+  const t = [];
+  if (s.x !== undefined || s.y !== undefined) t.push(`translate3d(${unit(s.x ?? 0, "px")}, ${unit(s.y ?? 0, "px")}, 0)`);
+  if (s.scale !== undefined) t.push(`scale(${s.scale})`);
+  if (s.rotate !== undefined) t.push(`rotate(${unit(s.rotate, "deg")})`);
+  if (t.length) st.transform = t.join(" ");
+};
+const mix = (from, to, p) => { const o = {}; for (const k in to) o[k] = lerpValue(from[k] ?? to[k], to[k], p); return o; };
+/** A 0→1 spring driving a from→to style. */
+const tween = (el, from, to, cfg, precision = 0.0005) => {
+  const s = new Spring(0, { ...Spring.of(cfg), precision });
+  s.onChange = (p) => write(el, mix(from, to, p));
+  s.onChange(0);
+  return s;
+};
+
+/* ═══════════════════ Inview ═══════════════════ */
+const inview = (el, o) => {
+  const s = tween(o.target || el, o.from, o.to, o.config || [90, 26]);
+  let seen = false, enabled = !o.ready, done = false;
+  const go = () => { if (done || !seen || !enabled) return; done = true; io.disconnect(); s.start(1, { delay: o.delay || 0 }); o.onStart?.(); };
+  const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { seen = true; go(); } }, { rootMargin: o.rm || "0px" });
+  io.observe(o.trigger || el);
+  if (o.ready) whenReady(() => { enabled = true; go(); });
+  return s;
+};
+const onEnter = (el, fn, rm = "0px 0px -10% 0px") => {
+  const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); fn(); } }, { rootMargin: rm });
+  io.observe(el);
+};
+
+/* ═══════════════════ Hover ═══════════════════ */
+const hover = (trigger, target, from, to, cfg, { delayIn = 0, immediateOut = false } = {}) => {
+  const s = tween(target, from, to, cfg);
+  trigger.addEventListener("mouseenter", () => { if (!hoverOff()) s.start(1, { delay: delayIn }); });
+  trigger.addEventListener("mouseleave", () => (immediateOut ? s.jump(0) : s.start(0)));
+  return s;
+};
+
+/* ═══════════════════ Scrub ═══════════════════ */
+const scrubProgress = (el, start, end) => {
+  const bb = el.getBoundingClientRect(), clientHeight = window.innerHeight;
+  const poses = {
+    top_top: bb.top, center_top: bb.top + bb.height / 2, bottom_top: bb.bottom,
+    top_bottom: bb.top - clientHeight, center_bottom: bb.top + bb.height / 2 - clientHeight,
+    bottom_bottom: bb.bottom - clientHeight, top_center: bb.top - clientHeight / 2,
+    center_center: bb.top + bb.height / 2 - clientHeight / 2, bottom_center: bb.bottom - clientHeight / 2,
+  };
+  const scrollStart = poses[start.replace(" ", "_")], scrollEnd = poses[end.replace(" ", "_")];
+  const length = Math.abs(scrollStart - scrollEnd) || 1;
+  return Math.min(Math.max(0, 1 - (scrollStart + length) / length), 1);
+};
+const scrub = (trigger, start, end, onProgress) => {
+  let last = -1, off = null;
+  const read = () => {
+    const q = Math.round(scrubProgress(trigger, start, end) * 2000) / 2000;
+    if (q !== last) { last = q; onProgress(q); }
+  };
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting && !off) off = useLoop(read, 10, 0);
+    else if (!e.isIntersecting && off) { read(); off(); off = null; }
+  }, { rootMargin: "20% 0px" }).observe(trigger);
+  read();
+};
+
+/* ═══════════════════ Ink texture ═══════════════════ */
+const mulberry32 = (a) => () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+const inkNoise = (fill, surface) => {
+  const rnd = mulberry32(20260923);
+  const c = document.createElement("canvas");
+  c.width = c.height = 180;
+  const g = c.getContext("2d");
+  g.fillStyle = fill; g.fillRect(0, 0, 180, 180);
+  g.fillStyle = `rgba(${surface}, 0.55)`;
+  for (let i = 0; i < 2600; i++) { const s = 1 + Math.round(rnd()); g.fillRect(Math.floor(rnd() * 180), Math.floor(rnd() * 180), s, s); }
+  g.strokeStyle = `rgba(${surface}, 0.35)`; g.lineWidth = 1;
+  for (let i = 0; i < 40; i++) {
+    const x = rnd() * 180, y = rnd() * 180, len = 3 + rnd() * 6, a = rnd() * Math.PI * 2;
+    g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * len, y + Math.sin(a) * len); g.stroke();
+  }
+  return `url(${c.toDataURL()})`;
+};
+document.documentElement.style.setProperty("--ink-noise-dark", inkNoise("#ffffff", "11, 11, 11"));
+document.documentElement.style.setProperty("--ink-noise-light", inkNoise("#111111", "241, 239, 236"));
+
+/* ═══════════════════ Film grain ═══════════════════ */
+{
+  const c = $("[data-grain]");
+  c.width = c.height = 160;
+  const g = c.getContext("2d");
+  const img = g.createImageData(160, 160);
+  const draw = () => {
+    const d = img.data;
+    for (let i = 0; i < d.length; i += 4) { const v = (Math.random() * 256) | 0; d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255; }
+    g.putImageData(img, 0, 0);
+  };
+  draw();
+  if (!REDUCED) { let n = 0; useLoop(() => { if (++n % 3 === 0) draw(); }, 0, 1); }
+}
+
+/* ═══════════════════ TextEngine ═══════════════════ */
+/**
+ * Splits `el` into lines or words. Returns a controller with enter(extraDelay), reset(), jump().
+ * Line mode honours <br> as hard breaks and measures soft wraps; re-splits on resize.
+ */
+const textEngine = (el, mode, { delay = 0, stagger } = {}) => {
+  const html = el.innerHTML;
+  const plain = html.replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  const ink = el.classList.contains("ink");
+  if (ink) el.classList.remove("ink");
+  el.innerHTML = "";
+  const sr = document.createElement("span"); sr.className = "sr-only"; sr.textContent = plain;
+  const vis = document.createElement("span"); vis.setAttribute("aria-hidden", "true");
+  el.append(sr, vis);
+  let springs = [], state = "hidden";
+  const api = {
+    units: [],
+    enter(extra = 0) { state = "in"; springs.forEach((s) => { s.jump(0); s.start(1, { delay: delay + extra + s._d }); }); },
+    reset() { state = "hidden"; springs.forEach((s) => s.jump(0)); },
+    jump() { state = "in"; springs.forEach((s) => s.jump(1)); },
+  };
+  if (mode === "words") {
+    vis.className = "te-words";
+    const st = stagger ?? 16;
+    springs = plain.split(" ").map((w, i) => {
+      const span = document.createElement("span"); span.className = "te-word"; span.textContent = w; vis.appendChild(span);
+      api.units.push(span);
+      const s = new Spring(0, dur(620, "easeOutQuart"));
+      s.onChange = (p) => { span.style.opacity = p; span.style.transform = `translate3d(0, ${lerp(14, 0, p)}px, 0)`; span.style.filter = p >= 1 ? "none" : `blur(${lerp(6, 0, p)}px)`; };
+      s.onChange(0); s._d = i * st;
+      return s;
+    });
+    return api;
+  }
+  vis.className = "te-lines";
+  const segments = html.split(/<br\s*\/?>/i).map((seg) => seg.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()).filter(Boolean);
+  const layout = () => {
+    vis.innerHTML = "";
+    const lines = [];
+    for (const seg of segments) {
+      const probe = document.createElement("span"); probe.style.display = "block";
+      const words = seg.split(" ").map((w, i, a) => { const s = document.createElement("span"); s.textContent = w + (i < a.length - 1 ? " " : ""); probe.appendChild(s); return s; });
+      vis.appendChild(probe);
+      let top = null, cur = null;
+      for (const w of words) { if (top === null || Math.abs(w.offsetTop - top) > 2) { cur = []; lines.push(cur); top = w.offsetTop; } cur.push(w.textContent); }
+      probe.remove();
+    }
+    springs.forEach((s) => s.stop());
+    springs = lines.map((l, i) => {
+      const line = document.createElement("span"); line.className = "te-line";
+      const inner = document.createElement("span"); inner.textContent = l.join("").trim();
+      if (ink) inner.classList.add("ink");
+      line.appendChild(inner); vis.appendChild(line);
+      const s = new Spring(0, dur(900, "easeOutCubic"));
+      s.onChange = (p) => { inner.style.opacity = p; inner.style.transform = `translate3d(0, ${lerp(110, 0, p)}%, 0)`; };
+      s._d = i * 90; s._inner = inner;
+      if (state === "in") s.jump(1); else s.onChange(0);
+      return s;
+    });
+    api.lines = springs.map((s) => s._inner);
+    api.onLayout?.();
+  };
+  layout();
+  let timer = 0, lastW = window.innerWidth;
+  window.addEventListener("resize", () => { if (window.innerWidth === lastW) return; lastW = window.innerWidth; clearTimeout(timer); timer = setTimeout(layout, 150); });
+  api.relayout = layout;
+  lineEngines.push(api);
+  return api;
+};
+const lineEngines = [];
+document.fonts?.ready.then(() => lineEngines.forEach((t) => t.relayout()));
+
+/* ═══════════════════ DigitRoll ═══════════════════ */
+const digitRoll = (el, { delay = 0 } = {}) => {
+  el.classList.add("dr");
+  let cols = [], value = "";
+  const build = (str) => {
+    value = str;
+    el.innerHTML = "";
+    const ghost = document.createElement("span"); ghost.className = "dr-ghost"; ghost.textContent = str;
+    const cells = document.createElement("span"); cells.className = "dr-cells"; cells.setAttribute("aria-hidden", "true");
+    el.append(ghost, cells);
+    cols = [];
+    let order = 0;
+    for (const ch of str) {
+      if (/\d/.test(ch)) {
+        const col = document.createElement("span"); col.className = "dr-col";
+        const sizer = document.createElement("span"); sizer.className = "dr-sizer"; sizer.textContent = ch;
+        const stack = document.createElement("span"); stack.className = "dr-stack";
+        for (let i = 0; i < 10; i++) { const c = document.createElement("span"); c.textContent = i; stack.appendChild(c); }
+        col.append(sizer, stack); cells.appendChild(col);
+        const s = new Spring(0, { tension: 90, friction: 26, precision: 0.001 });
+        s.onChange = (v) => { stack.style.transform = `translateY(${-v * 10}%)`; };
+        s.onChange(0);
+        cols.push({ s, n: +ch, order: order++ });
+      } else {
+        const p = document.createElement("span"); p.className = "dr-plain"; p.textContent = ch; cells.appendChild(p);
+      }
+    }
+  };
+  build(el.textContent);
+  return {
+    play(extra = 0) { cols.forEach((c) => c.s.start(c.n, { delay: delay + extra + c.order * 70 })); },
+    reset() { cols.forEach((c) => c.s.jump(0)); },
+    jump() { cols.forEach((c) => c.s.jump(c.n)); },
+    /** Rolls from the digits on screen to a new value of the same shape; rebuilds if the shape changes. */
+    set(str, extra = 0) {
+      const same = str.length === value.length && [...str].every((ch, i) => /\d/.test(ch) === /\d/.test(value[i]));
+      if (!same) { build(str); cols.forEach((c) => c.s.start(c.n, { delay: extra + c.order * 70 })); return; }
+      value = str; el.firstChild.textContent = str;
+      let k = 0;
+      for (const ch of str) if (/\d/.test(ch)) { const c = cols[k++]; c.n = +ch; c.s.start(c.n, { delay: extra + c.order * 70 }); }
+    },
+  };
+};
+
+/* ═══════════════════ RuleDraw ═══════════════════ */
+const ruleDraw = (el, axis = "x", delay = 0) => {
+  const s = tween(el, axis === "x" ? { transform: "scaleX(0)" } : { transform: "scaleY(0)" }, axis === "x" ? { transform: "scaleX(1)" } : { transform: "scaleY(1)" }, [55, 22]);
+  return { enter: (extra = 0) => { s.jump(0); s.start(1, { delay: delay + extra }); }, reset: () => s.jump(0), jump: () => s.jump(1) };
+};
+
+/* ═══════════════════ UnderlineLink + PillCta ═══════════════════ */
+const underline = (host, trigger, rule = false) => {
+  const label = host.textContent.trim();
+  host.textContent = "";
+  const wrap = document.createElement("span"); wrap.className = "ul";
+  wrap.innerHTML = `<span class="ul-clip"><span class="ul-real"></span><span class="ul-dup" aria-hidden="true"></span></span>`;
+  wrap.querySelector(".ul-real").textContent = label;
+  wrap.querySelector(".ul-dup").textContent = label;
+  host.appendChild(wrap);
+  hover(trigger, wrap.querySelector(".ul-real"), { transform: "translateY(0%)" }, { transform: "translateY(-100%)" }, [260, 30]);
+  hover(trigger, wrap.querySelector(".ul-dup"), { transform: "translateY(100%)" }, { transform: "translateY(0%)" }, [260, 30]);
+  if (rule) {
+    const r = document.createElement("span"); r.className = "ul-rule"; wrap.appendChild(r);
+    hover(trigger, r, { transform: "scaleX(0)" }, { transform: "scaleX(1)" }, [220, 28]);
+  }
+};
+const ARROW = `<svg viewBox="0 0 12 12" width="10" height="10" fill="none" aria-hidden="true"><path d="M1 11 L11 1 M4 1 H11 V8" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>`;
+const pill = (a) => {
+  const label = document.createElement("span"); label.textContent = a.textContent.trim();
+  a.textContent = "";
+  a.appendChild(label);
+  const arrow = document.createElement("span"); arrow.className = "pill-arrow"; arrow.innerHTML = ARROW + ARROW;
+  a.appendChild(arrow);
+  underline(label, a, false);
+  const [a1, a2] = arrow.querySelectorAll("svg");
+  hover(a, a1, { transform: "translateX(0%)" }, { transform: "translateX(190%)" }, [200, 28]);
+  hover(a, a2, { transform: "translateX(-190%)" }, { transform: "translateX(0%)" }, [200, 28], { delayIn: 70 });
+  if (a.classList.contains("pill--filled")) hover(a, a, { scale: 1 }, { scale: 1.04 }, [220, 28]);
+};
+
+/* ═══════════════════ PointerLean ═══════════════════ */
+const pointerLean = (scope, inner, onLean) => {
+  const dx = new Spring(0, { tension: 90, friction: 22, precision: 0.001 });
+  const dy = new Spring(0, { tension: 90, friction: 22, precision: 0.001 });
+  const draw = () => { inner.style.transform = `rotateY(${dx.x * 10}deg) rotateX(${-dy.x * 10}deg)`; onLean?.(dx.x, dy.x); };
+  dx.onChange = draw; dy.onChange = draw;
+  if (REDUCED) return;
+  scope.addEventListener("pointermove", (e) => {
+    if (hoverOff() || e.pointerType === "touch") return;
+    const b = scope.getBoundingClientRect();
+    dx.start(clamp(((e.clientX - b.left) / b.width) * 2 - 1, -1, 1));
+    dy.start(clamp(((e.clientY - b.top) / b.height) * 2 - 1, -1, 1));
+  });
+  scope.addEventListener("pointerleave", () => { dx.start(0); dy.start(0); });
+};
+
+/* ═══════════════════ PulseDot ═══════════════════ */
+$$("[data-pulse]").forEach((d) => {
+  if (REDUCED) return;
+  const s = new Spring(1, dur(700, "easeInOutSine"));
+  s.onChange = (v) => { d.style.opacity = v; };
+  s.start(0.15, { loop: true });
+});
+
+/* ═══════════════════ Scroll lock ═══════════════════ */
+const stopScroll = () => { lenis?.stop(); };
+const startScroll = () => { lenis?.start(); };
+
+/* ═══════════════════ 1 — The story ═══════════════════ */
+const FRAMES = [
+  { file: "hero-burger.jpg", w: 1515, h: 688, f: [900, 380], surface: "char" },
+  { file: "hero-burger-float.jpg", w: 1515, h: 688, f: [900, 300], surface: "char" },
+  { file: "burger-exploded.jpg", w: 1376, h: 768, f: [660, 400], surface: "paper" },
+  { file: "the-stack.jpg", w: 1399, h: 730, f: [700, 380], surface: "paper" },
+  { file: "combo-boxes.jpg", w: 1376, h: 768, f: [560, 400], surface: "char" },
+  { file: "combo-open.jpg", w: 1570, h: 1536, f: [785, 700], surface: "char" },
+  { file: "combo-closed.jpg", w: 1920, h: 1080, f: [960, 560], surface: "char" },
+];
+const WINDOWS = [[0, 0.12], [0.12, 0.26], [0.26, 0.44], [0.44, 0.6], [0.6, 0.74], [0.74, 0.88], [0.88, 1.0001]];
+const P_SMOOTH = 0.14;
+const CALLOUTS = [
+  { at: [850, 168], label: "BUTTERY TOASTED BUN", sub: "Brioche, kissed on the flat-top" },
+  { at: [848, 248], label: "SIGNATURE SAUCE", sub: "SELF sauce. Don't ask." },
+  { at: [846, 350], label: "CARAMELIZED ONIONS", sub: "Low and slow, 40 minutes" },
+  { at: [840, 452], label: "MELTED AMERICAN CHEESE", sub: "Two slices, to the edge" },
+  { at: [846, 568], label: "JUICY BEEF PATTY", sub: "Smashed thin, lace-crisp" },
+  { at: [842, 672], label: "TOASTED BUN", sub: "Holds it all together" },
+];
+const CALLOUT_STEP = 0.12;
+
+const story = $("[data-story]");
+const stage = $("[data-stage]");
+const surfaceEl = $("[data-stage-surface]");
+const framesHost = $("[data-frames]");
+const [scrimLeft, scrimBottom, scrimRight, scrimTop, scrimPaper] = $$("[data-scrim] > span");
+const copyEl = $("[data-copy]");
+const veil = $("[data-veil]");
+const progressEl = $("[data-progress]");
+const hint = $("[data-hint]");
+
+const r = (p, a, b) => clamp01((p - a) / (b - a));
+const e = easings.easeInOutCubic;
+
+/* Frames: one <img> per still, sized to its natural pixels and placed by the cover box. */
+const frameEls = FRAMES.map((fr, i) => {
+  const img = new Image();
+  img.className = "frame";
+  img.alt = ""; img.decoding = "async"; img.draggable = false;
+  img.width = fr.w; img.height = fr.h;
+  img.style.width = `${fr.w}px`; img.style.height = `${fr.h}px`;
+  img.style.zIndex = i + 1; // later frames fade in over earlier ones
+  img.addEventListener("error", () => { reportFailure(img.src); img.style.display = "none"; });
+  img.src = ASSET_BASE + fr.file;
+  framesHost.appendChild(img);
+  return img;
+});
+
+/* Video mode: four scrubbed videos replace F1–F2, F3, F4–F5, F6–F7. */
+const videoGroups = VIDEO ? [
+  { src: VIDEO.hero, frames: [0, 1], win: [0, 0.26] },
+  { src: VIDEO.explode, frames: [2], win: [0.26, 0.44] },
+  { src: VIDEO.combo, frames: [3, 4], win: [0.44, 0.74] },
+  { src: VIDEO.box, frames: [5, 6], win: [0.74, 1] },
+].map((g) => {
+  const v = document.createElement("video");
+  v.className = "frame is-video"; v.muted = true; v.playsInline = true; v.preload = "auto";
+  v.setAttribute("muted", ""); v.setAttribute("playsinline", "");
+  v.style.zIndex = g.frames[0] + 1;
+  v.src = g.src;
+  v.addEventListener("loadedmetadata", () => { const pr = v.play(); pr?.then?.(() => v.pause()).catch(() => {}); });
+  v.addEventListener("error", () => reportFailure(g.src));
+  g.frames.forEach((i) => { frameEls[i].style.display = "none"; });
+  framesHost.appendChild(v);
+  return { ...g, v, target: 0, current: 0, lastSeek: 0 };
+}) : [];
+if (videoGroups.length) {
+  useLoop((now) => {
+    for (const g of videoGroups) {
+      const d = g.v.duration;
+      if (!Number.isFinite(d)) continue;
+      g.current += (g.target - g.current) * 0.09;
+      if (Math.abs(g.v.currentTime - g.current) > 0.02 && now - g.lastSeek >= 30) { g.v.currentTime = g.current; g.lastSeek = now; }
+    }
+  }, 0, 1);
+}
+
+/* The cover box. */
+const covers = FRAMES.map(() => ({ s: 1, left: 0, top: 0 }));
+const coverOf = (i, zoom, shiftX = 0, shiftY = 0, liftY = 0) => {
+  const fr = FRAMES[i];
+  const vw = stage.clientWidth, vh = stage.clientHeight;
+  const s = Math.max(vw / fr.w, vh / fr.h) * (zoom + 24 / vw);
+  const W = fr.w * s, H = fr.h * s;
+  let left = clamp(vw / 2 - fr.f[0] * s, vw - W, 0);
+  let top = clamp(vh / 2 - fr.f[1] * s, vh - H, 0);
+  left = clamp(left + shiftX, vw - W, 0);
+  top = clamp(top + shiftY + liftY * H, vh - H, 0);
+  const c = covers[i]; c.s = s; c.left = left; c.top = top;
+  return c;
+};
+const imageCoords = (i, x, y) => { const c = covers[i]; return { left: c.left + x * c.s, top: c.top + y * c.s }; };
+
+/* Surfaces, interpolated in linear RGB. */
+const toLin = (c) => { c /= 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+const toSrgb = (c) => Math.round(255 * clamp01(c <= 0.0031308 ? c * 12.92 : 1.055 * Math.pow(c, 1 / 2.4) - 0.055));
+const CHAR = [11, 11, 11].map(toLin), PAPER = [241, 239, 236].map(toLin);
+const surfaceAt = (t) => `rgb(${CHAR.map((c, k) => toSrgb(lerp(c, PAPER[k], t))).join(",")})`;
+
+/* ── Chapters: reversible reveals driven by the story's progress ── */
+class Chapter {
+  constructor(el) {
+    this.el = el; this.in = false; this.units = [];
+    this.exit = new Spring(0, dur(300, "easeOutCubic"));
+    this.exit.onChange = (v) => { el.style.opacity = 1 - v; el.style.filter = v > 0 ? `blur(${9 * v}px)` : "none"; el.style.transform = `translate3d(0, ${-28 * v}px, 0)`; };
+    this.exit.onRest = (v) => { if (v >= 1 && !this.in) { el.style.visibility = "hidden"; this.units.forEach((u) => u.reset()); } };
+  }
+  set(on) {
+    if (on === this.in) return;
+    this.in = on;
+    if (on) {
+      this.exit.jump(0);
+      this.el.style.visibility = "visible";
+      this.units.forEach((u) => (REDUCED ? u.jump() : u.enter()));
+    } else if (REDUCED) {
+      this.exit.cfg = { ...this.exit.cfg, ...dur(200) }; this.exit.start(1);
+    } else this.exit.start(1);
+  }
+}
+const riseUnit = (el, delay) => {
+  const s = tween(el, { opacity: 0, y: 12 }, { opacity: 1, y: 0 }, [90, 26]);
+  return { enter: () => { s.jump(0); s.start(1, { delay }); }, reset: () => s.jump(0), jump: () => s.jump(1) };
+};
+const chapters = $$("[data-chapter]", copyEl).map((el) => {
+  const ch = new Chapter(el);
+  const eyebrow = el.querySelector(".eyebrow");
+  ch.units.push(riseUnit(eyebrow, 0), ruleDraw(eyebrow.querySelector("[data-rule]"), "x", 0));
+  for (const t of el.querySelectorAll("[data-te]")) {
+    const te = textEngine(t, t.dataset.te, { delay: +(t.dataset.delay || 0), stagger: t.dataset.stagger ? +t.dataset.stagger : undefined });
+    ch.units.push(te);
+    t._te = te;
+  }
+  for (const d of el.querySelectorAll("[data-rise]")) ch.units.push(riseUnit(d, +d.dataset.rise));
+  for (const d of el.querySelectorAll("[data-dr]")) { const dr = digitRoll(d, { delay: +d.dataset.dr }); ch.units.push({ enter: () => { dr.reset(); dr.play(); }, reset: dr.reset, jump: dr.jump }); }
+  el.style.visibility = "hidden";
+  return ch;
+});
+
+/* ── Callouts (C3) ── */
+const calloutHost = $("[data-callouts]");
+const calloutList = $("[data-callout-list]");
+const callouts = CALLOUTS.map((c, i) => {
+  const el = document.createElement("div");
+  el.className = "callout";
+  el.innerHTML = `<span class="sq"></span><span class="ln"></span><span class="tx"><b></b><small></small></span>`;
+  el.querySelector("b").textContent = c.label;
+  el.querySelector("small").textContent = c.sub;
+  calloutHost.appendChild(el);
+  const sq = tween(el.querySelector(".sq"), { scale: 0 }, { scale: 1 }, [260, 30]);
+  const ln = tween(el.querySelector(".ln"), { transform: "scaleX(0)" }, { transform: "scaleX(1)" }, [55, 22]);
+  const b = tween(el.querySelector("b"), { opacity: 0, y: 8 }, { opacity: 1, y: 0 }, [90, 26]);
+  const sm = tween(el.querySelector("small"), { opacity: 0, y: 8 }, { opacity: 0.55, y: 0 }, [90, 26]);
+  const pulse = new Spring(1, { tension: 220, friction: 28, precision: 0.001 });
+  const item = { el, c, shown: false, pulse, scale: 1 };
+  pulse.onChange = (v) => { item.scale = v; };
+  item.show = () => { item.shown = true; el.style.opacity = 1; sq.start(1); ln.start(1, { delay: 60 }); b.start(1, { delay: 140 }); sm.start(1, { delay: 180 }); };
+  item.hide = () => { item.shown = false; el.style.opacity = 0; [sq, ln, b, sm].forEach((s) => s.jump(0)); };
+  el.addEventListener("mouseenter", () => { if (hoverOff()) return; calloutHost.classList.add("has-hover"); el.classList.add("is-hover"); });
+  el.addEventListener("mouseleave", () => { calloutHost.classList.remove("has-hover"); el.classList.remove("is-hover"); });
+  const li = document.createElement("span"); li.textContent = c.label; calloutList.appendChild(li);
+  return item;
+});
+chapters[2].units.push({ enter() {}, reset() { callouts.forEach((c) => c.hide()); }, jump() {} });
+/* Hovering the word "name" in the C3 lede pulses the six callouts in order. */
+{
+  const lede = $("[data-name-hover]");
+  const word = [...lede.querySelectorAll(".te-word")].find((w) => /^name\b/i.test(w.textContent));
+  if (word) {
+    word.style.textDecoration = "underline"; word.style.textUnderlineOffset = "3px"; word.style.cursor = "help"; word.style.pointerEvents = "auto";
+    word.addEventListener("mouseenter", () => {
+      if (hoverOff()) return;
+      callouts.forEach((c, i) => { c.pulse.start(1.06, { delay: i * 80 }); c.pulse.onRest = () => { c.pulse.onRest = null; c.pulse.start(1); }; });
+    });
+  }
+}
+
+/* ── Counter, progress, hint ── */
+const counterEl = $("[data-counter]");
+const counterNum = digitRoll($("[data-counter-num]"));
+counterNum.jump();
+const counterFill = $("[data-counter-fill]");
+if (!REDUCED) {
+  const arrow = $("[data-hint-arrow]");
+  const bob = new Spring(0, dur(900, "easeInOutSine"));
+  bob.onChange = (v) => { arrow.style.transform = `translateY(${v * 6}px)`; };
+  bob.start(1, { loop: true });
+}
+hint.style.opacity = 0;
+
+/* ── Pointer life on the stage ── */
+const ptr = { x: new Spring(0, { tension: 55, friction: 22, precision: 0.001 }), y: new Spring(0, { tension: 55, friction: 22, precision: 0.001 }) };
+let dirty = true;
+ptr.x.onChange = ptr.y.onChange = () => { dirty = true; };
+stage.addEventListener("pointermove", (ev) => {
+  if (REDUCED || window.innerWidth < 768 || ev.pointerType === "touch") return;
+  const b = stage.getBoundingClientRect();
+  ptr.x.start(clamp(((ev.clientX - b.left) / b.width) * 2 - 1, -1, 1));
+  ptr.y.start(clamp(((ev.clientY - b.top) / b.height) * 2 - 1, -1, 1));
+});
+stage.addEventListener("pointerleave", () => { ptr.x.start(0); ptr.y.start(0); });
+
+/* ── The story loop ── */
+let pRaw = 0, pSmooth = 0, lastChapter = -1;
+scrub(story, "top top", "bottom bottom", (q) => { pRaw = q; dirty = true; });
+const setTheme = (t) => { if (story.dataset.headerTheme !== t) story.dataset.headerTheme = t; };
+
+const render = () => {
+  const d = pRaw - pSmooth;
+  if (Math.abs(d) > 0.00005) { pSmooth += d * P_SMOOTH; dirty = true; } else if (pSmooth !== pRaw) { pSmooth = pRaw; dirty = true; }
+  if (!dirty) return;
+  dirty = false;
+  const p = pSmooth;
+  const plain = REDUCED;
+  const sx = ptr.x.x, sy = ptr.y.x;
+  const fx = -10 * sx, fy = -6 * sy;
+
+  // Per-frame state straight from the chapter table.
+  const st = [
+    { o: 1, z: 1 + 0.06 * r(p, 0, 0.2) },
+    { o: e(r(p, 0.12, 0.18)), z: 1.06 + 0.04 * r(p, 0.12, 0.26), lift: -0.03 * e(r(p, 0.12, 0.26)), blur: 24 * r(p, 0.26, 0.31) },
+    { o: e(r(p, 0.26, 0.31)), z: 1.08 - 0.08 * e(r(p, 0.26, 0.34)) + 0.06 * r(p, 0.44, 0.49), clip: 8 + 92 * e(r(p, 0.26, 0.33)), blur: 16 * r(p, 0.44, 0.49) },
+    { o: e(r(p, 0.44, 0.49)), z: 1.05 - 0.05 * e(r(p, 0.44, 0.52)) },
+    { o: e(r(p, 0.6, 0.65)), z: 1.1 - 0.1 * e(r(p, 0.6, 0.7)), blur: 20 * r(p, 0.74, 0.79) },
+    { o: e(r(p, 0.74, 0.79)), z: 1.0 + 0.08 * r(p, 0.74, 0.88) },
+    { o: e(r(p, 0.88, 0.92)), z: 1.12 - 0.12 * e(r(p, 0.88, 0.97)) },
+  ];
+  // A frame is covered once any frame above it is fully opaque and unclipped.
+  let coveredFrom = st.length;
+  for (let i = st.length - 1; i >= 0; i--) if (st[i].o >= 0.999 && (st[i].clip === undefined || st[i].clip >= 100)) { coveredFrom = i; break; }
+  st.forEach((s, i) => {
+    const img = frameEls[i];
+    const visible = s.o > 0.001 && i >= coveredFrom;
+    img.style.visibility = visible ? "visible" : "hidden";
+    img.style.willChange = visible ? "transform, opacity" : "auto";
+    const c = coverOf(i, plain ? 1 : s.z, fx, fy, s.lift || 0);
+    if (!visible) return;
+    img.style.opacity = s.o;
+    img.style.transform = `translate3d(${c.left}px, ${c.top}px, 0) scale(${c.s})`;
+    img.style.filter = !plain && s.blur > 0.05 ? `blur(${s.blur / c.s}px)` : "none";
+    const clipV = plain ? undefined : s.clip;
+    img.style.clipPath = clipV !== undefined && clipV < 100 ? `circle(${clipV}% at 50% 48%)` : "none";
+  });
+  // Video mode: scrub targets and opacities follow the group's first frame.
+  for (const g of videoGroups) {
+    const dd = g.v.duration;
+    if (Number.isFinite(dd)) g.target = r(p, g.win[0], g.win[1]) * dd;
+    g.v.style.opacity = st[g.frames[0]].o;
+  }
+
+  // Surface, scrims, veil.
+  const paper = p < 0.44 ? r(p, 0.26, 0.31) : 1 - r(p, 0.6, 0.64);
+  surfaceEl.style.background = surfaceAt(paper);
+  const left = p < 0.26 ? 1 : p < 0.74 ? 1 - r(p, 0.26, 0.31) : p < 0.88 ? r(p, 0.74, 0.79) : 1 - r(p, 0.88, 0.92);
+  const bottom = p < 0.74 ? r(p, 0.6, 0.65) : p < 0.88 ? 1 - r(p, 0.74, 0.79) : r(p, 0.88, 0.92);
+  scrimLeft.style.opacity = left;
+  scrimRight.style.opacity = p < 0.26 ? r(p, 0.12, 0.18) * (1 - r(p, 0.2, 0.26)) : r(p, 0.6, 0.65) * (1 - r(p, 0.74, 0.79));
+  scrimTop.style.opacity = r(p, 0.88, 0.92);
+  scrimPaper.style.opacity = p < 0.44 ? r(p, 0.26, 0.31) : 1 - r(p, 0.6, 0.64);
+  scrimBottom.style.opacity = bottom;
+  veil.style.opacity = r(p, 0.96, 1);
+
+  // Header theme.
+  setTheme(p >= 0.98 ? "light" : p >= 0.62 ? "dark" : p >= 0.29 ? "light" : "dark");
+
+  // Chapters.
+  const idx = WINDOWS.findIndex(([a, b]) => p >= a && p < b);
+  chapters.forEach((ch, i) => ch.set(i === 0 ? page.ready && idx === 0 : i === idx));
+  copyEl.style.transform = plain ? "" : `translate3d(${6 * sx}px, ${4 * sy}px, 0)`;
+
+  // Callouts pinned to F3.
+  const c3 = chapters[2];
+  const rr = r(p, 0.3, 0.42);
+  const wide = window.innerWidth >= 768;
+  callouts.forEach((c, i) => {
+    const pt = imageCoords(2, c.c.at[0], c.c.at[1]);
+    c.el.style.transform = `translate3d(${pt.left}px, ${pt.top}px, 0) scale(${c.scale})`;
+    const want = c3.in && rr >= i * CALLOUT_STEP - 1e-6;
+    if (want && !c.shown) c.show();
+  });
+  calloutHost.style.opacity = c3.in ? 1 : 1 - c3.exit.x;
+  calloutList.style.opacity = wide ? 0 : (c3.in ? r(p, 0.3, 0.34) : 0);
+
+  // Counter + progress + hint.
+  const ci = Math.max(0, idx);
+  if (ci !== lastChapter) { lastChapter = ci; counterNum.set(String(ci + 1).padStart(2, "0")); }
+  const [a, b] = WINDOWS[ci];
+  counterFill.style.transform = `scaleY(${r(p, a, Math.min(1, b))})`;
+  counterEl.classList.toggle("is-light", story.dataset.headerTheme === "light");
+  progressEl.style.transform = `scaleX(${p})`;
+  progressEl.style.opacity = 1 - r(p, 0.98, 1);
+  hint.style.visibility = p > 0.04 ? "hidden" : "visible";
+  hint.style.opacity = page.ready ? 1 - r(p, 0, 0.04) : 0;
+};
+useLoop(render, 0, 1);
+window.addEventListener("resize", () => { dirty = true; });
+whenReady(() => { dirty = true; });
+
+/* ═══════════════════ The header ═══════════════════ */
+const header = $("[data-header]");
+{
+  inview(header, { from: { opacity: 0, y: -12 }, to: { opacity: 1, y: 0 }, config: [90, 26], delay: 120, ready: true });
+  inview($("[data-nav-clip]"), { from: { clipPath: "inset(0 100% 0 0)" }, to: { clipPath: "inset(0 0% 0 0)" }, config: [46, 26], delay: 220, ready: true });
+  inview($("[data-right-clip]"), { from: { clipPath: "inset(0 100% 0 0)" }, to: { clipPath: "inset(0 0% 0 0)" }, config: [46, 26], delay: 480, ready: true });
+  $$("[data-ul]").forEach((a) => underline(a, a, false));
+  $$("[data-ul-rule]").forEach((a) => underline(a, a, true));
+  const themed = $$("[data-header-theme]");
+  useLoop(() => {
+    const y = 44;
+    const hit = themed.find((s) => { const b = s.getBoundingClientRect(); return b.top <= y && b.bottom > y; });
+    header.classList.toggle("is-light", hit?.dataset.headerTheme === "light");
+  }, 100, 0);
+  const panel = $("[data-panel]"), toggle = $("[data-toggle]");
+  let open = false;
+  const set = (v) => {
+    open = v;
+    panel.classList.toggle("open", v);
+    toggle.setAttribute("aria-expanded", String(v));
+    toggle.setAttribute("aria-label", v ? "Close menu" : "Open menu");
+    header.classList.toggle("is-light", false);
+    v ? stopScroll() : startScroll();
+  };
+  toggle.addEventListener("click", () => set(!open));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && open) { set(false); toggle.focus(); } });
+  $$("a", panel).forEach((a) => a.addEventListener("click", () => set(false)));
+}
+$$("[data-pill]").forEach(pill);
+
+/* ═══════════════════ The preloader ═══════════════════ */
+const STEP = { mount: 0.12, fonts: 0.6, loaded: 1 };
+const MIN_VISIBLE = 700, MAX_WAIT = 4000, HOLD = 200;
+const runPreloader = () => {
+  const panel = $("[data-preloader]");
+  if (REDUCED) { panel.remove(); page.set({ revealing: true, ready: true }); return; }
+  const count = $("[data-pl-count]", panel);
+  const layers = $$("[data-layer]", panel).map((g, i) => {
+    const s = new Spring(0, { tension: 170, friction: 26, precision: 0.001 });
+    s.onChange = (v) => { g.style.transform = `translateY(${lerp(-120, 0, v)}px)`; g.style.opacity = clamp01(v * 1.5); };
+    s.onChange(0);
+    return { s, threshold: i / 6, dropped: false };
+  });
+  const t0 = performance.now();
+  const level = new Spring(0, { tension: 120, friction: 26, precision: 0.001 });
+  const leave = new Spring(0, { tension: 120, friction: 18, precision: 0.001, clamp: true });
+  level.onChange = (v) => {
+    count.textContent = String(Math.round(v * 100)).padStart(3, "0");
+    for (const l of layers) if (!l.dropped && v >= l.threshold) { l.dropped = true; l.s.start(1); }
+  };
+  leave.onChange = (v) => { panel.style.clipPath = `inset(0 0 ${v * 100}% 0)`; };
+  let gone = false, finishing = false;
+  const done = () => { if (gone) return; gone = true; panel.remove(); page.set({ revealing: true, ready: true }); startScroll(); };
+  leave.onRest = done;
+  stopScroll();
+  level.start(STEP.mount);
+  level.onChange(0);
+  document.fonts?.ready.then(() => { if (!finishing) level.start(STEP.fonts); });
+  const finish = () => {
+    if (finishing) return;
+    finishing = true;
+    level.onRest = () => {
+      level.onRest = null;
+      setTimeout(() => { page.set({ revealing: true }); leave.start(1); }, Math.max(0, MIN_VISIBLE - (performance.now() - t0)) + HOLD);
+    };
+    level.start(STEP.loaded);
+  };
+  // Every still counts toward "loaded".
+  Promise.allSettled(FRAMES.map((fr) => { const im = new Image(); im.src = ASSET_BASE + fr.file; return im.decode(); })).then(finish);
+  window.addEventListener("load", finish, { once: true });
+  setTimeout(finish, MAX_WAIT);
+  setTimeout(done, MAX_WAIT + 2000);
+};
+
+/* ═══════════════════ 2 — The lineup ═══════════════════ */
+const CARDS = [
+  { photo: "card-burger.jpg", cat: "BURGER", name: "FREE THROW SHOT", desc: "Double smash, American cheese, crispy onions, bacon, SELF sauce.", prices: ["$9.46", "$12.34", "$15.79"] },
+  { photo: "card-fries.jpg", cat: "SIDE", name: "TIMEOUT FRIES", desc: "Skin-on, double-fried, sea salt.", prices: ["$3.99"] },
+  { photo: "card-shake.jpg", cat: "SHAKE", name: "OVERTIME SHAKE", desc: "Cookies & cream, chocolate drizzle, whipped top.", prices: ["$6.49"] },
+  { photo: "card-combo.jpg", cat: "COMBO", name: "GAME DAY COMBO", desc: "Burger + fries + shake + two sauces, one box.", prices: ["$18.99"] },
+];
+{
+  // Title: line reveal plus a per-character stamp.
+  const title = $("[data-lineup-title]");
+  const te = textEngine(title, "lines");
+  const chars = [];
+  const splitChars = () => {
+    chars.length = 0;
+    for (const inner of te.lines) {
+      const text = inner.textContent;
+      inner.classList.remove("ink");
+      inner.textContent = "";
+      for (const ch of text) {
+        const box = document.createElement("span"); box.className = "te-char";
+        const g = document.createElement("span"); g.className = "ink"; g.textContent = ch === " " ? " " : ch;
+        box.appendChild(g); inner.appendChild(box);
+        const s = new Spring(0, dur(700, "easeOutCubic"));
+        s.onChange = (v) => { g.style.transform = `translateY(${lerp(100, 0, v)}%)`; };
+        s.onChange(title._shown ? 1 : 0);
+        if (title._shown) s.jump(1);
+        chars.push(s);
+      }
+    }
+  };
+  te.onLayout = splitChars; splitChars();
+  onEnter(title, () => { title._shown = true; te.enter(); chars.forEach((s, i) => s.start(1, { delay: i * 35 })); }, "0px 0px -25% 0px");
+  inview($("[data-inview-fade]"), { from: { opacity: 0 }, to: { opacity: 0.55 }, delay: 300 });
+  const subRule = ruleDraw($("[data-rule-io]"), "x", 400);
+  onEnter($("[data-rule-io]"), () => subRule.enter());
+
+  const grid = $("[data-grid]");
+  CARDS.forEach((c, order) => {
+    const wrap = document.createElement("div");
+    wrap.className = "lean";
+    wrap.innerHTML = `
+      <div class="lean-in">
+        <article class="card on-paper">
+          <div class="card-top fine"><span data-idx>${String(order + 1).padStart(2, "0")}</span><span>${c.cat}</span></div>
+          <div class="card-media"><div data-float><img src="${ASSET_BASE + c.photo}" alt="${c.name}" loading="lazy" decoding="async"></div></div>
+          <h3 class="display ink card-name" data-name>${c.name}</h3>
+          <p class="card-desc">${c.desc}</p>
+          <div class="card-price">
+            <span class="p" data-price>${c.prices[0]}</span>
+            ${c.prices.length > 1 ? `<span class="sizes">${["SINGLE", "DOUBLE", "TRIPLE"].map((s, i) => `<button type="button" class="${i ? "" : "is-on"}" data-size="${i}">${s}</button>`).join("")}</span>` : ""}
+          </div>
+          <a href="#order" class="pill pill--outline" data-card-pill>ADD TO ORDER</a>
+        </article>
+      </div>`;
+    grid.appendChild(wrap);
+    const card = wrap.querySelector(".card");
+    const img = wrap.querySelector("img");
+    img.addEventListener("error", () => reportFailure(img.src));
+    pill(wrap.querySelector("[data-card-pill]"));
+    // Reveal.
+    inview(wrap, { from: { opacity: 0, y: 60, filter: "blur(8px)" }, to: { opacity: 1, y: 0, filter: "blur(0px)" }, config: [90, 26], delay: order * 90, trigger: grid });
+    const idx = digitRoll(wrap.querySelector("[data-idx]"), { delay: order * 90 + 160 });
+    const price = digitRoll(wrap.querySelector("[data-price]"), { delay: order * 90 + 240 });
+    const name = tween(wrap.querySelector("[data-name]"), { opacity: 0, y: 16 }, { opacity: 1, y: 0 }, [90, 26]);
+    onEnter(grid, () => { idx.play(); price.play(); name.start(1, { delay: order * 90 + 300 }); }, "0px");
+    // The product floats inside the card: lags the lean on its own spring, lifts on hover.
+    const float = wrap.querySelector("[data-float]");
+    const fx = new Spring(0, { tension: 90, friction: 22, precision: 0.001 }), fy = new Spring(0, { tension: 90, friction: 22, precision: 0.001 });
+    const hv = new Spring(0, { tension: 120, friction: 26, precision: 0.001 });
+    const drawFloat = () => { float.style.transform = `translate3d(${fx.x * 11}px, ${fy.x * 11 - 8 * hv.x}px, 0) scale(${1 + 0.06 * hv.x})`; };
+    fx.onChange = fy.onChange = hv.onChange = drawFloat;
+    pointerLean(wrap, wrap.querySelector(".lean-in"), (dx, dy) => { fx.start(dx); fy.start(dy); });
+    card.addEventListener("mouseenter", () => { if (!hoverOff()) hv.start(1); });
+    card.addEventListener("mouseleave", () => hv.start(0));
+    // Sizes re-roll the price.
+    wrap.querySelectorAll("[data-size]").forEach((b) => b.addEventListener("click", () => {
+      wrap.querySelectorAll("[data-size]").forEach((x) => x.classList.toggle("is-on", x === b));
+      price.set(c.prices[+b.dataset.size]);
+    }));
+  });
+
+  // VIEW FULL MENU: the combo photo slides in behind the button.
+  const more = $("[data-more]");
+  const slide = $("[data-more-slide]");
+  const s = tween(slide, { transform: "translate3d(150px, 150px, 0) rotate(-6deg)", opacity: 0 }, { transform: "translate3d(0px, 0px, 0) rotate(-6deg)", opacity: 1 }, [120, 26]);
+  more.addEventListener("mouseenter", () => { if (!hoverOff()) s.start(1); });
+  more.addEventListener("mouseleave", () => s.jump(0));
+}
+
+/* ═══════════════════ 3 — Order band ═══════════════════ */
+{
+  const band = $("#order");
+  const rule = ruleDraw($("[data-order-rule]"), "x");
+  onEnter(band, () => rule.enter());
+  for (const t of $$("[data-te-io]")) {
+    const te = textEngine(t, t.dataset.teIo, { delay: +(t.dataset.delay || 0) });
+    onEnter(t, () => te.enter(), "0px 0px -15% 0px");
+  }
+  for (const d of $$("[data-dr-io]")) { const dr = digitRoll(d, { delay: +d.dataset.drIo }); onEnter(d, () => dr.play()); }
+  const img = $("[data-order-img]");
+  img.addEventListener("error", () => reportFailure(img.src));
+  scrub(img.parentElement, "top bottom", "bottom top", (q) => {
+    img.style.transform = `translate3d(0, ${lerp(40, -40, q)}px, 0) scale(${lerp(1.12, 1, q)})`;
+  });
+}
+
+/* ═══════════════════ Anchors, root size, Lenis, boot ═══════════════════ */
+const FONT_BASE = 16, BASE_WIDTH = 1440, COEF = 0.6666;
+const interpolateFontSize = (w) => {
+  const widthReduction = ((BASE_WIDTH - w) / BASE_WIDTH) * 100;
+  return FONT_BASE - (FONT_BASE * widthReduction * COEF) / 100;
+};
+const applyGrid = () => {
+  const size = interpolateFontSize(window.innerWidth);
+  if (size > FONT_BASE) document.documentElement.style.setProperty("font-size", `${size}px`);
+  else document.documentElement.style.removeProperty("font-size");
+};
+applyGrid();
+window.addEventListener("resize", applyGrid);
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+window.scrollTo(0, 0);
+lenis = new Lenis({ smoothWheel: true, lerp: 0.09, wheelMultiplier: 0.9 });
+window.lenis = lenis;
+wake();
+$$('a[href^="#"]').forEach((a) => a.addEventListener("click", (ev) => {
+  const id = a.getAttribute("href");
+  const target = id.length > 1 && document.querySelector(id);
+  if (!target) return;
+  ev.preventDefault();
+  lenis.scrollTo(id === "#combo" ? story.offsetTop + (story.offsetHeight - innerHeight) * 0.66 : target, { duration: 1.4 });
+}));
+runPreloader();
+</script>
+</body>
+</html>
