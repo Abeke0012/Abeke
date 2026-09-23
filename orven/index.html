@@ -255,11 +255,29 @@ p { margin: 0; }
       const p = s.video.play();
       if (p && p.then) p.then(() => s.video.pause()).catch(() => {});
       else s.video.pause();
-      wake();
+      requestAnimationFrame(onScroll); // re-reads targets once the timeline code is set up
     };
-    if (s.video.readyState >= 1) onMeta(); else s.video.addEventListener("loadedmetadata", onMeta, { once: true });
+    s.video.addEventListener("loadedmetadata", onMeta);
+    if (s.video.readyState >= 1) onMeta();
+    // A finished seek frees the decoder for the next one.
+    s.video.addEventListener("seeked", wake);
   };
   scrubbers.forEach(prime);
+
+  /* Download each video whole and play it from memory: seeks then never wait on the network,
+     which is what makes scrubbing stall mid-clip. Falls back to streaming if the host blocks it. */
+  const toMemory = async (s) => {
+    const src = s.video.currentSrc || s.video.src;
+    try {
+      const res = await fetch(src, { mode: "cors" });
+      if (!res.ok) return;
+      const url = URL.createObjectURL(await res.blob());
+      s.ready = false;
+      s.video.src = url;
+      s.video.load();
+    } catch { /* keep streaming */ }
+  };
+  scrubbers.forEach(toMemory);
 
   const tick = (now) => {
     let busy = false;
@@ -271,7 +289,8 @@ p { margin: 0; }
       const drift = Math.abs(s.video.currentTime - s.current);
       if (drift > 0.02) {
         busy = true;
-        if (now - s.lastSeek >= 30) { s.video.currentTime = s.current; s.lastSeek = now; }
+        // One seek at a time: queued seeks pile up in the decoder and freeze the frame.
+        if (!s.video.seeking && now - s.lastSeek >= 30) { s.video.currentTime = s.current; s.lastSeek = now; }
       }
     }
     raf = busy ? requestAnimationFrame(tick) : 0;
@@ -279,7 +298,7 @@ p { margin: 0; }
   function wake() { if (!raf) raf = requestAnimationFrame(tick); }
 
   /* ── Scroll timeline ── */
-  const onScroll = () => {
+  function onScroll() {
     const vh = window.innerHeight;
     const y = window.scrollY - hero.offsetTop;
     const p1 = range(y, 0, SCRUB1_VH * vh);
