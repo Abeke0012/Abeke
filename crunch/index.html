@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRUNCH® — Smashed. Crusted. Flipped.</title>
+<meta name="description" content="Premium smashed burgers. 60-second sear, 450°F cast iron, 100% prime beef. The anatomy of a perfect burger.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gap: 24px;
+  --margin: 32px;
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --flame: #FF4500;
+  --font-head: "Syne", "Arial Black", sans-serif;
+  --font-ui: "Space Grotesk", system-ui, sans-serif;
+}
+html, body { margin: 0; box-sizing: border-box; overscroll-behavior: none; background: #000; }
+*, *::before, *::after { box-sizing: inherit; }
+body { color: #fff; font-family: var(--font-ui); font-weight: 500; -webkit-font-smoothing: antialiased; }
+h1, h2, p, ul { margin: 0; }
+a { color: inherit; text-decoration: none; }
+
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); padding-inline: var(--margin); }
+
+/* ─── Section 1: navigation ─── */
+.nav { position: fixed; top: 24px; left: 0; width: 100%; height: 60px; z-index: 100; mix-blend-mode: difference; display: flex; padding-inline: var(--margin); color: #fff; }
+.nav-col { flex: 1 1 0; display: flex; flex-direction: column; justify-content: center; gap: 6px; font-size: 14px; line-height: 1.15; }
+.nav-col.is-lines { border-left: 1px solid rgba(255, 255, 255, 0.2); padding-left: 20px; }
+.nav-logo { font-family: var(--font-head); font-size: 28px; font-weight: 800; letter-spacing: -0.05em; }
+.nav-cta { align-items: flex-end; text-align: right; color: var(--flame); letter-spacing: 0.04em; }
+.nav-cta a { transition: opacity 0.3s var(--ease-expo); }
+.nav-cta a:hover { opacity: 0.7; }
+
+/* ─── Section 2: hero ─── */
+.hero { position: relative; height: 1000vh; }
+.hero-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; background: #000; }
+.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero-video.is-v2 { opacity: 0; }
+.hero-shade { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.35), transparent 40%); pointer-events: none; }
+
+.hero-ui { position: fixed; inset: 0; z-index: 50; mix-blend-mode: difference; align-content: end; padding-bottom: 40px; pointer-events: none; }
+.hero-ui > * { pointer-events: auto; }
+.hero-left { grid-column: 1 / 8; will-change: opacity, transform; }
+.hero-title { font-family: var(--font-head); font-size: min(120px, 7.6vw); font-weight: 800; line-height: 90%; letter-spacing: -0.05em; text-transform: uppercase; }
+.hero-right { grid-column: 9 / 13; align-self: end; will-change: opacity; }
+.hero-desc { font-size: 18px; line-height: 130%; }
+.hero-meta { display: flex; justify-content: space-between; margin-top: 24px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.3); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+.hero-meta b { color: var(--flame); font-weight: 500; }
+
+/* ─── Section 3: ingredient panels ─── */
+.panels { position: fixed; inset: 0; z-index: 60; padding-top: 100px; pointer-events: none; mix-blend-mode: difference; align-items: start; }
+.panel { grid-row: 1; position: relative; top: 200vh; display: flex; flex-direction: column; gap: 48px; }
+.panel.is-right { grid-column: 9 / 12; }
+.panel.is-left { grid-column: 2 / 5; }
+.panel-index { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+.panel-index b { color: var(--flame); font-weight: 500; }
+.panel-text { font-size: 24px; line-height: 125%; letter-spacing: -0.02em; }
+.panel-text strong { font-family: var(--font-head); font-weight: 800; letter-spacing: -0.03em; text-transform: uppercase; }
+.specs { list-style: none; padding: 14px 0 0; border-top: 1px solid #fff; display: flex; flex-direction: column; gap: 10px; }
+.spec { display: flex; align-items: center; gap: 12px; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.spec::before { content: ""; width: 6px; height: 14px; background: var(--flame); flex: none; }
+.spec span:first-child { flex: 1; }
+
+/* ─── Section 4: after the hero ─── */
+.after { overflow: hidden; min-height: 100vh; display: grid; place-items: center; padding: 120px var(--margin); background: #000; }
+.after h2 { font-family: var(--font-head); font-size: clamp(44px, 10vw, 180px); font-weight: 800; letter-spacing: -0.05em; line-height: 0.9; text-align: center; }
+.after h2 span { color: var(--flame); }
+
+/* ─── Word / char stagger reveal ─── */
+.reveal-word { display: inline-block; opacity: 0; filter: blur(10px); transform: translateY(20px);
+  transition: opacity 0.4s var(--ease-expo), filter 0.4s var(--ease-expo), transform 0.4s var(--ease-expo);
+  transition-delay: calc(var(--i) * var(--stagger)); will-change: opacity, filter, transform; }
+.reveal-glue { display: inline-block; white-space: nowrap; } /* keeps a char-split word on one line */
+.reveal-active .reveal-word { opacity: 1; filter: blur(0); transform: translateY(0); }
+.reveal-exit .reveal-word { opacity: 0; filter: blur(9px); transform: translateY(-28px); transition-duration: 0.3s; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  :root { --gap: 12px; --margin: 16px; }
+  .nav { top: 16px; }
+  .nav-col.is-lines { display: none; }
+  .nav-logo { font-size: 22px; }
+  .hero-title { font-size: min(48px, 10.5vw); }
+  .hero-left, .hero-right { grid-column: 1 / -1; }
+  .hero-right { margin-top: 20px; }
+  .hero-desc { font-size: 15px; }
+  .panels { padding-top: 90px; }
+  .panel.is-right, .panel.is-left { grid-column: 1 / -1; }
+  .panel { gap: 28px; }
+  .panel-text { font-size: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-word { transition-duration: 0.01s; transition-delay: 0s; }
+}
+</style>
+</head>
+<body>
+
+<!-- Section 1: navigation -->
+<header class="nav">
+  <div class="nav-col"><a href="#top" class="nav-logo">CRUNCH®</a></div>
+  <nav class="nav-col is-lines" aria-label="Brand">
+    <span>Smashed Daily</span>
+    <span>100% Prime Beef</span>
+  </nav>
+  <nav class="nav-col is-lines" aria-label="Site">
+    <a href="#locations">Menu / Locations</a>
+    <a href="#manifesto">Our Manifesto</a>
+  </nav>
+  <div class="nav-col nav-cta"><a href="#order">+ ORDER NOW</a></div>
+</header>
+
+<main id="top">
+  <!-- Section 2: burger anatomy hero -->
+  <section class="hero" data-hero aria-label="Burger anatomy">
+    <div class="hero-sticky">
+      <!-- Swap these for your own footage; keep them muted for autoplay-free scrubbing. -->
+      <video class="hero-video is-v2" data-video="2" muted playsinline preload="auto" src="video2.mp4" aria-label="Melting cheddar and sauce, close up"></video>
+      <video class="hero-video is-v1" data-video="1" muted playsinline preload="auto" src="video1.mp4" aria-label="Patties sizzling on the smash grill"></video>
+      <div class="hero-shade"></div>
+    </div>
+  </section>
+
+  <!-- Section 4 -->
+  <section class="after" id="order" aria-label="Order">
+    <h2 data-reveal-io="words">NOW GO<br>GET <span>SMASHED.</span></h2>
+  </section>
+</main>
+
+<!-- Hero UI overlay -->
+<div class="hero-ui grid" data-hero-ui>
+  <div class="hero-left" data-hero-left>
+    <h1 class="hero-title" data-reveal="chars" data-stagger="0.025">Smashed. Crusted. Flipped.</h1>
+  </div>
+  <div class="hero-right" data-hero-right>
+    <p class="hero-desc" data-reveal="words">No gourmet fluff. Just raw heat, deeply caramelized crust, and unholy amounts of melted cheese. The blueprint of a perfect burger.</p>
+    <p class="hero-meta" data-reveal="words"><span>(Anatomy)</span><span>Scroll <b>↓</b></span></p>
+  </div>
+</div>
+
+<!-- Section 3: ingredient panels -->
+<div class="panels grid" aria-live="off">
+  <article class="panel is-right" data-panel="crust">
+    <p class="panel-index" data-reveal="words"><span>01 / Layer</span><b>Patty</b></p>
+    <p class="panel-text" data-reveal="words"><strong>The Crust:</strong> 60-second sear on a 450°F cast iron surface. Traps all juices, creates the iconic jagged edges.</p>
+    <ul class="specs">
+      <li class="spec"><span>Heat</span><span>450°F</span></li>
+      <li class="spec"><span>Time</span><span>60s</span></li>
+      <li class="spec"><span>Maillard Effect</span><span>100%</span></li>
+    </ul>
+  </article>
+  <article class="panel is-left" data-panel="bun">
+    <p class="panel-index" data-reveal="words"><span>02 / Layer</span><b>Bun</b></p>
+    <p class="panel-text" data-reveal="words"><strong>The Bun:</strong> Custom pillow-soft potato roll. Heavily buttered and toasted to form an impenetrable sauce barrier.</p>
+    <ul class="specs">
+      <li class="spec"><span>Type</span><span>Potato</span></li>
+      <li class="spec"><span>Fat</span><span>Real Butter</span></li>
+      <li class="spec"><span>Texture</span><span>Cloud</span></li>
+    </ul>
+  </article>
+</div>
+
+<script>
+(() => {
+  /* ── Scroll timeline (in viewport heights) ── */
+  const SCRUB1_VH = 3;   // phase 1: video 1 scrub
+  const FADE_VH = 2;     // phase 2: crossfade
+  const SCRUB2_VH = 4;   // phase 3: video 2 scrub + panels
+  const LERP = 0.09;
+  const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const clamp01 = (v) => Math.min(1, Math.max(0, v));
+  const range = (p, a, b) => clamp01((p - a) / (b - a));
+
+  /* ── Word / char stagger reveal ── */
+  // Splits the text nodes of `el` (inline markup such as <strong> survives) into
+  // <span class="reveal-word"> units carrying --i and --stagger.
+  function splitReveal(el, mode = "words", stagger = 0.05) {
+    el.setAttribute("aria-label", el.textContent.replace(/\s+/g, " ").trim());
+    let i = 0;
+    const unit = (text) => {
+      const s = document.createElement("span");
+      s.className = "reveal-word";
+      s.textContent = text;
+      s.style.setProperty("--i", i++);
+      s.style.setProperty("--stagger", `${stagger}s`);
+      return s;
+    };
+    const walk = (node) => {
+      for (const child of [...node.childNodes]) {
+        if (child.nodeType === 1) { child.setAttribute("aria-hidden", "true"); if (child.tagName !== "BR") walk(child); continue; }
+        if (child.nodeType !== 3) continue;
+        const frag = document.createDocumentFragment();
+        const parts = child.textContent.split(/(\s+)/);
+        for (const part of parts) {
+          if (!part) continue;
+          if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(" ")); continue; }
+          if (mode === "chars") {
+            const glue = document.createElement("span");
+            glue.className = "reveal-glue";
+            glue.setAttribute("aria-hidden", "true");
+            for (const ch of part) glue.appendChild(unit(ch));
+            frag.appendChild(glue);
+          } else {
+            const w = unit(part); w.setAttribute("aria-hidden", "true"); frag.appendChild(w);
+          }
+        }
+        child.replaceWith(frag);
+      }
+    };
+    walk(el);
+    el.classList.add("reveal");
+    return el;
+  }
+  /** on: true → active, false → exit, null → hidden. */
+  const reveal = (el, on) => {
+    if (el._state === on) return;
+    el._state = on;
+    el.classList.toggle("reveal-active", on === true);
+    el.classList.toggle("reveal-exit", on === false);
+  };
+  document.querySelectorAll("[data-reveal]").forEach((el) => splitReveal(el, el.dataset.reveal, el.dataset.stagger ? +el.dataset.stagger : 0.05));
+  document.querySelectorAll("[data-reveal-io]").forEach((el) => {
+    splitReveal(el, el.dataset.revealIo, 0.08);
+    new IntersectionObserver(([e]) => reveal(el, e.isIntersecting ? true : null), { threshold: 0.4 }).observe(el);
+  });
+
+  const heroLeft = document.querySelector("[data-hero-left]");
+  const heroRight = document.querySelector("[data-hero-right]");
+  const heroReveals = [...document.querySelectorAll("[data-hero-ui] .reveal")];
+  const panels = [...document.querySelectorAll("[data-panel]")].map((el, n) => ({
+    el,
+    reveals: [...el.querySelectorAll(".reveal")],
+    win: n === 0 ? [0, 0.45] : [0.5, 0.95],
+  }));
+  // The hero cluster reveals as soon as the page is up.
+  requestAnimationFrame(() => requestAnimationFrame(() => { introDone = true; onScroll(); }));
+  let introDone = false;
+
+  /* ── Video scrub engine (RAF-lerp) ── */
+  const hero = document.querySelector("[data-hero]");
+  const v1 = document.querySelector('[data-video="1"]');
+  const v2 = document.querySelector('[data-video="2"]');
+  const scrubbers = [v1, v2].map((video) => ({ video, target: 0, current: 0, lastSeek: 0, ready: false }));
+  const [s1, s2] = scrubbers;
+  let raf = 0;
+
+  scrubbers.forEach((s) => {
+    const onMeta = () => {
+      s.ready = true;
+      // iOS Safari paints seeks only after the element has played once.
+      const p = s.video.play();
+      if (p && p.then) p.then(() => s.video.pause()).catch(() => {});
+      requestAnimationFrame(onScroll);
+    };
+    s.video.addEventListener("loadedmetadata", onMeta);
+    if (s.video.readyState >= 1) onMeta();
+    s.video.addEventListener("seeked", wake); // a finished seek frees the decoder for the next
+  });
+
+  function tick(now) {
+    let busy = false;
+    for (const s of scrubbers) {
+      const d = s.video.duration;
+      if (!s.ready || !Number.isFinite(d)) continue;
+      const diff = s.target - s.current;
+      if (Math.abs(diff) > 0.001) { s.current += diff * LERP; busy = true; } else s.current = s.target;
+      if (Math.abs(s.video.currentTime - s.current) > 0.02) {
+        busy = true;
+        // One seek at a time, at most every 30 ms: queued seeks stall the decoder.
+        if (!s.video.seeking && now - s.lastSeek >= 30) { s.video.currentTime = s.current; s.lastSeek = now; }
+      }
+    }
+    raf = busy ? requestAnimationFrame(tick) : 0;
+  }
+  function wake() { if (!raf) raf = requestAnimationFrame(tick); }
+
+  /* ── Scroll → timeline ── */
+  function onScroll() {
+    const vh = window.innerHeight;
+    const y = window.scrollY - hero.offsetTop;
+    const p1 = range(y, 0, SCRUB1_VH * vh);
+    const p2 = range(y, SCRUB1_VH * vh, (SCRUB1_VH + FADE_VH) * vh);
+    const p3 = range(y, (SCRUB1_VH + FADE_VH) * vh, (SCRUB1_VH + FADE_VH + SCRUB2_VH) * vh);
+
+    // Phase 1: scrub video 1; from 80% the title fades and drifts up 100px.
+    if (Number.isFinite(v1.duration)) s1.target = p1 * v1.duration;
+    const out = range(p1, 0.8, 1);
+    heroLeft.style.opacity = 1 - out;
+    heroLeft.style.transform = out ? `translate3d(0, ${-100 * out}px, 0)` : "";
+    heroRight.style.opacity = 1 - out;
+    const heroOn = introDone && out < 0.15;
+    heroReveals.forEach((el) => reveal(el, introDone ? heroOn : null));
+
+    // Phase 2: crossfade with blur.
+    v1.style.opacity = 1 - p2;
+    v1.style.filter = p2 > 0.001 ? `blur(${50 * p2}px)` : "none";
+    v1.style.visibility = p2 >= 1 ? "hidden" : "visible";
+    v2.style.opacity = p2;
+
+    // Phase 3: scrub video 2 while the panels glide through.
+    if (Number.isFinite(v2.duration)) s2.target = p3 * v2.duration;
+    for (const pn of panels) place(pn, range(p3, pn.win[0], pn.win[1]), vh);
+
+    wake();
+  }
+
+  const PANEL_TOP = 100; // .panels padding-top
+  function place(pn, sub, vh) {
+    const h = pn.el.offsetHeight;
+    const from = vh - PANEL_TOP + 40;  // just under the fold
+    const to = -(PANEL_TOP + h);       // clear above the fold
+    // `top` rather than transform keeps mix-blend-mode on a single layer.
+    pn.el.style.top = `${Math.round(from + (to - from) * sub)}px`;
+    const state = sub > 0.1 && sub < 0.85 ? true : sub >= 0.85 ? false : null;
+    pn.reveals.forEach((el) => reveal(el, state));
+  }
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll);
+  if (REDUCED) document.documentElement.style.scrollBehavior = "auto";
+  onScroll();
+})();
+</script>
+</body>
+</html>
