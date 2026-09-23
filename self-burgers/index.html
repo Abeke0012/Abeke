@@ -88,6 +88,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .still { position: absolute; will-change: transform, opacity; }
 .still img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .still__patch { position: absolute; pointer-events: none; }
+/* Layered still: each slice is the whole photo masked to one layer; multiply lets the white around a layer vanish where layers overlap. */
+.still--layered { background: #fff; isolation: isolate; }
+.still--layered img { visibility: hidden; }
+.still__slice { position: absolute; inset: 0; background-size: 100% 100%; mix-blend-mode: multiply; will-change: transform; filter: brightness(1.04); /* lifts the photo's 246 grey ground to white */ }
 .slot video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; background: var(--dark); transition: opacity .3s linear; }
 .slot video.is-live { opacity: 1; }
 .stage__grad { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0, 0, 0, .55), transparent 40%), linear-gradient(to right, rgba(0, 0, 0, .45), transparent 42%), linear-gradient(to left, rgba(0, 0, 0, .4), transparent 38%); pointer-events: none; will-change: opacity; }
@@ -96,8 +100,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .layer { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--gap); padding-inline: var(--margin); pointer-events: none; z-index: 10; }
 .layer a, .layer button { pointer-events: auto; }
 .box { grid-row: 1; }
-.layer--hero .box { grid-column: 1 / 7; align-self: end; padding-bottom: 64px; will-change: transform; }
-.layer--hero h1 { font-size: clamp(64px, 9vw, 150px); margin-top: 16px; }
+.layer--hero .box { grid-column: 1 / 6; align-self: center; margin-top: -4vh; will-change: transform; }
+.layer--hero h1 { font-size: clamp(56px, 6.4vw, 118px); margin-top: 16px; }
 .hero__ctas { display: flex; gap: 12px; margin-top: 28px; }
 .hero__caption { margin-top: 18px; font-size: 14px; opacity: .7; }
 .reveal-active .hero__caption.reveal-block { opacity: .7; }
@@ -158,8 +162,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .card { display: flex; flex-direction: column; opacity: 0; transform: translate3d(0, 40px, 0); filter: blur(8px); transition: opacity .8s var(--ease-expo), transform .8s var(--ease-expo), filter .8s var(--ease-expo); transition-delay: calc(var(--i, 0) * 0.08s); }
 .card.is-in { opacity: 1; transform: none; filter: blur(0); }
 .card__media { position: relative; aspect-ratio: 4 / 3; border-radius: 6px; overflow: hidden; background: #1a1a1a; }
-.card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .9s var(--ease-expo); }
-.card:hover .card__media img, .card:hover .card__ph { transform: scale(1.06); }
+.card__media img { width: 100%; height: 100%; object-fit: cover; transform: scale(var(--z, 1)); transition: transform .9s var(--ease-expo); }
+.card:hover .card__media img { transform: scale(calc(var(--z, 1) * 1.06)); }
+.card:hover .card__ph { transform: scale(1.06); }
 .card__ph { position: absolute; inset: 0; display: grid; place-items: center; font-size: 64px; background: radial-gradient(120% 90% at 30% 20%, #2a2a2a 0%, #141414 55%, #0a0a0a 100%); transition: transform .9s var(--ease-expo); }
 .card__name { font-size: 34px; margin-top: 22px; }
 .card__desc { font-size: 13px; opacity: .6; margin-top: 10px; min-height: 2.8em; }
@@ -339,14 +344,16 @@ const CONFIG = {
    * patches = rectangles (fractions of the image) painted over baked-in text or UI.
    */
   scenes: {
-    hero: { src: "images/scenes/hero.jpg", w: 1515, h: 688, view: [0, 0, 0.94, 0.92], focus: [0.5, 0.55], zoom: [1, 1.08],
+    hero: { src: "images/scenes/hero.jpg", w: 1515, h: 688, view: [0, 0, 0.94, 0.92], focus: [0.54, 0.55], zoom: [1, 1.04],
       patches: [{ x: 0, y: 0, w: 0.4, h: 1, bg: "linear-gradient(to right, #0b0a0e 0%, #0b0a0e 76%, rgba(11,10,14,0) 100%)" }] },
-    explode: { src: "images/scenes/explode.jpg", w: 1376, h: 768, view: [0, 0, 0.94, 1], focus: [0.48, 0.5], zoom: [1.06, 1],
-      patches: [{ x: 0.616, y: 0, w: 0.4, h: 1, bg: "linear-gradient(to right, rgba(246,246,245,0) 0%, #f6f6f5 4%)" }] },
+    explode: { src: "images/scenes/explode.jpg", w: 1376, h: 768, view: [0, 0, 0.94, 1], focus: [0.48, 0.5], zoom: [1.04, 1],
+      /* Cut into its layers at the gaps between them; the layers start pressed together and fly apart on scroll. */
+      layers: { cuts: [0.25, 0.355, 0.492, 0.648, 0.805], feather: 0.012, x: [0.325, 0.618], centre: 0.52, press: 0.3 } },
     stack: { src: "images/scenes/stack.jpg", w: 1399, h: 768, view: [0, 0, 0.935, 0.935], focus: [0.5, 0.5], zoom: [1.05, 1],
       patches: [{ x: 0.015, y: 0.42, w: 0.29, h: 0.22, bg: "#f0efeb", blur: 14 }] },
     combo: { src: "images/scenes/combo.jpg", w: 1376, h: 768, view: [0, 0, 1, 0.89], focus: [0.36, 0.5], zoom: [1, 1.05] },
-    box: { src: "images/scenes/combo.jpg", w: 1376, h: 768, view: [0, 0, 1, 0.89], focus: [0.36, 0.5], zoom: [1.05, 1.16] },
+    /* The closed box on the right of the combo photo: the camera settles on it for the last phase. */
+    box: { src: "images/scenes/combo.jpg", w: 1376, h: 768, view: [0, 0, 1, 0.89], focus: [0.74, 0.56], zoom: [1.02, 1.45] },
   },
   /* Which stills stand in for each video, bottom to top. Slot 3 shares the combo photo and pushes in. */
   slots: [["hero"], ["explode"], ["stack", "combo"], ["box"]],
@@ -390,19 +397,19 @@ const CONFIG = {
     burgersLabel: "Burgers",
     sidesLabel: "Sides & Shakes",
     burgers: [
-      { name: "FREE THROW SHOT BURGER", desc: "Single smash, American cheese, pickles, SELF sauce.", img: "images/burger-1.jpg", // IMG_1
+      { name: "FREE THROW SHOT BURGER", desc: "Single smash, American cheese, pickles, SELF sauce.", img: "images/scenes/hero.jpg", crop: [0.6, 0.62, 1.9], // IMG_1
         sizes: [["Single", "$7.46"], ["Double", "$10.34"], ["Triple", "$13.79"]] },
-      { name: "LAYUP BURGER", desc: "Bacon, cheddar, grilled onions, BBQ glaze.", img: "images/burger-2.jpg", // IMG_2
+      { name: "LAYUP BURGER", desc: "Bacon, cheddar, grilled onions, BBQ glaze.", img: "images/scenes/stack.jpg", crop: [0.46, 0.66, 1.9], // IMG_2
         sizes: [["Single", "$9.19"], ["Double", "$13.79"], ["Triple", "$16.69"]] },
-      { name: "HOOK SHOT BURGER", desc: "Jalapeños, pepper jack, crispy onions, chipotle mayo.", img: "images/burger-3.jpg", // IMG_3
+      { name: "HOOK SHOT BURGER", desc: "Jalapeños, pepper jack, crispy onions, chipotle mayo.", img: "images/scenes/combo.jpg", crop: [0.22, 0.64, 2.6], // IMG_3
         sizes: [["Single", "$14.04"], ["Double", "$19.54"], ["Triple", "$22.10"]] },
     ],
     sides: [
-      { name: "TIMEOUT FRIES", desc: "Skin-on, sea salt.", img: "images/fries.jpg", emoji: "🍟", // IMG_4
+      { name: "TIMEOUT FRIES", desc: "Skin-on, sea salt.", img: "images/scenes/stack.jpg", crop: [0.17, 0.14, 3.1], emoji: "🍟", // IMG_4
         sizes: [["Regular", "$3.16"], ["Large", "$4.49"]] },
-      { name: "SELF LOADED FRIES", desc: "Cheese sauce, bacon, pickles, SELF sauce.", img: "images/loaded-fries.jpg", emoji: "🍟", // IMG_5
+      { name: "SELF LOADED FRIES", desc: "Cheese sauce, bacon, pickles, SELF sauce.", img: "images/scenes/combo.jpg", crop: [0.37, 0.56, 3], emoji: "🍟", // IMG_5
         sizes: [["One size", "$6.99"]] },
-      { name: "OVERTIME MILKSHAKES", desc: "Oreo / Biscoff / Strawberry.", img: "images/shakes.jpg", emoji: "🥤", // IMG_6
+      { name: "OVERTIME MILKSHAKES", desc: "Oreo / Biscoff / Strawberry.", img: "images/scenes/stack.jpg", crop: [0.84, 0.46, 2.5], emoji: "🥤", // IMG_6
         sizes: [["Regular", "$5.99"], ["Large", "$6.99"]] },
     ],
   },
@@ -515,7 +522,7 @@ const rangeState = (t, a, b) => (t < a ? "hidden" : t <= b ? "active" : "exit");
 const cardHTML = (item, i, fallbackEmoji) => `
   <article class="card" style="--i:${i}">
     <div class="card__media">
-      <img src="${esc(item.img)}" alt="${esc(item.name)}" loading="lazy" decoding="async" data-fallback="${esc(item.emoji || fallbackEmoji)}" />
+      <img src="${esc(item.img)}" alt="${esc(item.name)}" loading="lazy" decoding="async" data-fallback="${esc(item.emoji || fallbackEmoji)}"${item.crop ? ` style="--z:${item.crop[2]};object-position:${item.crop[0] * 100}% ${item.crop[1] * 100}%;transform-origin:${item.crop[0] * 100}% ${item.crop[1] * 100}%"` : ""} />
     </div>
     <h3 class="anton card__name">${esc(item.name)}</h3>
     <p class="card__desc">${esc(item.desc)}</p>
@@ -573,7 +580,19 @@ CONFIG.slots.forEach((keys, i) => {
     const el = document.createElement("div");
     el.className = "still";
     el.dataset.still = key;
-    el.innerHTML = `<img src="${esc(scene.src)}" alt="" decoding="async" />` +
+    const L = scene.layers;
+    const bands = L ? [0, ...L.cuts, 1].slice(0, -1).map((y0, j, arr) => [y0, j + 1 < arr.length ? arr[j + 1] : 1]) : [];
+    const f = L ? L.feather * 100 : 0;
+    const sliceHTML = bands.map(([y0, y1], j) => {
+      const a = y0 * 100, b = y1 * 100;
+      const mask = `linear-gradient(to bottom, transparent ${j ? a - f : 0}%, #000 ${j ? a + f : 0}%, #000 ${j < bands.length - 1 ? b - f : 100}%, transparent ${j < bands.length - 1 ? b + f : 100}%)`;
+      // Intersected with a horizontal mask round the burger, so only the food is cut and moved; the photo's own labels fall outside it.
+      const [xa, xb] = L.x.map((v) => v * 100);
+      const side = `linear-gradient(to right, transparent ${xa}%, #000 ${xa + 1.2}%, #000 ${xb - 0.8}%, transparent ${xb}%)`;
+      return `<span class="still__slice" data-band="${(y0 + y1) / 2}" style="background-image:url('${esc(scene.src)}');-webkit-mask-image:${mask},${side};mask-image:${mask},${side};-webkit-mask-composite:source-in;mask-composite:intersect"></span>`;
+    }).join("");
+    if (L) el.classList.add("still--layered");
+    el.innerHTML = `<img src="${esc(scene.src)}" alt="" decoding="async" />` + sliceHTML +
       (scene.patches || []).map((q) => `<span class="still__patch" style="left:${q.x * 100}%;top:${q.y * 100}%;width:${q.w * 100}%;height:${q.h * 100}%;background:${q.bg};${q.blur ? `filter:blur(${q.blur}px);` : ""}"></span>`).join("");
     slot.appendChild(el);
     stills.push({ el, scene, key, slot: i });
@@ -591,6 +610,8 @@ CONFIG.slots.forEach((keys, i) => {
 });
 // DOM order puts slot 0 on top.
 [...slotEls].reverse().forEach((el) => slotsHost.appendChild(el));
+for (const s of stills) s.slices = [...s.el.querySelectorAll(".still__slice")].map((el) => ({ el, band: +el.dataset.band }));
+const easeOutCubic = (x) => 1 - Math.pow(1 - x, 3);
 const stillByKey = (key, slot) => stills.find((s) => s.key === key && (slot === undefined || s.slot === slot));
 
 /** Lays a still out so its crop window covers the stage, keeping its focus point as central as it can. */
@@ -763,7 +784,13 @@ function update() {
   const heroS = stillByKey("hero"), exS = stillByKey("explode"), stackS = stillByKey("stack"), comboS = stillByKey("combo", 2), boxS = stillByKey("box");
   const exZoom = prog(p2, 0, 0.45);
   if (heroS) heroS.el.style.transform = zoomAt(heroS.scene, p1);
-  if (exS) exS.el.style.transform = zoomAt(exS.scene, exZoom);
+  if (exS) {
+    exS.el.style.transform = zoomAt(exS.scene, exZoom);
+    // Pressed together while the hero fades out, fully apart by 45% of the explode phase.
+    const L = exS.scene.layers, H = exS.el.offsetHeight;
+    const spread = easeOutCubic(prog(t, B.f1[0] + 0.3 * T.FADE1, B.p2[0] + 0.45 * T.SCRUB2));
+    for (const sl of exS.slices) sl.el.style.transform = `translate3d(0, ${(L.centre - sl.band) * H * L.press * (1 - spread)}px, 0)`;
+  }
   calloutLayer.style.transform = zoomAt(CONFIG.scenes.explode, exZoom);
   const swap = prog(p3, 0.5, 0.6);
   if (stackS) stackS.el.style.transform = zoomAt(stackS.scene, prog(p3, 0, 0.5));
