@@ -168,6 +168,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .footer__social { display: flex; gap: 20px; }
 .footer__social a:hover { color: var(--accent); opacity: 1; }
 
+.asset-note { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 350; display: none; padding: 12px 44px 12px 16px; border-radius: 8px; background: rgba(215, 38, 61, .95); color: #fff; font-size: 13px; line-height: 1.45; }
+.asset-note.on { display: block; }
+.asset-note code { font-family: ui-monospace, monospace; font-size: 12px; background: rgba(0, 0, 0, .25); padding: 1px 5px; border-radius: 4px; }
+.asset-note button { position: absolute; top: 8px; right: 12px; font-size: 18px; line-height: 1; }
+
 /* ═══════════════ Dev grid ═══════════════ */
 .devgrid { position: fixed; inset: 0; z-index: 400; display: none; grid-template-columns: repeat(12, 1fr); column-gap: var(--gap); padding-inline: var(--margin); pointer-events: none; }
 .devgrid.on { display: grid; }
@@ -201,6 +206,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 <body>
 <div class="preloader" data-preloader><div class="preloader__bar" data-preloader-bar></div></div>
 <div class="devgrid" data-devgrid aria-hidden="true"></div>
+<div class="asset-note" data-asset-note role="status"><button type="button" aria-label="Close">×</button><div data-asset-note-text></div></div>
 
 <!-- ═══════════════ Header ═══════════════ -->
 <header class="header" data-header>
@@ -313,10 +319,10 @@ const CONFIG = {
     { label: "About", href: "#top" },
   ],
   videos: [
-    "/videos/hero.mp4",    // VIDEO_1_URL
-    "/videos/explode.mp4", // VIDEO_2_URL
-    "/videos/combo.mp4",   // VIDEO_3_URL
-    "/videos/box.mp4",     // VIDEO_4_URL
+    "videos/hero.mp4",    // VIDEO_1_URL
+    "videos/explode.mp4", // VIDEO_2_URL
+    "videos/combo.mp4",   // VIDEO_3_URL
+    "videos/box.mp4",     // VIDEO_4_URL
   ],
   hero: {
     label: "★ SMASHED FRESH DAILY",
@@ -356,19 +362,19 @@ const CONFIG = {
     burgersLabel: "Burgers",
     sidesLabel: "Sides & Shakes",
     burgers: [
-      { name: "FREE THROW SHOT BURGER", desc: "Single smash, American cheese, pickles, SELF sauce.", img: "/images/burger-1.jpg", // IMG_1
+      { name: "FREE THROW SHOT BURGER", desc: "Single smash, American cheese, pickles, SELF sauce.", img: "images/burger-1.jpg", // IMG_1
         sizes: [["Single", "$7.46"], ["Double", "$10.34"], ["Triple", "$13.79"]] },
-      { name: "LAYUP BURGER", desc: "Bacon, cheddar, grilled onions, BBQ glaze.", img: "/images/burger-2.jpg", // IMG_2
+      { name: "LAYUP BURGER", desc: "Bacon, cheddar, grilled onions, BBQ glaze.", img: "images/burger-2.jpg", // IMG_2
         sizes: [["Single", "$9.19"], ["Double", "$13.79"], ["Triple", "$16.69"]] },
-      { name: "HOOK SHOT BURGER", desc: "Jalapeños, pepper jack, crispy onions, chipotle mayo.", img: "/images/burger-3.jpg", // IMG_3
+      { name: "HOOK SHOT BURGER", desc: "Jalapeños, pepper jack, crispy onions, chipotle mayo.", img: "images/burger-3.jpg", // IMG_3
         sizes: [["Single", "$14.04"], ["Double", "$19.54"], ["Triple", "$22.10"]] },
     ],
     sides: [
-      { name: "TIMEOUT FRIES", desc: "Skin-on, sea salt.", img: "/images/fries.jpg", emoji: "🍟", // IMG_4
+      { name: "TIMEOUT FRIES", desc: "Skin-on, sea salt.", img: "images/fries.jpg", emoji: "🍟", // IMG_4
         sizes: [["Regular", "$3.16"], ["Large", "$4.49"]] },
-      { name: "SELF LOADED FRIES", desc: "Cheese sauce, bacon, pickles, SELF sauce.", img: "/images/loaded-fries.jpg", emoji: "🍟", // IMG_5
+      { name: "SELF LOADED FRIES", desc: "Cheese sauce, bacon, pickles, SELF sauce.", img: "images/loaded-fries.jpg", emoji: "🍟", // IMG_5
         sizes: [["One size", "$6.99"]] },
-      { name: "OVERTIME MILKSHAKES", desc: "Oreo / Biscoff / Strawberry.", img: "/images/shakes.jpg", emoji: "🥤", // IMG_6
+      { name: "OVERTIME MILKSHAKES", desc: "Oreo / Biscoff / Strawberry.", img: "images/shakes.jpg", emoji: "🥤", // IMG_6
         sizes: [["Regular", "$5.99"], ["Large", "$6.99"]] },
     ],
   },
@@ -581,6 +587,18 @@ function finishLoading() {
   setTimeout(() => preloader.classList.add("is-done"), 250);
   update();
 }
+/* A missing video leaves the stage black, so say which file is missing and where it is looked for. */
+const note = $("[data-asset-note]");
+const missing = [];
+note.querySelector("button").addEventListener("click", () => note.classList.remove("on"));
+function reportMissingVideo(src) {
+  missing.push(src);
+  const where = new URL(src, location.href).href;
+  $("[data-asset-note-text]").innerHTML =
+    `<strong>Video not found:</strong> ${missing.map((m) => `<code>${esc(m)}</code>`).join(" ")}<br>` +
+    `Put the files in a <code>videos</code> folder next to <code>index.html</code> (with Vite: <code>public/videos</code>). Looked for: <code>${esc(where)}</code>`;
+  note.classList.add("on");
+}
 videoEls.forEach((v, i) => {
   let counted = false;
   const once = () => { if (!counted) { counted = true; markLoaded(); } };
@@ -591,7 +609,7 @@ videoEls.forEach((v, i) => {
     update();
   }, { once: true });
   v.addEventListener("canplaythrough", once, { once: true });
-  v.addEventListener("error", once, { once: true });
+  v.addEventListener("error", () => { once(); reportMissingVideo(CONFIG.videos[i]); }, { once: true });
   v.src = CONFIG.videos[i];
   v.load();
 });

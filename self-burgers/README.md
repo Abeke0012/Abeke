@@ -21,6 +21,9 @@ Drop your files here (paths are set in `CONFIG` at the top of the script in `ind
 | `lineup.burgers[0..2].img` (IMG_1–3) | `public/images/burger-1.jpg` … `burger-3.jpg` |
 | `lineup.sides[0..2].img` (IMG_4–6) | `public/images/fries.jpg`, `loaded-fries.jpg`, `shakes.jpg` |
 
+You can also open `index.html` straight from disk: put `videos/` and `images/` folders next to it.
+If a video is missing, a red notice on the page names the file and the path it was looked for.
+
 Missing images fall back to a dark gradient with an emoji.
 
 For smooth scrubbing, encode the videos with frequent keyframes, e.g.
