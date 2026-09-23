@@ -82,9 +82,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* ═══════════════ Story ═══════════════ */
 .story { position: relative; /* height set from the timeline constants in JS */ height: 2000vh; }
 .stage { position: sticky; top: 0; height: 100vh; overflow: hidden; background: var(--dark); }
-.stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: opacity, filter; opacity: 0; background: var(--dark); }
-.stage video.v1 { opacity: 1; }
-.stage__grad { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0, 0, 0, .55), transparent 40%); pointer-events: none; will-change: opacity; }
+.slot { position: absolute; inset: 0; opacity: 0; will-change: opacity, filter; }
+.slot[data-slot="0"] { opacity: 1; }
+/* A still is laid out by JS so that its crop window covers the stage; patches are % of the still. */
+.still { position: absolute; will-change: transform, opacity; }
+.still img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.still__patch { position: absolute; pointer-events: none; }
+.slot video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; background: var(--dark); transition: opacity .3s linear; }
+.slot video.is-live { opacity: 1; }
+.stage__grad { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0, 0, 0, .55), transparent 40%), linear-gradient(to right, rgba(0, 0, 0, .45), transparent 42%), linear-gradient(to left, rgba(0, 0, 0, .4), transparent 38%); pointer-events: none; will-change: opacity; }
 .stage__fade { position: absolute; inset: 0; background: var(--light); opacity: 0; pointer-events: none; will-change: opacity; z-index: 20; }
 
 .layer { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--gap); padding-inline: var(--margin); pointer-events: none; z-index: 10; }
@@ -100,9 +106,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .layer--smash h2 { font-size: 72px; }
 .story-p { font-size: 15px; line-height: 1.55; max-width: 320px; margin-top: 20px; }
 .layer--smash .story-p { color: rgba(255, 255, 255, .85); }
+.on-light .tex, .on-light .tex.is-split .reveal-char { background-color: var(--ink); background-image: var(--noise-light); }
+.on-light .tex.is-split { background: none; }
+.layer--smash.on-light .story-p { color: rgba(17, 17, 17, .8); }
 
-.layer--callouts { display: block; }
-.callout { position: absolute; left: 62%; display: flex; align-items: center; gap: 14px; color: var(--ink); transform: translateY(-50%); }
+.layer--callouts { display: block; inset: auto; padding: 0; will-change: transform; }
+.callout { position: absolute; display: flex; align-items: center; gap: 14px; color: var(--ink); transform: translateY(-50%); }
 .callout__line { width: 60px; height: 1px; background: var(--ink); transform: scaleX(0); transform-origin: left center; transition: transform .6s var(--ease-expo); flex: none; }
 .callout.reveal-active .callout__line { transform: scaleX(1); }
 .callout.reveal-exit .callout__line { transform: scaleX(0); transition-duration: .3s; }
@@ -189,8 +198,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .layer--smash h2, .layer--stack h2, .layer--combo h2, .layer--shakes h2 { font-size: 44px; }
   .story-p { max-width: none; }
   .hero__ctas { flex-wrap: wrap; }
-  .layer--callouts { top: auto; bottom: 12vh; left: var(--margin); right: var(--margin); inset-inline: var(--margin); height: auto; display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; }
-  .callout { position: static; transform: none; gap: 0; }
+  .layer--callouts { top: auto !important; bottom: 12vh; left: var(--margin) !important; right: var(--margin); width: auto !important; height: auto !important; transform: none !important; background: rgba(246, 246, 245, .92); border-radius: 8px; opacity: 0; transition: opacity .3s var(--ease-expo); }
+  .layer--callouts.is-on { opacity: 1; display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; }
+  .callout { position: static; transform: none; gap: 0; left: auto !important; top: auto !important; }
   .callout__line { display: none; }
   .callout__title, .callout__sub { font-size: 11px; }
   .callout__text { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -224,10 +234,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   <!-- ═══════════════ Scroll story ═══════════════ -->
   <section class="story" data-story aria-label="The SELF BURGERS story">
     <div class="stage">
-      <video class="v4" data-video="3" muted playsinline preload="auto" aria-hidden="true"></video>
-      <video class="v3" data-video="2" muted playsinline preload="auto" aria-hidden="true"></video>
-      <video class="v2" data-video="1" muted playsinline preload="auto" aria-hidden="true"></video>
-      <video class="v1" data-video="0" muted playsinline preload="auto" aria-hidden="true"></video>
+      <div class="slots" data-slots></div>
       <div class="stage__grad" data-grad></div>
 
       <!-- A. Hero -->
@@ -324,6 +331,25 @@ const CONFIG = {
     "videos/combo.mp4",   // VIDEO_3_URL
     "videos/box.mp4",     // VIDEO_4_URL
   ],
+  /*
+   * Stills: shown whenever a slot's video is missing, so the story works on photos alone.
+   * view  = crop window [x0, y0, x1, y1] in fractions of the image; it always covers the stage.
+   * focus = the point kept nearest the centre when the screen is narrower than the window.
+   * zoom  = [from, to] scale over the phase (Ken Burns), about the focus point.
+   * patches = rectangles (fractions of the image) painted over baked-in text or UI.
+   */
+  scenes: {
+    hero: { src: "images/scenes/hero.jpg", w: 1515, h: 688, view: [0, 0, 0.94, 0.92], focus: [0.5, 0.55], zoom: [1, 1.08],
+      patches: [{ x: 0, y: 0, w: 0.4, h: 1, bg: "linear-gradient(to right, #0b0a0e 0%, #0b0a0e 76%, rgba(11,10,14,0) 100%)" }] },
+    explode: { src: "images/scenes/explode.jpg", w: 1376, h: 768, view: [0, 0, 0.94, 1], focus: [0.48, 0.5], zoom: [1.06, 1],
+      patches: [{ x: 0.616, y: 0, w: 0.4, h: 1, bg: "linear-gradient(to right, rgba(246,246,245,0) 0%, #f6f6f5 4%)" }] },
+    stack: { src: "images/scenes/stack.jpg", w: 1399, h: 768, view: [0, 0, 0.935, 0.935], focus: [0.5, 0.5], zoom: [1.05, 1],
+      patches: [{ x: 0.015, y: 0.42, w: 0.29, h: 0.22, bg: "#f0efeb", blur: 14 }] },
+    combo: { src: "images/scenes/combo.jpg", w: 1376, h: 768, view: [0, 0, 1, 0.89], focus: [0.36, 0.5], zoom: [1, 1.05] },
+    box: { src: "images/scenes/combo.jpg", w: 1376, h: 768, view: [0, 0, 1, 0.89], focus: [0.36, 0.5], zoom: [1.05, 1.16] },
+  },
+  /* Which stills stand in for each video, bottom to top. Slot 3 shares the combo photo and pushes in. */
+  slots: [["hero"], ["explode"], ["stack", "combo"], ["box"]],
   hero: {
     label: "★ SMASHED FRESH DAILY",
     title: "BUILT LIKE<br>SELF.",
@@ -335,12 +361,14 @@ const CONFIG = {
     title: "SMASHED<br>TO ORDER",
     body: "Two 100% beef patties smashed thin on a screaming-hot griddle for crispy lace edges, stacked with melted cheddar, bacon, grilled onions and house sauce.",
   },
+  /* Positions are fractions of the explode still (x = where the leader line starts, y = the layer). */
   callouts: [
-    { title: "BUTTER-TOASTED BUN", sub: "Brioche, toasted on the flat-top", top: 22 },
-    { title: "CHEDDAR, TWICE", sub: "Two slices melted to the edge", top: 36 },
-    { title: "APPLEWOOD BACON", sub: "Thick-cut, extra crispy", top: 50 },
-    { title: "SMASHED PATTY", sub: "Fresh beef, lace-crispy edges", top: 64 },
-    { title: "SELF SAUCE", sub: "Secret recipe. Don't ask.", top: 78 },
+    { title: "BUTTER-TOASTED BUN", sub: "Brioche, toasted on the flat-top", x: 0.625, y: 0.22 },
+    { title: "SELF SAUCE", sub: "Secret recipe. Don't ask.", x: 0.625, y: 0.325 },
+    { title: "CARAMELIZED ONIONS", sub: "Low and slow on the griddle", x: 0.625, y: 0.455 },
+    { title: "AMERICAN CHEESE", sub: "Melted to the edge", x: 0.625, y: 0.595 },
+    { title: "SMASHED PATTY", sub: "Fresh beef, lace-crispy edges", x: 0.625, y: 0.74 },
+    { title: "TOASTED HEEL", sub: "Griddled golden on the flat-top", x: 0.625, y: 0.885 },
   ],
   stack: {
     title: "THE STACK",
@@ -412,7 +440,7 @@ $("[data-social]").innerHTML = CONFIG.footer.social.map((s) => `<li><a href="${e
 $("[data-footer]").id = "footer";
 
 $("[data-callouts]").innerHTML = CONFIG.callouts.map((c, i) => `
-  <div class="callout" data-callout="${i}" style="top:${c.top}%">
+  <div class="callout" data-callout="${i}" style="left:${c.x * 100}%;top:${c.y * 100}%">
     <span class="callout__line" aria-hidden="true"></span>
     <div class="callout__text">
       <p class="callout__title reveal-block" style="--i:0">${esc(c.title)}</p>
@@ -532,7 +560,65 @@ const story = $("[data-story]");
 story.style.height = `${B.total * 100}vh`;
 
 /* ═════════════════════════════ Video scrub engine ═════════════════════════════ */
-const videoEls = CONFIG.videos.map((_, i) => $(`[data-video="${i}"]`));
+const slotsHost = $("[data-slots]");
+const slotEls = [];
+const videoEls = [];
+const stills = []; // { el, scene, slot }
+CONFIG.slots.forEach((keys, i) => {
+  const slot = document.createElement("div");
+  slot.className = "slot";
+  slot.dataset.slot = i;
+  for (const key of keys) {
+    const scene = CONFIG.scenes[key];
+    const el = document.createElement("div");
+    el.className = "still";
+    el.dataset.still = key;
+    el.innerHTML = `<img src="${esc(scene.src)}" alt="" decoding="async" />` +
+      (scene.patches || []).map((q) => `<span class="still__patch" style="left:${q.x * 100}%;top:${q.y * 100}%;width:${q.w * 100}%;height:${q.h * 100}%;background:${q.bg};${q.blur ? `filter:blur(${q.blur}px);` : ""}"></span>`).join("");
+    slot.appendChild(el);
+    stills.push({ el, scene, key, slot: i });
+  }
+  const video = document.createElement("video");
+  video.muted = true;
+  video.playsInline = true;
+  video.preload = "auto";
+  video.setAttribute("muted", "");
+  video.setAttribute("playsinline", "");
+  video.setAttribute("aria-hidden", "true");
+  slot.appendChild(video);
+  slotEls.push(slot);
+  videoEls.push(video);
+});
+// DOM order puts slot 0 on top.
+[...slotEls].reverse().forEach((el) => slotsHost.appendChild(el));
+const stillByKey = (key, slot) => stills.find((s) => s.key === key && (slot === undefined || s.slot === slot));
+
+/** Lays a still out so its crop window covers the stage, keeping its focus point as central as it can. */
+const geometry = (scene, vw, vh) => {
+  const [x0, y0, x1, y1] = scene.view;
+  const s = Math.max(vw / ((x1 - x0) * scene.w), vh / ((y1 - y0) * scene.h));
+  const W = scene.w * s, H = scene.h * s;
+  const clampTo = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const left = clampTo(vw / 2 - scene.focus[0] * W, vw - x1 * W, -x0 * W);
+  const top = clampTo(vh / 2 - scene.focus[1] * H, vh - y1 * H, -y0 * H);
+  return { left, top, W, H };
+};
+const place = (el, g, scene) => {
+  Object.assign(el.style, { left: `${g.left}px`, top: `${g.top}px`, width: `${g.W}px`, height: `${g.H}px`,
+    transformOrigin: `${scene.focus[0] * 100}% ${scene.focus[1] * 100}%` });
+};
+const calloutLayer = $("[data-callouts]");
+function layoutStills() {
+  const vw = window.innerWidth, vh = window.innerHeight;
+  for (const s of stills) place(s.el, geometry(s.scene, vw, vh), s.scene);
+  // The callouts share the explode still's box, so each label stays on its layer at any aspect ratio.
+  const ex = CONFIG.scenes.explode;
+  place(calloutLayer, geometry(ex, vw, vh), ex);
+}
+layoutStills();
+window.addEventListener("resize", layoutStills);
+const zoomAt = (scene, p) => `scale(${lerp(scene.zoom[0], scene.zoom[1], p)})`;
+function lerp(a, b, t) { return a + (b - a) * t; }
 class Scrubber {
   constructor(video) {
     this.video = video;
@@ -551,7 +637,7 @@ class Scrubber {
     const diff = this.target - this.current;
     this.current = Math.abs(diff) < 0.001 ? this.target : this.current + diff * CONFIG.scrub.lerp;
     const v = this.video;
-    if (!this.active || v.readyState < 1) return true;
+    if (this.dead || !this.active || v.readyState < 1) return true;
     const drift = Math.abs(v.currentTime - this.current);
     if (drift > CONFIG.scrub.minDrift && now - this.lastSeek >= CONFIG.scrub.minSeekGap) {
       if (typeof v.fastSeek === "function" && drift > 1) v.fastSeek(this.current);
@@ -575,11 +661,18 @@ let loadedCount = 0;
 const bar = $("[data-preloader-bar]");
 const preloader = $("[data-preloader]");
 let pageReady = false;
+const stillImgs = [...new Set(stills.map((s) => s.el.querySelector("img")))];
+const loadTotal = videoEls.length + stillImgs.length;
 const markLoaded = () => {
   loadedCount++;
-  bar.style.transform = `scaleX(${loadedCount / videoEls.length})`;
-  if (loadedCount >= videoEls.length) finishLoading();
+  bar.style.transform = `scaleX(${loadedCount / loadTotal})`;
+  if (loadedCount >= loadTotal) finishLoading();
 };
+stillImgs.forEach((img) => {
+  if (img.complete) { markLoaded(); return; }
+  img.addEventListener("load", markLoaded, { once: true });
+  img.addEventListener("error", () => { markLoaded(); reportMissingVideo(img.getAttribute("src"), "Image"); }, { once: true });
+});
 function finishLoading() {
   if (pageReady) return;
   pageReady = true;
@@ -591,12 +684,12 @@ function finishLoading() {
 const note = $("[data-asset-note]");
 const missing = [];
 note.querySelector("button").addEventListener("click", () => note.classList.remove("on"));
-function reportMissingVideo(src) {
+function reportMissingVideo(src, kind = "Video") {
   missing.push(src);
   const where = new URL(src, location.href).href;
   $("[data-asset-note-text]").innerHTML =
-    `<strong>Video not found:</strong> ${missing.map((m) => `<code>${esc(m)}</code>`).join(" ")}<br>` +
-    `Put the files in a <code>videos</code> folder next to <code>index.html</code> (with Vite: <code>public/videos</code>). Looked for: <code>${esc(where)}</code>`;
+    `<strong>${kind} not found:</strong> ${missing.map((m) => `<code>${esc(m)}</code>`).join(" ")}<br>` +
+    `Put the files next to <code>index.html</code> (with Vite: under <code>public/</code>). Looked for: <code>${esc(where)}</code>`;
   note.classList.add("on");
 }
 videoEls.forEach((v, i) => {
@@ -609,7 +702,13 @@ videoEls.forEach((v, i) => {
     update();
   }, { once: true });
   v.addEventListener("canplaythrough", once, { once: true });
-  v.addEventListener("error", () => { once(); reportMissingVideo(CONFIG.videos[i]); }, { once: true });
+  v.addEventListener("loadeddata", () => { v.classList.add("is-live"); slotEls[i].classList.add("has-video"); update(); }, { once: true });
+  v.addEventListener("error", () => {
+    once();
+    scrubbers[i].dead = true;
+    // A slot with stills simply shows them; only a slot with nothing to show is worth a warning.
+    if (!CONFIG.slots[i]?.length) reportMissingVideo(CONFIG.videos[i]);
+  }, { once: true });
   v.src = CONFIG.videos[i];
   v.load();
 });
@@ -624,7 +723,7 @@ const layers = Object.fromEntries($$("[data-layer]").map((el) => [el.dataset.lay
 const callouts = $$("[data-callout]");
 const lineup = $("[data-lineup]");
 const footer = $("[data-footer]");
-const [v1, v2, v3, v4] = videoEls;
+const [v1, v2, v3, v4] = slotEls;
 const [s1, s2, s3, s4] = scrubbers;
 /* Each video's visible window, padded by one fade either side, decides whether it decodes. */
 const windows = [[B.p1[0], B.f1[1]], [B.f1[0], B.f2[1]], [B.f2[0], B.f3[1]], [B.f3[0], B.end[1]]];
@@ -660,11 +759,25 @@ function update() {
   v3.style.opacity = t < B.f3[0] ? f2 : 1 - f3;
   v4.style.opacity = f3;
 
+  // Stills: a slow push or pull per phase; the combo slot swaps the stack photo for the box at 50–60%.
+  const heroS = stillByKey("hero"), exS = stillByKey("explode"), stackS = stillByKey("stack"), comboS = stillByKey("combo", 2), boxS = stillByKey("box");
+  const exZoom = prog(p2, 0, 0.45);
+  if (heroS) heroS.el.style.transform = zoomAt(heroS.scene, p1);
+  if (exS) exS.el.style.transform = zoomAt(exS.scene, exZoom);
+  calloutLayer.style.transform = zoomAt(CONFIG.scenes.explode, exZoom);
+  const swap = prog(p3, 0.5, 0.6);
+  if (stackS) stackS.el.style.transform = zoomAt(stackS.scene, prog(p3, 0, 0.5));
+  if (comboS) { comboS.el.style.opacity = swap; comboS.el.style.transform = zoomAt(comboS.scene, prog(p3, 0.5, 1)); }
+  if (boxS) boxS.el.style.transform = zoomAt(boxS.scene, p4);
+
   // Light phase: from 40% of the explode scrub until the box scene at 55% of the combo scrub.
-  const lightStart = B.p2[0] + 0.4 * T.SCRUB2;
+  // The explode photo is light from its first frame, so on photos the light phase starts mid-fade.
+  const exPhoto = !slotEls[1].classList.contains("has-video");
+  const lightStart = exPhoto ? B.f1[0] + 0.5 * T.FADE1 : B.p2[0] + 0.4 * T.SCRUB2;
   const lightEnd = B.p3[0] + 0.55 * T.SCRUB3;
   const inLight = t >= lightStart && t < lightEnd;
-  const gradOut = prog(t, B.p2[0] + 0.3 * T.SCRUB2, lightStart);
+  const gradOut = exPhoto ? prog(t, B.f1[0], lightStart) : prog(t, B.p2[0] + 0.3 * T.SCRUB2, lightStart);
+  layers.smash.classList.toggle("on-light", exPhoto);
   const gradIn = prog(t, lightEnd - 0.3, lightEnd);
   grad.style.opacity = t < lightEnd - 0.3 ? 1 - gradOut : gradIn;
   fade.style.opacity = end;
@@ -679,6 +792,7 @@ function update() {
     const a = B.p2[0] + (0.45 + i * 0.08) * T.SCRUB2;
     setState(el, rangeState(t, a, B.p2[0] + 0.95 * T.SCRUB2));
   });
+  calloutLayer.classList.toggle("is-on", callouts.some((el) => el._state === "active"));
   // D. The stack: 5–45% of phase 3. E. Game day combo: 60–100%.
   setState(layers.stack, rangeState(t, B.p3[0] + 0.05 * T.SCRUB3, B.p3[0] + 0.45 * T.SCRUB3));
   setState(layers.combo, rangeState(t, B.p3[0] + 0.6 * T.SCRUB3, B.p3[1]));
