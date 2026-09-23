@@ -396,8 +396,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .row.is-on .qty output { color: var(--accent); }
 .row.is-blocked { opacity: .4; }
 .row-end { width: 0; }
-.receipt { position: sticky; top: 5.5rem; background: var(--raw-color-char-950); color: #fff; border-radius: 8px; padding: 1.5rem; --ink-noise: var(--ink-noise-dark); }
-.stack { position: relative; height: 13rem; display: flex; flex-direction: column-reverse; align-items: center; justify-content: flex-start; padding-bottom: 0.5rem; border-bottom: 1px dashed rgba(255,255,255,.2); }
+.receipt { position: sticky; top: 5.5rem; max-height: calc(100vh - 6.5rem); overflow: auto; overscroll-behavior: contain; background: var(--raw-color-char-950); color: #fff; border-radius: 8px; padding: 1.5rem; --ink-noise: var(--ink-noise-dark); }
+.stack { position: relative; height: 9rem; display: flex; flex-direction: column-reverse; align-items: center; justify-content: flex-start; padding-bottom: 0.5rem; border-bottom: 1px dashed rgba(255,255,255,.2); }
 .stack-empty { position: absolute; left: 0; right: 0; top: 50%; text-align: center; opacity: .45; }
 .layer { flex: none; width: 70%; border-radius: 4px; will-change: transform, opacity; }
 .layer.bun-bottom { border-radius: 4px 4px 14px 14px; }
@@ -405,30 +405,51 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .layer.wide { width: 78%; }
 .layer.thin { width: 74%; }
 .receipt-title { margin-top: 1.25rem; opacity: .5; }
-.lines { margin-top: 0.75rem; max-height: 14rem; overflow: auto; font-size: var(--raw-font-size-label); }
+.lines { margin-top: 0.5rem; max-height: 11rem; overflow: auto; font-size: var(--raw-font-size-label); }
 .lines li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.3rem 0; border-bottom: 1px solid rgba(255,255,255,.08); }
 .lines li span:last-child { font-family: var(--font-mono); white-space: nowrap; opacity: .8; }
 .lines li.is-empty { opacity: .45; justify-content: flex-start; border: 0; }
-.mode { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 1.25rem; }
+.mode { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 1rem; }
 .mode button { display: flex; flex-direction: column; align-items: flex-start; gap: 0.2rem; padding: 0.65rem 0.8rem; border-radius: 6px; border: 1px solid rgba(255,255,255,.25); font-family: var(--font-mono); font-size: var(--raw-font-size-fine); letter-spacing: .08em; text-align: left; transition: background-color var(--raw-duration-fast), border-color var(--raw-duration-fast); }
 .mode button small { font-size: 10px; opacity: .6; letter-spacing: .04em; text-transform: none; }
 .mode button[aria-checked="true"] { border-color: var(--accent); background: rgba(255,90,31,.14); }
-.total { display: flex; align-items: baseline; justify-content: space-between; margin-top: 1.25rem; }
+.total { display: flex; align-items: baseline; justify-content: space-between; margin-top: 1rem; }
 .total b { font-size: 3rem; line-height: 1; }
 .discount { color: var(--accent); min-height: 1em; margin-top: 0.25rem; text-align: right; }
 .hint-line { opacity: .5; margin-top: 0.75rem; }
 .receipt-actions { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; }
-.receipt-actions .pill { flex: 1; }
+.receipt-actions { flex-wrap: wrap; }
+.receipt-actions .pill { flex: 1; min-width: 0; }
 .receipt-actions .pill:disabled { opacity: .35; cursor: not-allowed; }
 .reset { opacity: .55; }
 .reset:hover { opacity: 1; }
+.btabs { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1rem; }
+.btab { display: inline-flex; align-items: stretch; border: 1px solid rgba(255,255,255,.25); border-radius: 6px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; overflow: hidden; }
+.btab.is-active { border-color: var(--accent); background: rgba(255,90,31,.14); }
+.btab-pick { display: flex; flex-direction: column; align-items: flex-start; gap: 0.1rem; padding: 0.45rem 0.6rem; text-align: left; }
+.btab-pick small { opacity: .6; font-size: 10px; }
+.btab-x { padding: 0 0.55rem; border-left: 1px solid rgba(255,255,255,.15); font-size: 14px; opacity: .6; }
+.btab-x:hover { opacity: 1; color: var(--accent); }
+.btab-add { padding: 0.45rem 0.7rem; border-style: dashed; align-items: center; }
+.btab-add:hover { border-color: var(--accent); color: var(--accent); }
+.lines li.is-head { margin-top: 0.5rem; font-family: var(--font-mono); font-size: var(--raw-font-size-fine); letter-spacing: .08em; text-transform: uppercase; border-bottom-color: rgba(255,255,255,.2); }
+.lines li.is-head.is-active span:first-child { color: var(--accent); }
+.lines li.is-sub { padding-left: 0.75rem; opacity: .85; }
+.editing { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem; color: var(--accent); }
+.more-burger { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; margin-top: 2rem; padding: 1.25rem 1.5rem; border-radius: 8px; background: var(--raw-color-paper-100); }
+.more-burger .pill { white-space: normal; }
+.more-burger p { display: flex; flex-direction: column; gap: 0.35rem; }
+.more-burger b { font-family: var(--font-display); font-size: 1.5rem; text-transform: uppercase; line-height: 1.05; }
+.more-burger .fine { opacity: .55; }
+@media (max-width: 639.98px) { .more-burger { flex-direction: column; align-items: stretch; } }
 .copied { margin-top: 0.75rem; color: var(--raw-color-cheese-400); min-height: 1em; }
 .bar { display: none; }
 @media (max-width: 1023.98px) {
-  .builder-grid { grid-template-columns: 1fr; }
-  .receipt { position: relative; top: 0; }
+  .builder-grid { grid-template-columns: minmax(0, 1fr); }
+  .receipt { position: relative; top: 0; max-height: none; overflow: visible; }
   .bar { position: sticky; bottom: 0.75rem; z-index: 5; display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; padding: 0.6rem 0.6rem 0.6rem 1.25rem; border-radius: 999px; background: var(--raw-color-char-950); color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
-  .bar b { font-size: 1.5rem; line-height: 1; margin-right: auto; }
+  .bar b { font-size: 1.5rem; line-height: 1; margin-right: auto; white-space: nowrap; }
+  .bar .fine { white-space: nowrap; }
   .bar .fine { opacity: .6; }
 }
 @media (max-width: 639.98px) {
@@ -596,10 +617,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   </div>
   <div class="builder-grid">
     <div class="steps" data-steps></div>
-    <aside class="receipt" id="receipt" data-receipt aria-label="Твой заказ">
+    <aside class="receipt" id="receipt" data-receipt data-lenis-prevent aria-label="Твой заказ">
       <div class="stack" data-stack aria-hidden="true"><p class="stack-empty fine" data-stack-empty>Начни с булочки ↓</p></div>
+      <div class="btabs" data-burgers></div>
       <p class="fine receipt-title">// ТВОЙ ЗАКАЗ</p>
-      <ul class="lines" data-lines></ul>
+      <ul class="lines" data-lines data-lenis-prevent></ul>
       <div class="mode" role="radiogroup" aria-label="Способ получения">
         <button type="button" role="radio" aria-checked="true" data-mode="delivery">ДОСТАВКА<small>40 мин – 1 ч</small></button>
         <button type="button" role="radio" aria-checked="false" data-mode="pickup">САМОВЫВОЗ<small>20 мин · −10%</small></button>
@@ -615,7 +637,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
     </aside>
   </div>
   <div class="bar" data-bar>
-    <span class="fine"><span data-bar-count>0</span> ПОЗ.</span>
+    <span class="fine" data-bar-count></span>
     <b class="display"><span data-bar-total>0</span> ТГ</b>
     <a href="#receipt" class="pill pill--filled pill--compact" data-bar-go>К ЗАКАЗУ</a>
   </div>
@@ -1084,7 +1106,7 @@ const P_SMOOTH = 0.14;
 const LIFT_ALIGN = 0.175;
 const CALLOUTS = [
   { at: [850, 168], label: "БУЛОЧКА БРИОШЬ", sub: "80 г · 500 тг" },
-  { at: [848, 248], label: "СОУС НА ВЫБОР", sub: "До трёх на бургер · от 250 тг" },
+  { at: [848, 248], label: "СОУС НА ВЫБОР", sub: "Сколько хочешь · от 250 тг" },
   { at: [846, 350], label: "КАРАМЕЛИЗИРОВАННЫЙ ЛУК", sub: "20 г · 180 тг" },
   { at: [840, 452], label: "СЫР", sub: "20 г · 250 тг" },
   { at: [846, 568], label: "ГОВЯЖЬЯ КОТЛЕТА", sub: "120 г · 1 790 тг" },
@@ -1473,7 +1495,7 @@ const MENU = [
     { id: "pepper", name: "Стручковый перец", wt: "20 г", price: 180, color: "#e0452b", h: 6 },
     { id: "jalapeno", name: "Халапеньо", wt: "15 г", price: 180, color: "#3f8f3a", h: 6 },
   ] },
-  { key: "sauce", title: "Соусы", note: "До 3 соусов на один бургер", kind: "many", max: 3, items: [
+  { key: "sauce", title: "Соусы", note: "Сколько хочешь", kind: "many", items: [
     { id: "piquant", name: "Пикант", wt: "30 г", price: 250, color: "#e0572a" },
     { id: "bbq", name: "BBQ", wt: "30 г", price: 250, color: "#6e2a17" },
     { id: "cream-cheese", name: "Сливочно-сырный", wt: "30 г", price: 300, color: "#f3e3b5" },
@@ -1531,18 +1553,26 @@ for (const g of MENU) for (const it of g.groups ? g.groups.flatMap((x) => x[1]) 
 const tg = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 const nameLower = (it) => it.name.charAt(0).toLowerCase() + it.name.slice(1);
 
-/* ── Builder state ── */
-const order = { bun: null, qty: new Map(), picks: { extra: [], sauce: [] }, mode: "delivery" };
-const pattyCount = () => MENU[1].items.reduce((n, it) => n + (order.qty.get(it.id) || 0), 0);
-const lineItems = () => {
+/* ── Builder state: several burgers plus order-wide sides and drinks ── */
+const newBurger = () => ({ bun: null, patty: new Map(), extra: [], sauce: [] });
+const order = { burgers: [newBurger()], active: 0, qty: new Map(), mode: "delivery" };
+const cur = () => order.burgers[order.active];
+const pattyCount = (b = cur()) => [...b.patty.values()].reduce((n, q) => n + q, 0);
+const burgerItems = (b) => {
   const out = [];
-  if (order.bun) out.push([ITEM.get(order.bun), 1]);
-  for (const [id, q] of order.qty) if (q > 0 && ITEM.get(id).group.key === "patty") out.push([ITEM.get(id), q]);
-  for (const id of order.picks.extra) out.push([ITEM.get(id), 1]);
-  for (const id of order.picks.sauce) out.push([ITEM.get(id), 1]);
-  for (const [id, q] of order.qty) if (q > 0 && ITEM.get(id).group.key !== "patty") out.push([ITEM.get(id), q]);
+  if (b.bun) out.push([ITEM.get(b.bun), 1]);
+  for (const [id, q] of b.patty) if (q > 0) out.push([ITEM.get(id), q]);
+  for (const id of b.extra) out.push([ITEM.get(id), 1]);
+  for (const id of b.sauce) out.push([ITEM.get(id), 1]);
   return out;
 };
+const addonItems = () => [...order.qty].filter(([, q]) => q > 0).map(([id, q]) => [ITEM.get(id), q]);
+const sumOf = (items) => items.reduce((t, [it, q]) => t + it.price * q, 0);
+const isEmpty = (b) => !burgerItems(b).length;
+const isComplete = (b) => !!b.bun && pattyCount(b) > 0;
+/** Burgers that go into the order: every non-empty one, numbered in order. */
+const orderBurgers = () => order.burgers.map((b, i) => ({ b, n: i + 1 })).filter(({ b }) => !isEmpty(b));
+const orderTotal = () => order.burgers.reduce((t, b) => t + sumOf(burgerItems(b)), 0) + sumOf(addonItems());
 
 {
   // Title: line reveal plus a per-character stamp.
@@ -1621,21 +1651,42 @@ const lineItems = () => {
 /* ═══════════════════ 3 — The builder ═══════════════════ */
 const rowEls = new Map();
 let renderOrder = () => {};
+/** A combo fills the burger being built if it is empty, otherwise it arrives as a new burger. */
 const loadCombo = (c) => {
-  order.bun = null; order.qty.clear(); order.picks.extra = []; order.picks.sauce = [];
+  if (!isEmpty(cur())) { order.burgers.push(newBurger()); order.active = order.burgers.length - 1; }
+  const b = cur();
   for (const id of c.items) {
     const it = ITEM.get(id), k = it.group.key;
-    if (k === "bun") order.bun = id;
-    else if (it.group.kind === "qty") order.qty.set(id, (order.qty.get(id) || 0) + 1);
-    else order.picks[k].push(id);
+    if (k === "bun") b.bun = id;
+    else if (k === "patty") b.patty.set(id, (b.patty.get(id) || 0) + 1);
+    else if (k === "extra" || k === "sauce") b[k].push(id);
+    else order.qty.set(id, (order.qty.get(id) || 0) + 1);
   }
+  renderOrder();
+};
+const addBurger = () => {
+  // An empty burger is reused rather than stacking blank ones.
+  const empty = order.burgers.findIndex(isEmpty);
+  if (empty >= 0) order.active = empty;
+  else { order.burgers.push(newBurger()); order.active = order.burgers.length - 1; }
+  renderOrder();
+  lenis?.scrollTo("#build", { duration: 1.2, offset: 40 });
+};
+const removeBurger = (i) => {
+  order.burgers.splice(i, 1);
+  if (!order.burgers.length) order.burgers.push(newBurger());
+  order.active = Math.min(order.active > i ? order.active - 1 : order.active, order.burgers.length - 1);
   renderOrder();
 };
 {
   const host = $("[data-steps]");
+  const editing = document.createElement("p");
+  editing.className = "fine editing";
+  host.appendChild(editing);
   const rowHtml = (it, kind) => `
     <span class="box" aria-hidden="true"></span><span class="nm"></span><span class="wt">${it.wt}</span><span class="pr">${tg(it.price)} тг</span>
     ${kind === "qty" ? `<span class="qty"><button type="button" data-minus aria-label="Убрать: ${it.name} ${it.wt}">−</button><output>0</output><button type="button" data-plus aria-label="Добавить: ${it.name} ${it.wt}">+</button></span>` : `<span class="row-end"></span>`}`;
+  const qtyMap = (g) => (g.key === "patty" ? cur().patty : order.qty);
   const makeRow = (it, g) => {
     const row = document.createElement(g.kind === "qty" ? "div" : "button");
     row.className = "row"; row.dataset.kind = g.kind;
@@ -1644,21 +1695,23 @@ const loadCombo = (c) => {
     row.querySelector(".nm").textContent = it.name;
     if (g.kind === "qty") {
       const add = (d) => {
-        const q = (order.qty.get(it.id) || 0) + d;
+        const m = qtyMap(g);
+        const q = (m.get(it.id) || 0) + d;
         if (q < 0) return;
         if (d > 0 && (g.key === "patty" ? pattyCount() >= g.max : q > g.max)) return;
-        order.qty.set(it.id, q);
+        m.set(it.id, q);
         renderOrder();
       };
       row.querySelector("[data-plus]").addEventListener("click", (ev) => { ev.stopPropagation(); add(1); });
       row.querySelector("[data-minus]").addEventListener("click", (ev) => { ev.stopPropagation(); add(-1); });
-      row.addEventListener("click", () => { if (!order.qty.get(it.id)) add(1); });
+      row.addEventListener("click", () => { if (!qtyMap(g).get(it.id)) add(1); });
       row.style.cursor = "pointer";
     } else {
       row.addEventListener("click", () => {
-        if (g.kind === "one") order.bun = order.bun === it.id ? null : it.id;
+        const b = cur();
+        if (g.kind === "one") b.bun = b.bun === it.id ? null : it.id;
         else {
-          const list = order.picks[g.key], at = list.indexOf(it.id);
+          const list = b[g.key], at = list.indexOf(it.id);
           if (at >= 0) list.splice(at, 1);
           else if (!g.max || list.length < g.max) list.push(it.id);
           else return;
@@ -1680,25 +1733,38 @@ const loadCombo = (c) => {
     else addRows(g.items);
     host.appendChild(step);
     inview(step, { from: { opacity: 0, y: 40 }, to: { opacity: 1, y: 0 }, config: [90, 26] });
+    if (g.key === "sauce") {
+      // After the last burger layer: start another burger, or move on to sides and drinks.
+      const more = document.createElement("div");
+      more.className = "more-burger";
+      more.innerHTML = `<p><b data-more-title></b><span class="fine">Гарниры и напитки ниже — они общие на весь заказ.</span></p><button type="button" class="pill pill--filled" data-add-burger>+ ЕЩЁ БУРГЕР</button>`;
+      host.appendChild(more);
+    }
   });
 
   // Receipt.
-  const stackEl = $("[data-stack]"), emptyEl = $("[data-stack-empty]"), linesEl = $("[data-lines]");
+  const stackEl = $("[data-stack]"), emptyEl = $("[data-stack-empty]"), linesEl = $("[data-lines]"), tabsEl = $("[data-burgers]");
   const total = digitRoll($("[data-total]")), barTotal = digitRoll($("[data-bar-total]")), barCount = $("[data-bar-count]");
   total.jump(); barTotal.jump();
   const discountEl = $("[data-discount]"), needEl = $("[data-need]"), checkout = $("[data-checkout]"), copied = $("[data-copied]");
   const layers = new Map(); // key → { el, s }
+  let stackOf = -1; // which burger the stack shows; a switch rebuilds it
   const layerSpec = () => {
-    const out = [];
-    const bun = order.bun && ITEM.get(order.bun);
+    const b = cur(), out = [];
+    const bun = b.bun && ITEM.get(b.bun);
     if (bun) out.push({ key: "bun-b", color: bun.color, h: 20, cls: "bun-bottom" });
-    for (const [id, q] of order.qty) { const it = ITEM.get(id); if (it.group.key === "patty") for (let i = 0; i < q; i++) out.push({ key: `${id}:${i}`, color: it.color, h: it.h, cls: "wide" }); }
-    for (const id of order.picks.extra) { const it = ITEM.get(id); out.push({ key: id, color: it.color, h: it.h, cls: it.wide ? "wide" : "" }); }
-    for (const id of order.picks.sauce) out.push({ key: id, color: ITEM.get(id).color, h: 4, cls: "thin" });
+    for (const [id, q] of b.patty) { const it = ITEM.get(id); for (let i = 0; i < q; i++) out.push({ key: `${id}:${i}`, color: it.color, h: it.h, cls: "wide" }); }
+    for (const id of b.extra) { const it = ITEM.get(id); out.push({ key: id, color: it.color, h: it.h, cls: it.wide ? "wide" : "" }); }
+    b.sauce.forEach((id, i) => out.push({ key: `${id}:s${i}`, color: ITEM.get(id).color, h: 4, cls: "thin" }));
     if (bun) out.push({ key: "bun-t", color: bun.color, h: 40, cls: "bun-top" });
     return out;
   };
   const renderStack = () => {
+    if (stackOf !== order.burgers[order.active]) {
+      stackOf = order.burgers[order.active];
+      for (const [, l] of layers) { l.s.stop(); l.el.remove(); }
+      layers.clear();
+    }
     const spec = layerSpec();
     const room = stackEl.clientHeight - 24;
     const need = spec.reduce((t, l) => t + l.h + 2, 0);
@@ -1712,7 +1778,7 @@ const loadCombo = (c) => {
         const s = new Spring(0, { tension: 260, friction: 22, precision: 0.001 });
         s.onChange = (v) => { el.style.opacity = clamp01(v * 2); el.style.transform = `translate3d(0, ${lerp(-90, 0, v)}px, 0)`; };
         s.onChange(0);
-        REDUCED ? s.jump(1) : s.start(1);
+        REDUCED ? s.jump(1) : s.start(1, { delay: Math.min(i, 12) * 25 });
         rec = { el, s }; layers.set(l.key, rec);
       }
       rec.el.className = `layer ${l.cls}`;
@@ -1723,58 +1789,108 @@ const loadCombo = (c) => {
     });
     emptyEl.style.opacity = spec.length ? 0 : 0.45;
   };
+  const renderTabs = () => {
+    tabsEl.innerHTML = "";
+    order.burgers.forEach((b, i) => {
+      const tab = document.createElement("span");
+      tab.className = "btab" + (i === order.active ? " is-active" : "");
+      const pick = document.createElement("button");
+      pick.type = "button"; pick.className = "btab-pick";
+      pick.setAttribute("aria-pressed", String(i === order.active));
+      pick.innerHTML = `<b>БУРГЕР ${i + 1}</b><small>${isEmpty(b) ? "пусто" : `${tg(sumOf(burgerItems(b)))} тг`}</small>`;
+      pick.addEventListener("click", () => { order.active = i; renderOrder(); });
+      tab.appendChild(pick);
+      if (order.burgers.length > 1) {
+        const x = document.createElement("button");
+        x.type = "button"; x.className = "btab-x"; x.textContent = "×";
+        x.setAttribute("aria-label", `Удалить бургер ${i + 1}`);
+        x.addEventListener("click", () => removeBurger(i));
+        tab.appendChild(x);
+      }
+      tabsEl.appendChild(tab);
+    });
+    const add = document.createElement("button");
+    add.type = "button"; add.className = "btab btab-add"; add.textContent = "+ ЕЩЁ БУРГЕР";
+    add.addEventListener("click", addBurger);
+    tabsEl.appendChild(add);
+  };
+  const line = (text, price, cls = "") => {
+    const li = document.createElement("li"); if (cls) li.className = cls;
+    const a = document.createElement("span"); a.textContent = text;
+    const b = document.createElement("span"); b.textContent = price;
+    li.append(a, b); linesEl.appendChild(li);
+  };
+  const itemText = (it, q) => `${it.name}${/мл|л$/.test(it.wt) ? ` ${it.wt}` : ""}${q > 1 ? ` × ${q}` : ""}`;
   renderOrder = () => {
-    const pc = pattyCount();
+    const b = cur(), pc = pattyCount();
     for (const [id, row] of rowEls) {
       const it = ITEM.get(id), g = it.group;
       let on, blocked = false;
-      if (g.kind === "one") on = order.bun === id;
-      else if (g.kind === "many") { on = order.picks[g.key].includes(id); blocked = !on && !!g.max && order.picks[g.key].length >= g.max; row.setAttribute("aria-pressed", String(on)); }
+      if (g.kind === "one") { on = b.bun === id; row.setAttribute("aria-pressed", String(on)); }
+      else if (g.kind === "many") { on = b[g.key].includes(id); blocked = !on && !!g.max && b[g.key].length >= g.max; row.setAttribute("aria-pressed", String(on)); }
       else {
-        const q = order.qty.get(id) || 0; on = q > 0;
+        const q = (g.key === "patty" ? b.patty : order.qty).get(id) || 0; on = q > 0;
         row.querySelector("output").textContent = q;
         row.querySelector("[data-minus]").disabled = q === 0;
         row.querySelector("[data-plus]").disabled = g.key === "patty" ? pc >= g.max : q >= g.max;
         blocked = !on && g.key === "patty" && pc >= g.max;
       }
-      if (g.kind === "one") row.setAttribute("aria-pressed", String(on));
       row.classList.toggle("is-on", on);
       row.classList.toggle("is-blocked", blocked);
     }
-    const items = lineItems();
+    const n = order.active + 1;
+    editing.innerHTML = `<span class="dot"></span>СЕЙЧАС СОБИРАЕШЬ: БУРГЕР ${n}${order.burgers.length > 1 ? ` ИЗ ${order.burgers.length}` : ""}`;
+    $$("[data-more-title]").forEach((t) => { t.textContent = isComplete(b) ? `Бургер ${n} готов. Собрать ещё один?` : "Хочешь несколько бургеров?"; });
+    renderTabs();
+
     linesEl.innerHTML = "";
-    if (!items.length) linesEl.innerHTML = `<li class="is-empty">Пока пусто — ничего не добавляем за тебя.</li>`;
-    for (const [it, q] of items) {
-      const li = document.createElement("li");
-      const a = document.createElement("span"); a.textContent = `${it.name}${/мл|л$/.test(it.wt) ? ` ${it.wt}` : ""}${q > 1 ? ` × ${q}` : ""}`;
-      const b = document.createElement("span"); b.textContent = `${tg(it.price * q)} тг`;
-      li.append(a, b); linesEl.appendChild(li);
+    const burgers = orderBurgers(), addons = addonItems();
+    if (!burgers.length && !addons.length) linesEl.innerHTML = `<li class="is-empty">Пока пусто — ничего не добавляем за тебя.</li>`;
+    for (const { b: bb, n: k } of burgers) {
+      const items = burgerItems(bb);
+      line(`Бургер ${k}`, `${tg(sumOf(items))} тг`, "is-head" + (bb === b ? " is-active" : ""));
+      for (const [it, q] of items) line(itemText(it, q), `${tg(it.price * q)} тг`, "is-sub");
     }
-    const sum = items.reduce((t, [it, q]) => t + it.price * q, 0);
+    if (addons.length) {
+      line("К заказу", `${tg(sumOf(addons))} тг`, "is-head");
+      for (const [it, q] of addons) line(itemText(it, q), `${tg(it.price * q)} тг`, "is-sub");
+    }
+    const sum = orderTotal();
     const pickup = order.mode === "pickup";
     const final = pickup ? Math.round(sum * 0.9) : sum;
     total.set(tg(final)); barTotal.set(tg(final));
-    barCount.textContent = items.reduce((t, [, q]) => t + q, 0);
+    barCount.textContent = burgers.length ? `${burgers.length} БУРГ.` : "";
     discountEl.textContent = pickup && sum ? `Скидка самовывоза −${tg(sum - final)} тг` : "";
-    const ok = !!order.bun && pc > 0;
+    const broken = burgers.find(({ b: bb }) => !isComplete(bb));
+    const ok = burgers.length > 0 && !broken;
     checkout.disabled = !ok;
-    needEl.textContent = ok ? (pickup ? "Готовность за 20 минут · ул. Бұқарбай батыра, 22" : "Курьер привезёт за 40 минут – 1 час") : !order.bun && !pc ? "Нужны булочка и хотя бы одна котлета." : !order.bun ? "Осталось выбрать булочку." : "Добавь хотя бы одну котлету.";
+    needEl.textContent = ok
+      ? (pickup ? "Готовность за 20 минут · ул. Бұқарбай батыра, 22" : "Курьер привезёт за 40 минут – 1 час")
+      : !burgers.length ? "Нужны булочка и хотя бы одна котлета."
+      : `Бургер ${broken.n}: ${!broken.b.bun && !pattyCount(broken.b) ? "выбери булочку и котлету" : !broken.b.bun ? "осталось выбрать булочку" : "добавь хотя бы одну котлету"}.`;
     copied.textContent = "";
     renderStack();
   };
-  $$("[data-mode]").forEach((b) => b.addEventListener("click", () => {
-    order.mode = b.dataset.mode;
-    $$("[data-mode]").forEach((x) => x.setAttribute("aria-checked", String(x === b)));
+  $$("[data-mode]").forEach((btn) => btn.addEventListener("click", () => {
+    order.mode = btn.dataset.mode;
+    $$("[data-mode]").forEach((x) => x.setAttribute("aria-checked", String(x === btn)));
     renderOrder();
   }));
-  $("[data-reset]").addEventListener("click", () => loadCombo({ items: [] }));
+  $("[data-reset]").addEventListener("click", () => { order.burgers = [newBurger()]; order.active = 0; order.qty.clear(); renderOrder(); });
+  $$("[data-add-burger]").forEach((btn) => btn.addEventListener("click", addBurger));
   checkout.addEventListener("click", () => {
-    const items = lineItems();
-    const sum = items.reduce((t, [it, q]) => t + it.price * q, 0);
     const pickup = order.mode === "pickup";
-    const text = [`SELF — мой заказ (${pickup ? "самовывоз" : "доставка"})`, ...items.map(([it, q]) => `• ${it.name} ${it.wt}${q > 1 ? ` × ${q}` : ""} — ${tg(it.price * q)} тг`), `Итого: ${tg(pickup ? Math.round(sum * 0.9) : sum)} тг${pickup ? " (скидка 10% за самовывоз)" : ""}`, pickup ? "Заберу с ул. Бұқарбай батыра, 22" : "Адрес доставки: "].join("\n");
+    const sum = orderTotal();
+    const rows = [`SELF — мой заказ (${pickup ? "самовывоз" : "доставка"})`];
+    for (const { b, n } of orderBurgers()) {
+      const items = burgerItems(b);
+      rows.push("", `Бургер ${n} — ${tg(sumOf(items))} тг`, ...items.map(([it, q]) => `• ${it.name} ${it.wt}${q > 1 ? ` × ${q}` : ""} — ${tg(it.price * q)} тг`));
+    }
+    const addons = addonItems();
+    if (addons.length) rows.push("", "К заказу:", ...addons.map(([it, q]) => `• ${it.name} ${it.wt}${q > 1 ? ` × ${q}` : ""} — ${tg(it.price * q)} тг`));
+    rows.push("", `Итого: ${tg(pickup ? Math.round(sum * 0.9) : sum)} тг${pickup ? " (скидка 10% за самовывоз)" : ""}`, pickup ? "Заберу с ул. Бұқарбай батыра, 22" : "Адрес доставки: ");
     // The order goes straight to the SELF WhatsApp chat, ready to send.
-    const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
+    const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(rows.join("\n"))}`;
     const win = window.open(url, "_blank", "noopener");
     if (!win) location.href = url;
     copied.textContent = "Открываем WhatsApp — останется нажать «Отправить».";
