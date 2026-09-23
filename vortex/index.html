@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VORTEX BURGER — The Apex of Smash</title>
+<meta name="description" content="VORTEX BURGER. 100% Black Angus, a 60-second hard sear, assembled layer by layer.">
+<meta name="theme-color" content="#080808">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js" } }
+</script>
+<style>
+:root {
+  --bg: #080808;
+  --green: #00FF66;
+  --orange: #FF5500;
+  --dim: rgba(255, 255, 255, 0.55);
+  --line: rgba(255, 255, 255, 0.14);
+  --pad: 40px;
+  --syne: "Syne", "Arial Black", sans-serif;
+  --inter: "Inter", system-ui, sans-serif;
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; background: #080808; color: #fff; font-family: var(--inter); -webkit-font-smoothing: antialiased; overscroll-behavior: none; }
+h1, h2, h3, p, ul, dl, dd { margin: 0; padding: 0; }
+a, button { color: inherit; font: inherit; }
+button { background: none; border: 0; cursor: pointer; }
+
+/* The page itself is only a scroll track; everything visible is fixed. */
+.track { height: 500vh; }
+.backdrop { position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(60% 55% at 50% 52%, #16120e 0%, #0b0a09 45%, #080808 75%); }
+#stage { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; display: block; }
+
+/* ─── Overlay ─── */
+.overlay { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
+.nav { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 28px var(--pad); }
+.logo { font-family: var(--syne); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; text-decoration: none; pointer-events: auto; }
+.logo span { color: var(--green); }
+.nav-links { display: flex; gap: 28px; font-family: var(--syne); font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.nav-links a { pointer-events: auto; text-decoration: none; opacity: .75; transition: opacity .25s, color .25s; }
+.nav-links a:hover { opacity: 1; color: var(--green); }
+.nav-links a.is-cta { color: var(--orange); opacity: 1; }
+
+/* Progress rail */
+.rail { position: absolute; right: var(--pad); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: flex-end; gap: 14px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+.rail-bar { position: relative; width: 2px; height: 160px; background: var(--line); }
+.rail-fill { position: absolute; left: 0; right: 0; top: 0; height: 100%; background: linear-gradient(var(--orange), var(--green)); transform-origin: top; transform: scaleY(0); }
+.rail-pct { font-family: var(--syne); font-size: 13px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
+.rail-phase { color: var(--green); }
+
+/* Split-text reveal */
+.reveal-word { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; margin-bottom: -.08em; }
+.reveal-word > span { display: inline-block; transform: translateY(105%); opacity: 0; transition: transform .9s var(--ease-expo), opacity .9s var(--ease-expo); transition-delay: calc(var(--i) * 90ms); }
+.is-on .reveal-word > span { transform: none; opacity: 1; }
+.is-off .reveal-word > span { transform: translateY(-105%); opacity: 0; transition-duration: .45s; transition-delay: calc(var(--i) * 30ms); }
+
+/* 0–25%: heading */
+.hero { position: absolute; left: var(--pad); bottom: 56px; max-width: min(760px, 70vw); }
+.hero-kicker { display: flex; align-items: center; gap: 12px; font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--green); margin-bottom: 20px; }
+.hero-kicker::before { content: ""; width: 28px; height: 2px; background: var(--green); box-shadow: 0 0 10px var(--green); }
+.hero h1 { font-family: var(--syne); font-weight: 800; font-size: clamp(56px, 9vw, 136px); line-height: .88; letter-spacing: -0.045em; }
+.hero h1 em { font-style: normal; color: var(--orange); }
+.hero-sub { margin-top: 22px; max-width: 26rem; color: var(--dim); font-size: 16px; line-height: 1.5; }
+.hint { position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--dim); transition: opacity .4s; }
+
+/* 40–60%: tags pinned to the patty */
+.tag { position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 0; opacity: 0; will-change: transform, opacity; }
+.tag .dot { position: relative; width: 10px; height: 10px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px rgba(0,255,102,.18), 0 0 16px var(--green); flex: none; }
+.tag .lead { width: 70px; height: 1px; background: linear-gradient(90deg, var(--green), rgba(0,255,102,.2)); transform-origin: left; }
+.tag .card { padding: 12px 16px; border: 1px solid rgba(0,255,102,.35); background: rgba(8,8,8,.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); white-space: nowrap; }
+.tag .card small { display: block; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--green); margin-bottom: 4px; }
+.tag .card b { font-family: var(--syne); font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+.tag.is-left { flex-direction: row-reverse; }
+.tag.is-left .lead { background: linear-gradient(270deg, var(--green), rgba(0,255,102,.2)); transform-origin: right; }
+.tag.is-orange .dot { background: var(--orange); box-shadow: 0 0 0 4px rgba(255,85,0,.2), 0 0 16px var(--orange); }
+.tag.is-orange .lead { background: linear-gradient(270deg, var(--orange), rgba(255,85,0,.2)); }
+.tag.is-orange .card { border-color: rgba(255,85,0,.4); }
+.tag.is-orange .card small { color: var(--orange); }
+
+/* 85–100%: order panel */
+.order { position: absolute; right: calc(var(--pad) + 90px); bottom: 56px; width: 340px; padding: 28px; border: 1px solid var(--line); background: rgba(10,10,10,.78); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  opacity: 0; transform: translateY(30px); transition: opacity .6s var(--ease-expo), transform .6s var(--ease-expo); }
+.order.is-live { opacity: 1; transform: none; pointer-events: auto; }
+.order small { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--green); }
+.order h2 { margin-top: 10px; font-family: var(--syne); font-weight: 800; font-size: 34px; letter-spacing: -0.03em; line-height: .95; }
+.order ul { list-style: none; margin-top: 16px; color: var(--dim); font-size: 14px; line-height: 1.7; }
+.order-row { display: flex; align-items: center; justify-content: space-between; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); }
+.price { font-family: var(--syne); font-size: 30px; font-weight: 700; }
+.qty { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.qty button { width: 32px; height: 32px; border: 1px solid var(--line); border-radius: 50%; font-size: 16px; line-height: 1; transition: border-color .2s, color .2s; }
+.qty button:hover { border-color: var(--green); color: var(--green); }
+.buy { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; height: 54px; margin-top: 18px; background: var(--orange); color: #080808; font-family: var(--syne); font-weight: 800; font-size: 15px; letter-spacing: .06em; text-transform: uppercase;
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px); transition: background .25s, box-shadow .25s; }
+.buy:hover { background: var(--green); }
+.buy:focus-visible, .qty button:focus-visible, .nav a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+.order-note { margin-top: 12px; font-size: 12px; color: var(--dim); min-height: 1.2em; }
+
+/* ─── Mobile: 2.5D SVG layers instead of WebGL ─── */
+.flat { position: fixed; inset: 0; z-index: 1; display: none; place-items: center; perspective: 900px; pointer-events: none; }
+.flat-stack { position: relative; width: min(78vw, 340px); height: 60vh; transform-style: preserve-3d; will-change: transform; }
+.flat-layer { position: absolute; left: 0; top: 50%; width: 100%; will-change: transform; filter: drop-shadow(0 18px 18px rgba(0,0,0,.55)); }
+.flat-layer svg { display: block; width: 100%; height: auto; overflow: visible; }
+body.is-flat #stage { display: none; }
+body.is-flat .flat { display: grid; }
+
+@media (max-width: 767.98px) {
+  :root { --pad: 20px; }
+  .nav { padding: 20px var(--pad); }
+  .nav-links a:not(.is-cta) { display: none; }
+  .logo { font-size: 17px; }
+  .hero { bottom: 40px; max-width: none; right: var(--pad); }
+  .hero h1 { font-size: 52px; }
+  .hero-sub { font-size: 14px; }
+  .rail { top: auto; bottom: 110px; transform: none; }
+  .rail-bar { height: 90px; }
+  .tag .lead { width: 28px; }
+  .tag .card { padding: 9px 11px; }
+  .tag .card b { font-size: 15px; }
+  .order { left: var(--pad); right: var(--pad); bottom: 24px; width: auto; }
+}
+@media (max-width: 767.98px) and (max-height: 720px) {
+  .hero h1 { font-size: 42px; }
+  .hero-sub { display: none; }
+  .order { padding: 18px 20px; }
+  .order h2 { font-size: 24px; }
+  .order h2 br { display: none; }
+  .order ul { display: none; }
+  .order-row { margin-top: 12px; padding-top: 12px; }
+  .buy { height: 46px; margin-top: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-word > span, .order { transition-duration: .01s; transition-delay: 0s; }
+}
+</style>
+</head>
+<body>
+<div class="backdrop" aria-hidden="true"></div>
+<canvas id="stage" aria-label="A 3D burger that assembles as you scroll"></canvas>
+
+<!-- Mobile: layered SVG cards -->
+<div class="flat" aria-hidden="true">
+  <div class="flat-stack" data-flat-stack>
+    <div class="flat-layer" data-flat="bottom">
+      <svg viewBox="0 0 300 90"><defs><linearGradient id="gb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3a25a"/><stop offset=".55" stop-color="#c47a32"/><stop offset="1" stop-color="#8a4f1c"/></linearGradient></defs>
+        <path d="M14 22 Q150 2 286 22 L280 62 Q150 92 20 62 Z" fill="url(#gb)"/><path d="M14 22 Q150 2 286 22 Q150 40 14 22Z" fill="#f2cf95"/></svg>
+    </div>
+    <div class="flat-layer" data-flat="patty">
+      <svg viewBox="0 0 300 80"><defs><linearGradient id="gp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a3322"/><stop offset=".5" stop-color="#3a2014"/><stop offset="1" stop-color="#1f110a"/></linearGradient></defs>
+        <path d="M8 26 L20 18 L34 22 L50 14 L70 19 L92 12 L118 17 L142 11 L168 16 L194 11 L220 17 L246 13 L268 20 L292 25 L288 52 L270 60 L240 64 L200 68 L150 70 L100 68 L60 64 L28 58 L10 50 Z" fill="url(#gp)"/>
+        <g fill="#7a4a30" opacity=".7"><circle cx="60" cy="30" r="3"/><circle cx="110" cy="40" r="2.5"/><circle cx="170" cy="28" r="3.5"/><circle cx="220" cy="42" r="2.5"/><circle cx="250" cy="30" r="2"/><circle cx="90" cy="52" r="2"/><circle cx="190" cy="54" r="3"/></g></svg>
+    </div>
+    <div class="flat-layer" data-flat="cheese">
+      <svg viewBox="0 0 300 70"><path d="M4 18 L296 14 L288 26 L276 50 Q270 58 266 48 L258 30 L220 32 L204 58 Q199 66 195 56 L186 32 L120 34 L104 54 Q99 62 95 52 L88 34 L40 32 L30 46 Q25 54 22 44 L16 30 Z" fill="#ffb81c"/><path d="M4 18 L296 14 L292 20 L8 24Z" fill="#ffd24d"/></svg>
+    </div>
+    <div class="flat-layer" data-flat="bacon">
+      <svg viewBox="0 0 300 60"><g fill="none" stroke-linecap="round"><path d="M20 30 Q50 10 80 30 T140 30 T200 30 T260 30 T290 26" stroke="#7a2e1a" stroke-width="12"/><path d="M26 36 Q56 20 86 36 T146 36 T206 36 T266 36" stroke="#b5553a" stroke-width="4"/>
+        <ellipse cx="70" cy="22" rx="22" ry="8" stroke="#c98b4a" stroke-width="5"/><ellipse cx="160" cy="18" rx="26" ry="9" stroke="#b77838" stroke-width="5"/><ellipse cx="240" cy="24" rx="20" ry="7" stroke="#c98b4a" stroke-width="5"/></g></svg>
+    </div>
+    <div class="flat-layer" data-flat="top">
+      <svg viewBox="0 0 300 150"><defs><radialGradient id="gt" cx=".4" cy=".25" r=".85"><stop offset="0" stop-color="#f3b96a"/><stop offset=".5" stop-color="#d0852f"/><stop offset="1" stop-color="#8a4a16"/></radialGradient></defs>
+        <path d="M10 128 Q10 18 150 10 Q290 18 290 128 Q150 146 10 128 Z" fill="url(#gt)"/>
+        <g fill="#f7e6c1"><ellipse cx="100" cy="46" rx="6" ry="3" transform="rotate(-20 100 46)"/><ellipse cx="150" cy="34" rx="6" ry="3"/><ellipse cx="200" cy="48" rx="6" ry="3" transform="rotate(20 200 48)"/><ellipse cx="70" cy="80" rx="6" ry="3" transform="rotate(-30 70 80)"/><ellipse cx="128" cy="70" rx="6" ry="3" transform="rotate(10 128 70)"/><ellipse cx="178" cy="76" rx="6" ry="3" transform="rotate(-10 178 76)"/><ellipse cx="232" cy="84" rx="6" ry="3" transform="rotate(30 232 84)"/><ellipse cx="104" cy="104" rx="6" ry="3"/><ellipse cx="206" cy="108" rx="6" ry="3"/></g></svg>
+    </div>
+  </div>
+</div>
+
+<div class="overlay">
+  <header class="nav">
+    <a href="#" class="logo" data-jump="0">VORTEX<span>/</span>BURGER</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#" data-jump="0.5">Anatomy</a>
+      <a href="#" data-jump="0.5">Specs</a>
+      <a href="#" class="is-cta" data-jump="1">Order</a>
+    </nav>
+  </header>
+
+  <section class="hero" data-hero aria-label="Intro">
+    <p class="hero-kicker" data-split>Exploded view · 05 layers</p>
+    <h1 data-split>THE APEX OF <em>SMASH</em></h1>
+    <p class="hero-sub" data-split>Five layers engineered to collide. Scroll to pull them together.</p>
+  </section>
+  <p class="hint" data-hint>Scroll to assemble ↓</p>
+
+  <aside class="rail" aria-hidden="true">
+    <span class="rail-pct" data-pct>000%</span>
+    <span class="rail-bar"><span class="rail-fill" data-fill></span></span>
+    <span class="rail-phase" data-phase>Exploded</span>
+  </aside>
+
+  <div class="tag" data-tag="right"><span class="dot"></span><span class="lead"></span><span class="card"><small>Beef</small><b>100% Black Angus</b></span></div>
+  <div class="tag is-left is-orange" data-tag="left"><span class="dot"></span><span class="lead"></span><span class="card"><small>Crust</small><b>60-Second Hard Sear</b></span></div>
+
+  <section class="order" data-order aria-label="Order">
+    <small>Assembled · ready</small>
+    <h2>THE VORTEX <br>DOUBLE</h2>
+    <ul>
+      <li>Brioche, butter-toasted</li>
+      <li>Black Angus smash, 60s sear</li>
+      <li>Aged cheddar · crispy onion</li>
+    </ul>
+    <div class="order-row">
+      <span class="price" data-price>$14</span>
+      <span class="qty"><button type="button" data-q="-1" aria-label="One less">−</button><output data-qty>1</output><button type="button" data-q="1" aria-label="One more">+</button></span>
+    </div>
+    <button type="button" class="buy" data-buy>Order now <span aria-hidden="true">↗</span></button>
+    <p class="order-note" data-note role="status"></p>
+  </section>
+</div>
+
+<div class="track" aria-hidden="true"></div>
+
+<script type="module">
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const lerp = (a, b, t) => a + (b - a) * t;
+const clamp01 = (v) => Math.min(1, Math.max(0, v));
+const range = (p, a, b) => clamp01((p - a) / (b - a));
+const smooth = (t) => t * t * (3 - 2 * t);
+const EASE = 0.08;
+
+/* ═══ Shared input: scroll progress and pointer ═══ */
+const input = { p: 0, mx: 0, my: 0 };
+const readScroll = () => { input.p = clamp01(scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight)); };
+addEventListener("scroll", readScroll, { passive: true });
+addEventListener("resize", readScroll);
+addEventListener("pointermove", (e) => { input.mx = (e.clientX / innerWidth) * 2 - 1; input.my = (e.clientY / innerHeight) * 2 - 1; }, { passive: true });
+readScroll();
+
+/* Layer heights: exploded at scroll 0, stacked at scroll 1. */
+const LAYERS = [
+  { key: "top", from: 4, to: 0.8 },
+  { key: "bacon", from: 2.2, to: 0.42 },
+  { key: "cheese", from: 1.1, to: 0.2 },
+  { key: "patty", from: 0, to: 0 },
+  { key: "bottom", from: -4, to: -0.6 },
+];
+
+/* ═══ Overlay: split text, milestones, tags, order ═══ */
+const split = (el) => {
+  el.setAttribute("aria-label", el.textContent.replace(/\s+/g, " ").trim());
+  let i = 0;
+  const walk = (node) => {
+    for (const child of [...node.childNodes]) {
+      if (child.nodeType === 1) { walk(child); continue; }
+      const frag = document.createDocumentFragment();
+      child.textContent.split(/(\s+)/).forEach((part) => {
+        if (!part) return;
+        if (/^\s+$/.test(part)) { frag.append(" "); return; }
+        const w = document.createElement("span"); w.className = "reveal-word"; w.setAttribute("aria-hidden", "true");
+        const s = document.createElement("span"); s.textContent = part; s.style.setProperty("--i", i++);
+        w.append(s); frag.append(w);
+      });
+      child.replaceWith(frag);
+    }
+  };
+  walk(el);
+};
+$$("[data-split]").forEach(split);
+const hero = $("[data-hero]");
+const tags = { right: $('[data-tag="right"]'), left: $('[data-tag="left"]') };
+const orderPanel = $("[data-order]");
+const ui = { pct: $("[data-pct]"), fill: $("[data-fill]"), phase: $("[data-phase]"), hint: $("[data-hint]") };
+let heroState = null, lastPhase = "";
+
+function overlay(p) {
+  // 0–25%: heading in; out after.
+  const heroOn = p < 0.25;
+  if (heroOn !== heroState) { heroState = heroOn; hero.classList.toggle("is-on", heroOn); hero.classList.toggle("is-off", !heroOn); }
+  ui.hint.style.opacity = 1 - range(p, 0.02, 0.08);
+  ui.pct.textContent = `${String(Math.round(p * 100)).padStart(3, "0")}%`;
+  ui.fill.style.transform = `scaleY(${p})`;
+  const phase = p < 0.25 ? "Exploded" : p < 0.4 ? "Converging" : p < 0.6 ? "Core scan" : p < 0.85 ? "Stacking" : "Locked";
+  if (phase !== lastPhase) { lastPhase = phase; ui.phase.textContent = phase; }
+  // 85–100%: the order panel takes pointer events.
+  orderPanel.classList.toggle("is-live", p >= 0.85);
+}
+/** Tag visibility for 40–60%, with short fades at the edges. */
+const tagAlpha = (p) => Math.min(range(p, 0.4, 0.44), 1 - range(p, 0.56, 0.6));
+function placeTag(el, x, y, a, side) {
+  el.style.opacity = a;
+  el.style.visibility = a > 0.01 ? "visible" : "hidden";
+  const w = el.offsetWidth, h = el.offsetHeight;
+  // The dot sits on the anchor; the card extends outward.
+  let left = side === "right" ? x - 5 : x - w + 5;
+  let top = y - h / 2;
+  if (innerWidth < 768) { // no room beside the patty: clamp into view, one tag above, one below
+    left = Math.min(Math.max(12, left), innerWidth - w - 12);
+    top += side === "right" ? h * 0.9 : -h * 0.9;
+  }
+  el.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+  el.querySelector(".lead").style.transform = `scaleX(${a})`;
+}
+
+// Order panel
+{
+  let q = 1;
+  const PRICE = 14;
+  const out = $("[data-qty]"), price = $("[data-price]"), note = $("[data-note]");
+  $$("[data-q]").forEach((b) => b.addEventListener("click", () => {
+    q = Math.min(9, Math.max(1, q + +b.dataset.q));
+    out.textContent = q; price.textContent = `$${PRICE * q}`; note.textContent = "";
+  }));
+  $("[data-buy]").addEventListener("click", () => { note.textContent = `${q} × Vortex Double added — $${PRICE * q}. Checkout coming soon.`; });
+}
+// Nav jumps to scroll milestones.
+$$("[data-jump]").forEach((a) => a.addEventListener("click", (e) => {
+  e.preventDefault();
+  const max = document.documentElement.scrollHeight - innerHeight;
+  scrollTo({ top: +a.dataset.jump * max, behavior: REDUCED ? "auto" : "smooth" });
+}));
+
+/* ═══ Mode: WebGL on wide screens, 2.5D SVG under 768px ═══ */
+const wantsFlat = () => innerWidth < 768;
+let engine = null;
+async function pick() {
+  const flat = wantsFlat();
+  document.body.classList.toggle("is-flat", flat || engine === false);
+  if (!flat && engine === null) {
+    engine = undefined; // loading
+    try { engine = await createBurger3D($("#stage")); }
+    catch (err) { console.warn("WebGL unavailable, using the 2.5D view", err); engine = false; document.body.classList.add("is-flat"); }
+  }
+}
+addEventListener("resize", pick);
+pick();
+
+/* ═══ 2.5D SVG stack (mobile) ═══ */
+const flat = (() => {
+  const stack = $("[data-flat-stack]");
+  // Pixel offsets tuned to the SVG heights (at an 844px-tall screen): apart → stacked.
+  const PX = { top: [-250, -125], bacon: [-150, -62], cheese: [-85, -38], patty: [0, 0], bottom: [190, 78] };
+  const layers = LAYERS.map((L) => ({ ...L, px: PX[L.key], el: $(`[data-flat="${L.key}"]`) }));
+  // Keep the burger clear of the headline (start) and the order panel (end).
+  const lift = (p) => p < 0.25 ? -16 : p < 0.4 ? lerp(-16, -6, smooth(range(p, 0.25, 0.4))) : p < 0.6 ? -6 : lerp(-6, -24, smooth(range(p, 0.6, 0.85)));
+  return {
+    render(p, t, mx, my) {
+      const a = smooth(p), k = Math.min(1, innerHeight / 844);
+      stack.style.transform = `translate3d(0, ${lift(p)}vh, 0) scale(${lerp(0.72, 1, a)}) rotateX(${10 + my * 6}deg) rotateY(${mx * 10 + Math.sin(p * Math.PI * 2) * 8}deg)`;
+      layers.forEach((L, i) => {
+        const y = lerp(L.px[0], L.px[1], a) * k;
+        const bob = REDUCED ? 0 : Math.sin(t * 1.3 + i) * 5 * (1 - a);
+        const tilt = (1 - a) * (i % 2 ? -4 : 4);
+        L.el.style.transform = `translate3d(0, calc(-50% + ${y + bob}px), ${(2 - i) * 12}px) rotateZ(${tilt}deg)`;
+      });
+    },
+    anchor() {
+      const b = $('[data-flat="patty"]').getBoundingClientRect();
+      return { right: { x: b.right - 8, y: b.top + b.height * 0.45 }, left: { x: b.left + 8, y: b.top + b.height * 0.45 } };
+    },
+  };
+})();
+
+/* ═══ Three.js burger ═══ */
+async function createBurger3D(canvas) {
+  const THREE = await import("three");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight, false);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.1;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.1, 100);
+
+  // Lights: ambient, orange rim top-left, green rim bottom-right, shadowing point light overhead.
+  scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+  const rimOrange = new THREE.DirectionalLight(0xff5500, 1.6); rimOrange.position.set(-7, 8, -5); scene.add(rimOrange);
+  const rimGreen = new THREE.DirectionalLight(0x00ff66, 0.9); rimGreen.position.set(7, -1.5, -6); scene.add(rimGreen);
+  const key = new THREE.PointLight(0xfff1e0, 120, 0, 1.6); key.position.set(0.5, 9, 3);
+  key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.bias = -0.0015; key.shadow.radius = 4;
+  scene.add(key);
+  // Soft frontal fill that follows the camera, so the true colours read from every angle of the orbit.
+  const fill = new THREE.DirectionalLight(0xffe8d2, 1.3); camera.add(fill); fill.position.set(2, 3, 4); scene.add(camera);
+
+  // ── Procedural textures ──
+  const canvasTex = (w, h, draw, color = true) => {
+    const c = document.createElement("canvas"); c.width = w; c.height = h;
+    draw(c.getContext("2d"), w, h);
+    const t = new THREE.CanvasTexture(c);
+    if (color) t.colorSpace = THREE.SRGBColorSpace;
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    return t;
+  };
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const noiseTex = (w, h, dots, lo, hi) => canvasTex(w, h, (g) => {
+    g.fillStyle = "#808080"; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < dots; i++) { const v = (lo + rnd() * (hi - lo)) | 0; g.fillStyle = `rgb(${v},${v},${v})`; const r = 1 + rnd() * 3; g.beginPath(); g.arc(rnd() * w, rnd() * h, r, 0, 7); g.fill(); }
+  }, false);
+  const bunMap = canvasTex(512, 256, (g, w, h) => {
+    const gr = g.createLinearGradient(0, 0, 0, h);
+    gr.addColorStop(0, "#8f4c17"); gr.addColorStop(0.45, "#c9782c"); gr.addColorStop(1, "#e7ad62");
+    g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 2600; i++) { g.fillStyle = `rgba(${rnd() < 0.5 ? "90,45,10" : "255,220,160"},${0.05 + rnd() * 0.08})`; g.fillRect(rnd() * w, rnd() * h, 2 + rnd() * 4, 1 + rnd() * 3); }
+  });
+  const bunBump = noiseTex(256, 256, 3000, 90, 170);
+  const pattyBump = noiseTex(512, 512, 9000, 20, 235);
+  pattyBump.repeat.set(3, 1);
+  const pattyMap = canvasTex(512, 256, (g, w, h) => {
+    g.fillStyle = "#3a2216"; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 5000; i++) { const c = rnd(); g.fillStyle = c < 0.4 ? "rgba(20,10,5,.5)" : c < 0.8 ? "rgba(92,54,34,.45)" : "rgba(140,80,40,.35)"; g.fillRect(rnd() * w, rnd() * h, 1 + rnd() * 4, 1 + rnd() * 3); }
+  });
+
+  const bunMat = new THREE.MeshStandardMaterial({ map: bunMap, bumpMap: bunBump, bumpScale: 0.6, roughness: 0.6, metalness: 0.1 });
+  const crumbMat = new THREE.MeshStandardMaterial({ color: 0xf1d4a2, roughness: 0.9, metalness: 0, bumpMap: bunBump, bumpScale: 1.2 });
+  const shade = (m) => { m.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } }); return m; };
+  const burger = new THREE.Group();
+  scene.add(burger);
+  const groups = {};
+
+  // 1 · Top bun: squashed half-sphere with sesame seeds and a crumb underside.
+  {
+    const g = new THREE.Group();
+    const dome = new THREE.Mesh(new THREE.SphereGeometry(2.3, 96, 48, 0, Math.PI * 2, 0, Math.PI / 2), bunMat);
+    dome.scale.set(1, 0.62, 1); dome.position.y = -0.32;
+    const under = new THREE.Mesh(new THREE.CircleGeometry(2.3, 96), crumbMat);
+    under.rotation.x = Math.PI / 2; under.position.y = -0.32;
+    g.add(dome, under);
+    const seedGeo = new THREE.SphereGeometry(1, 10, 6);
+    const seedMat = new THREE.MeshStandardMaterial({ color: 0xf6e6c2, roughness: 0.5 });
+    const seeds = new THREE.InstancedMesh(seedGeo, seedMat, 90);
+    const d = new THREE.Object3D(), n = new THREE.Vector3();
+    for (let i = 0; i < 90; i++) {
+      // Even-ish spread on the upper dome, then pushed onto the squashed surface.
+      const u = rnd(), th = rnd() * Math.PI * 2, ph = Math.acos(1 - u * 0.82);
+      n.set(Math.sin(ph) * Math.cos(th), Math.cos(ph), Math.sin(ph) * Math.sin(th));
+      d.position.set(n.x * 2.3, n.y * 2.3 * 0.62 - 0.32, n.z * 2.3);
+      d.lookAt(d.position.x + n.x, d.position.y + n.y / 0.62, d.position.z + n.z);
+      d.rotateZ(rnd() * Math.PI);
+      d.scale.set(0.075, 0.13, 0.03);
+      d.updateMatrix(); seeds.setMatrixAt(i, d.matrix);
+    }
+    g.add(seeds);
+    groups.top = shade(g);
+  }
+  // 2 · Crispy bacon strips and fried onion rings.
+  {
+    const g = new THREE.Group();
+    const baconMat = new THREE.MeshStandardMaterial({ color: 0x6b2414, roughness: 0.55, metalness: 0.05, side: THREE.DoubleSide, bumpMap: pattyBump, bumpScale: 1 });
+    const fatMat = new THREE.MeshStandardMaterial({ color: 0xc9795a, roughness: 0.5, side: THREE.DoubleSide });
+    for (let s = 0; s < 3; s++) {
+      const geo = new THREE.PlaneGeometry(3.9, 0.7, 90, 4);
+      const pos = geo.attributes.position;
+      for (let i = 0; i < pos.count; i++) { const x = pos.getX(i), y = pos.getY(i); pos.setZ(i, Math.sin(x * 3.2 + s) * 0.13 + Math.sin(x * 7.1 + y * 4) * 0.03); }
+      geo.computeVertexNormals();
+      const strip = new THREE.Mesh(geo, s === 1 ? fatMat : baconMat);
+      strip.rotation.x = -Math.PI / 2; strip.rotation.z = (s - 1) * 0.55 + 0.2;
+      strip.position.set((s - 1) * 0.35, s * 0.05, (s - 1) * 0.5);
+      if (s === 1) strip.scale.set(0.9, 0.35, 1);
+      g.add(strip);
+    }
+    const onionMat = new THREE.MeshStandardMaterial({ color: 0xb8742e, roughness: 0.5, metalness: 0.05, bumpMap: bunBump, bumpScale: 1.5 });
+    for (let i = 0; i < 11; i++) {
+      const r = 0.3 + rnd() * 0.3;
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.085 + rnd() * 0.04, 10, 32), onionMat);
+      const a = rnd() * Math.PI * 2, dist = rnd() * 1.7;
+      ring.position.set(Math.cos(a) * dist, 0.08 + rnd() * 0.12, Math.sin(a) * dist);
+      ring.rotation.set(Math.PI / 2 + (rnd() - 0.5) * 0.5, rnd() * 3, (rnd() - 0.5) * 0.5);
+      ring.scale.y = 0.8 + rnd() * 0.5;
+      g.add(ring);
+    }
+    groups.bacon = shade(g);
+  }
+  // 3 · Cheese: a thin square whose corners droop over the patty.
+  {
+    const geo = new THREE.BoxGeometry(4.3, 0.07, 4.3, 48, 1, 48);
+    const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i), z = pos.getZ(i), d = Math.hypot(x, z);
+      const over = Math.max(0, d - 1.95);
+      pos.setY(i, pos.getY(i) - over * over * 0.55 - over * 0.12);
+    }
+    geo.computeVertexNormals();
+    const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0xffb200, roughness: 0.2, metalness: 0.05, emissive: 0x3a1c00, emissiveIntensity: 0.25 }));
+    mesh.rotation.y = Math.PI / 4;
+    const g = new THREE.Group(); g.add(mesh);
+    groups.cheese = shade(g);
+  }
+  // 4 · Smashed patty: a cylinder with a jagged crust edge and a lumpy top.
+  {
+    const geo = new THREE.CylinderGeometry(2.3, 2.35, 0.34, 160, 6, false);
+    const pos = geo.attributes.position, v = new THREE.Vector3();
+    const n2 = (a, b) => Math.sin(a * 1.7 + b * 2.3) * Math.cos(a * 2.9 - b * 1.1) + 0.5 * Math.sin(a * 5.3 + b * 4.7);
+    for (let i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i);
+      const ang = Math.atan2(v.z, v.x), r = Math.hypot(v.x, v.z);
+      if (r > 0.01) {
+        const edge = 1 + 0.045 * Math.sin(ang * 13) + 0.03 * Math.sin(ang * 29 + 1.3) + 0.02 * Math.sin(ang * 61);
+        const k = r / 2.33;
+        v.x *= 1 + (edge - 1) * k; v.z *= 1 + (edge - 1) * k;
+      }
+      if (Math.abs(v.y) > 0.16) v.y += Math.sign(v.y) * 0.045 * n2(v.x * 1.4, v.z * 1.4) * Math.min(1, r / 0.6);
+      pos.setXYZ(i, v.x, v.y, v.z);
+    }
+    geo.computeVertexNormals();
+    const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: pattyMap, bumpMap: pattyBump, bumpScale: 2.2, roughness: 0.8, metalness: 0.05, color: 0xb08a78 }));
+    const g = new THREE.Group(); g.add(mesh);
+    groups.patty = shade(g);
+  }
+  // 5 · Bottom bun: a squashed cylinder, same bun material, crumb on top.
+  {
+    const geo = new THREE.CylinderGeometry(2.25, 2.05, 0.8, 96, 4);
+    const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) { const y = pos.getY(i), r = Math.hypot(pos.getX(i), pos.getZ(i)); if (y < -0.3 && r > 1.9) pos.setY(i, y + (r - 1.9) * 0.4); }
+    geo.computeVertexNormals();
+    const mesh = new THREE.Mesh(geo, [bunMat, crumbMat, bunMat]);
+    const g = new THREE.Group(); g.add(mesh);
+    groups.bottom = shade(g);
+  }
+  const parts = LAYERS.map((L, i) => { const g = groups[L.key]; g.position.y = L.from; burger.add(g); return { ...L, g, spin: (i % 2 ? -1 : 1) * (0.3 + i * 0.07) }; });
+
+  // Vortex rings: two thin neon loops orbiting the burger.
+  const ringGreen = new THREE.Mesh(new THREE.TorusGeometry(3.6, 0.012, 8, 200), new THREE.MeshBasicMaterial({ color: 0x00ff66, transparent: true, opacity: 0.55 }));
+  const ringOrange = new THREE.Mesh(new THREE.TorusGeometry(4.1, 0.01, 8, 200), new THREE.MeshBasicMaterial({ color: 0xff5500, transparent: true, opacity: 0.45 }));
+  ringGreen.rotation.x = Math.PI / 2.2; ringOrange.rotation.x = Math.PI / 1.8;
+  scene.add(ringGreen, ringOrange);
+  // A soft shadow catcher under the stack.
+  const floor = new THREE.Mesh(new THREE.CircleGeometry(7, 64), new THREE.ShadowMaterial({ opacity: 0.35 }));
+  floor.rotation.x = -Math.PI / 2; floor.position.y = -1.05; floor.receiveShadow = true;
+  scene.add(floor);
+
+  const state = { p: 0, mx: 0, my: 0 };
+  const onResize = () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight, false); };
+  addEventListener("resize", onResize);
+  const project = new THREE.Vector3();
+  const toScreen = (x, y, z, obj) => {
+    project.set(x, y, z); obj.localToWorld(project); project.project(camera);
+    return { x: (project.x * 0.5 + 0.5) * innerWidth, y: (-project.y * 0.5 + 0.5) * innerHeight };
+  };
+
+  return {
+    render(p, t, mx, my) {
+      const a = smooth(p);
+      // Layers: exploded → stacked, with a gentle drift while apart.
+      for (const L of parts) {
+        const target = lerp(L.from, L.to, a) + (REDUCED ? 0 : Math.sin(t * 1.2 + L.from) * 0.12 * (1 - a));
+        L.g.position.y = lerp(L.g.position.y, target, EASE);
+        L.g.rotation.y = (1 - a) * Math.sin(t * 0.4) * L.spin;
+        L.g.rotation.z = (1 - a) * 0.08 * Math.sin(t * 0.7 + L.from);
+      }
+      // Mouse parallax: burger tilts up to 0.2 rad.
+      state.mx = lerp(state.mx, mx, EASE); state.my = lerp(state.my, my, EASE);
+      burger.rotation.x = state.my * 0.2;
+      burger.rotation.z = -state.mx * 0.2 * 0.5;
+      // Camera: one full orbit across the scroll, pulling in as the stack closes.
+      const ang = p * Math.PI * 2;
+      const radius = lerp(15.5, 11, a);
+      const height = lerp(2.2, 3.4, a);
+      const wideShift = innerWidth > 1100 ? 1 : 0;
+      camera.position.set(Math.sin(ang) * radius + state.mx * 0.8, height - state.my * 0.6, Math.cos(ang) * radius);
+      camera.lookAt(0, lerp(0.2, -0.1, a), 0);
+      // Frame the burger right of centre while the headline and order panel sit left/right.
+      camera.setViewOffset(innerWidth, innerHeight, (p < 0.3 ? -0.2 : p > 0.8 ? 0.14 : 0) * innerWidth * wideShift * (p < 0.3 ? 1 - range(p, 0.2, 0.3) : range(p, 0.8, 0.9)), 0, innerWidth, innerHeight);
+      ringGreen.rotation.z = t * 0.25; ringOrange.rotation.z = -t * 0.18;
+      ringGreen.position.y = lerp(1.6, 0, a); ringOrange.position.y = lerp(-1.4, 0.1, a);
+      ringGreen.material.opacity = 0.55 * (0.4 + 0.6 * (1 - a)); ringOrange.material.opacity = 0.45 * (0.4 + 0.6 * (1 - a));
+      floor.position.y = lerp(-5, -1.05, a);
+      renderer.render(scene, camera);
+    },
+    anchor() {
+      const pg = groups.patty;
+      // The patty's rim, left and right as seen from the camera.
+      const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+      const inv = pg.getWorldQuaternion(new THREE.Quaternion()).invert();
+      right.applyQuaternion(inv).setY(0).normalize().multiplyScalar(2.3);
+      return { right: toScreen(right.x, 0, right.z, pg), left: toScreen(-right.x, 0, -right.z, pg) };
+    },
+  };
+}
+
+/* ═══ One RAF loop for both modes ═══ */
+let eased = input.p;
+const t0 = performance.now();
+function frame(now) {
+  requestAnimationFrame(frame);
+  const t = (now - t0) / 1000;
+  eased = lerp(eased, input.p, EASE);
+  if (Math.abs(eased - input.p) < 0.0005) eased = input.p;
+  const p = eased;
+  const view = document.body.classList.contains("is-flat") ? flat : engine;
+  if (!view) { overlay(p); return; }
+  view.render(p, t, input.mx, input.my);
+  overlay(p);
+  const a = tagAlpha(p);
+  if (a > 0) {
+    const pts = view.anchor();
+    placeTag(tags.right, pts.right.x, pts.right.y, a, "right");
+    placeTag(tags.left, pts.left.x, pts.left.y, a, "left");
+  } else { tags.right.style.visibility = tags.left.style.visibility = "hidden"; }
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
