@@ -464,7 +464,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   <span class="rule rule-x lineup-sub-rule" data-rule-io></span>
   <div class="grid" data-grid></div>
   <div class="more">
-    <div class="more-slide" data-more-slide aria-hidden="true"><img src="./assets/combo-boxes.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="more-slide" data-more-slide aria-hidden="true"><img data-asset="combo-boxes.jpg" alt="" loading="lazy" decoding="async"></div>
     <a href="#lineup" class="pill pill--outline" data-pill data-more>VIEW FULL MENU</a>
   </div>
 </section>
@@ -484,7 +484,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
         <span><span data-dr-io="120">100</span>% BEEF</span>
         <span data-dr-io="240">11:00–23:00</span>
       </div>
-      <div class="order-frame"><img data-order-img src="./assets/combo-closed.jpg" alt="A closed SELF BURGERS box on a steel counter" loading="lazy" decoding="async"></div>
+      <div class="order-frame"><img data-order-img data-asset="combo-closed.jpg" alt="A closed SELF BURGERS box on a steel counter" loading="lazy" decoding="async"></div>
     </div>
   </div>
 </section>
@@ -507,6 +507,9 @@ import Lenis from "lenis";
 
 /* ═══════════════════ Constants ═══════════════════ */
 const ASSET_BASE = "./assets/";
+/* A standalone build fills window.__INLINE_ASSETS__ with data URIs, so the page also works as one file. */
+const assetUrl = (file) => window.__INLINE_ASSETS__?.[file] || ASSET_BASE + file;
+document.querySelectorAll("[data-asset]").forEach((img) => { img.src = assetUrl(img.dataset.asset); });
 const VIDEO = null; // e.g. { hero: "assets/hero.mp4", explode: "assets/explode.mp4", combo: "assets/combo.mp4", box: "assets/box.mp4" }
 const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const hoverOff = () => window.innerWidth < 768;
@@ -918,6 +921,9 @@ const FRAMES = [
 ];
 const WINDOWS = [[0, 0.12], [0.12, 0.26], [0.26, 0.44], [0.44, 0.6], [0.6, 0.74], [0.74, 0.88], [0.88, 1.0001]];
 const P_SMOOTH = 0.14;
+/* How far the burger sits higher in F2 than in F1, as a share of the frame's height. During the lift the two
+   frames are offset by this so their burgers coincide: one burger rises instead of two ghosting. */
+const LIFT_ALIGN = 0.175;
 const CALLOUTS = [
   { at: [850, 168], label: "BUTTERY TOASTED BUN", sub: "Brioche, kissed on the flat-top" },
   { at: [848, 248], label: "SIGNATURE SAUCE", sub: "SELF sauce. Don't ask." },
@@ -950,7 +956,7 @@ const frameEls = FRAMES.map((fr, i) => {
   img.style.width = `${fr.w}px`; img.style.height = `${fr.h}px`;
   img.style.zIndex = i + 1; // later frames fade in over earlier ones
   img.addEventListener("error", () => { reportFailure(img.src); img.style.display = "none"; });
-  img.src = ASSET_BASE + fr.file;
+  img.src = assetUrl(fr.file);
   framesHost.appendChild(img);
   return img;
 });
@@ -986,7 +992,7 @@ if (videoGroups.length) {
 
 /* The cover box. */
 const covers = FRAMES.map(() => ({ s: 1, left: 0, top: 0 }));
-const coverOf = (i, zoom, shiftX = 0, shiftY = 0, liftY = 0) => {
+const coverOf = (i, zoom, shiftX = 0, shiftY = 0, liftY = 0, freeY = 0) => {
   const fr = FRAMES[i];
   const vw = stage.clientWidth, vh = stage.clientHeight;
   const s = Math.max(vw / fr.w, vh / fr.h) * (zoom + 24 / vw);
@@ -994,7 +1000,7 @@ const coverOf = (i, zoom, shiftX = 0, shiftY = 0, liftY = 0) => {
   let left = clamp(vw / 2 - fr.f[0] * s, vw - W, 0);
   let top = clamp(vh / 2 - fr.f[1] * s, vh - H, 0);
   left = clamp(left + shiftX, vw - W, 0);
-  top = clamp(top + shiftY + liftY * H, vh - H, 0);
+  top = clamp(top + shiftY + liftY * H, vh - H, 0) + freeY * H;
   const c = covers[i]; c.s = s; c.left = left; c.top = top;
   return c;
 };
@@ -1125,8 +1131,8 @@ const render = () => {
 
   // Per-frame state straight from the chapter table.
   const st = [
-    { o: 1, z: 1 + 0.06 * r(p, 0, 0.2) },
-    { o: e(r(p, 0.12, 0.18)), z: 1.06 + 0.04 * r(p, 0.12, 0.26), lift: -0.03 * e(r(p, 0.12, 0.26)), blur: 24 * r(p, 0.26, 0.31) },
+    { o: 1, z: 1 + 0.06 * r(p, 0, 0.2), free: -LIFT_ALIGN * e(r(p, 0.12, 0.22)) },
+    { o: e(r(p, 0.12, 0.18)), z: 1.06 + 0.04 * r(p, 0.12, 0.26), lift: -0.03 * e(r(p, 0.12, 0.26)), free: LIFT_ALIGN * (1 - e(r(p, 0.12, 0.22))), blur: 24 * r(p, 0.26, 0.31) },
     { o: e(r(p, 0.26, 0.31)), z: 1.08 - 0.08 * e(r(p, 0.26, 0.34)) + 0.06 * r(p, 0.44, 0.49), clip: 8 + 92 * e(r(p, 0.26, 0.33)), blur: 16 * r(p, 0.44, 0.49) },
     { o: e(r(p, 0.44, 0.49)), z: 1.05 - 0.05 * e(r(p, 0.44, 0.52)) },
     { o: e(r(p, 0.6, 0.65)), z: 1.1 - 0.1 * e(r(p, 0.6, 0.7)), blur: 20 * r(p, 0.74, 0.79) },
@@ -1141,7 +1147,7 @@ const render = () => {
     const visible = s.o > 0.001 && i >= coveredFrom;
     img.style.visibility = visible ? "visible" : "hidden";
     img.style.willChange = visible ? "transform, opacity" : "auto";
-    const c = coverOf(i, plain ? 1 : s.z, fx, fy, s.lift || 0);
+    const c = coverOf(i, plain ? 1 : s.z, fx, fy, s.lift || 0, plain ? 0 : s.free || 0);
     if (!visible) return;
     img.style.opacity = s.o;
     img.style.transform = `translate3d(${c.left}px, ${c.top}px, 0) scale(${c.s})`;
@@ -1272,7 +1278,7 @@ const runPreloader = () => {
     level.start(STEP.loaded);
   };
   // Every still counts toward "loaded".
-  Promise.allSettled(FRAMES.map((fr) => { const im = new Image(); im.src = ASSET_BASE + fr.file; return im.decode(); })).then(finish);
+  Promise.allSettled(FRAMES.map((fr) => { const im = new Image(); im.src = assetUrl(fr.file); return im.decode(); })).then(finish);
   window.addEventListener("load", finish, { once: true });
   setTimeout(finish, MAX_WAIT);
   setTimeout(done, MAX_WAIT + 2000);
@@ -1322,7 +1328,7 @@ const CARDS = [
       <div class="lean-in">
         <article class="card on-paper">
           <div class="card-top fine"><span data-idx>${String(order + 1).padStart(2, "0")}</span><span>${c.cat}</span></div>
-          <div class="card-media"><div data-float><img src="${ASSET_BASE + c.photo}" alt="${c.name}" loading="lazy" decoding="async"></div></div>
+          <div class="card-media"><div data-float><img src="${assetUrl(c.photo)}" alt="${c.name}" loading="lazy" decoding="async"></div></div>
           <h3 class="display ink card-name" data-name>${c.name}</h3>
           <p class="card-desc">${c.desc}</p>
           <div class="card-price">
