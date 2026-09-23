@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orven® — Performance Optics</title>
+<meta name="description" content="Performance optics engineered for crystal vision. Precision-crafted lenses tested for durability.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gap: 24px;
+  --margin: 32px;
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+* { margin: 0; box-sizing: border-box; }
+html, body { overscroll-behavior: none; }
+body { background: #000; color: #fff; font-family: "Inter Tight", system-ui, sans-serif; font-weight: 500; -webkit-font-smoothing: antialiased; }
+p { margin: 0; }
+
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); padding-inline: var(--margin); }
+
+/* Dev grid overlay — toggle with "G" */
+.dev-grid { position: fixed; inset: 0; z-index: 9999; pointer-events: none; display: none; }
+.dev-grid.is-on { display: grid; }
+.dev-grid span { background: rgba(255, 0, 0, 0.1); height: 100%; }
+
+/* ─── Section 1: header ─── */
+.header { position: fixed; top: 24px; left: 0; width: 100%; height: 58px; padding-inline: var(--margin); z-index: 100; mix-blend-mode: difference; display: flex; color: #fff; }
+.header-col { flex: 1 1 0; display: flex; flex-direction: column; justify-content: center; gap: 8px; font-size: 14px; letter-spacing: -0.03em; line-height: 1.1; }
+.header-col + .header-col { border-left: 1px solid rgba(255, 255, 255, 0.1); padding: 0 24px; }
+.header-col.is-logo { font-size: 24px; letter-spacing: -0.04em; }
+.header-col.is-cart { align-items: flex-end; text-align: right; padding: 0 0 0 24px; }
+.header a { color: inherit; text-decoration: none; }
+
+/* ─── Section 2: hero ─── */
+.hero { position: relative; height: 1200vh; }
+.hero-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+.hero-backdrop { position: absolute; inset: 0; background: #000; }
+.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero-video.is-v2 { opacity: 0; }
+
+.hero-ui { position: fixed; inset: 0; height: 100vh; z-index: 50; mix-blend-mode: difference; align-content: end; padding-bottom: 33px; pointer-events: none; will-change: opacity, transform; }
+.hero-ui > * { pointer-events: auto; }
+.hero-left { grid-column: 1 / 7; }
+.hero-title { font-size: 160px; font-weight: 500; line-height: 100%; letter-spacing: -0.04em; }
+.hero-caption { font-size: 18px; line-height: 120%; letter-spacing: -0.04em; text-indent: 120px; }
+.hero-right { grid-column: 9 / 13; min-height: 176px; display: flex; flex-direction: column; justify-content: space-between; align-self: end; }
+.hero-info { display: flex; font-size: 18px; line-height: 120%; letter-spacing: -0.04em; }
+.hero-info-label { width: 120px; flex: none; }
+.hero-info-text { flex: 1; text-indent: 120px; }
+.hero-meta { display: flex; gap: 25px; font-size: 18px; letter-spacing: -0.04em; }
+
+/* ─── Section 3: feature panels ─── */
+.panels { position: fixed; inset: 0; z-index: 60; padding-top: 82px; pointer-events: none; mix-blend-mode: difference; align-items: start; }
+.panel { grid-row: 1; position: relative; top: 200vh; display: flex; flex-direction: column; gap: 24px; }
+.panel.is-right { grid-column: 9 / 12; }
+.panel.is-left { grid-column: 2 / 5; }
+.panel-bar { align-self: flex-end; width: 95px; height: 2px; background: linear-gradient(90deg, #888DCC 0%, #02B5B8 25.96%, #868D0A 55.77%, #B2A2B6 95.19%); }
+.panel-body { display: flex; flex-direction: column; gap: 80px; }
+.panel-text { font-size: 32px; font-weight: 400; line-height: 120%; letter-spacing: -0.04em; text-indent: 120px; }
+.specs { border-top: 1px solid #fff; padding-top: 12px; display: flex; flex-direction: column; gap: 12px; list-style: none; padding-left: 0; margin: 0; }
+.spec { display: flex; align-items: center; gap: 12px; font-size: 14px; text-transform: uppercase; letter-spacing: -0.03em; white-space: nowrap; }
+.spec-bar { width: 6px; height: 14px; background: #fff; flex: none; }
+.spec-label { flex: 1; }
+.spec-value { text-align: right; }
+
+/* ─── Section 4 ─── */
+.next { min-height: 100vh; background: #000; }
+
+/* ─── Reveal ─── */
+.reveal-word { display: inline-block; opacity: 0; filter: blur(10px); transform: translateY(20px); text-indent: 0;
+  transition: opacity 0.4s var(--ease-expo), filter 0.4s var(--ease-expo), transform 0.4s var(--ease-expo);
+  transition-delay: calc(var(--i) * var(--stagger)); will-change: opacity, filter, transform; }
+.reveal-active .reveal-word { opacity: 1; filter: blur(0); transform: translateY(0); }
+.reveal-exit .reveal-word { opacity: 0; filter: blur(9px); transform: translateY(-28px); transition-duration: 0.3s; }
+
+/* ─── Responsive (mobile only) ─── */
+@media (max-width: 768px) {
+  :root { --gap: 12px; --margin: 16px; }
+  .hero-title { font-size: 56px; }
+  .hero-left { grid-column: 1 / -1; }
+  .hero-caption { grid-column: 1 / -1; font-size: 14px; text-indent: 0; }
+  .hero-right { grid-column: 1 / -1; min-height: auto; margin-top: 24px; gap: 16px; }
+  .hero-info { flex-direction: column; gap: 8px; }
+  .hero-info-label { width: auto; font-size: 14px; }
+  .hero-info-text { font-size: 14px; text-indent: 0; }
+  .hero-meta span { font-size: 14px; }
+  .hero-ui { padding-bottom: 24px; }
+  .header { padding-inline: 16px; top: 16px; }
+  .header-col:not(.is-logo) { display: none; }
+  .panel.is-right, .panel.is-left { grid-column: 1 / -1; }
+  .panel-text { font-size: 20px; text-indent: 0; }
+}
+@media (max-width: 480px) {
+  .hero-title { font-size: 40px; }
+}
+</style>
+</head>
+<body>
+
+<div class="dev-grid grid" data-dev-grid aria-hidden="true">
+  <span></span><span></span><span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<!-- Section 1: header -->
+<header class="header">
+  <div class="header-col is-logo"><a href="#top">Orven®</a></div>
+  <nav class="header-col" aria-label="Product">
+    <span>Precision engineered</span>
+    <span>Essential</span>
+    <span>Proven</span>
+  </nav>
+  <nav class="header-col" aria-label="Company">
+    <span>Innovation Redefined</span>
+    <span>Our Story</span>
+  </nav>
+  <div class="header-col is-cart"><a href="#cart">+ Cart</a></div>
+</header>
+
+<main id="top">
+  <!-- Section 2: hero -->
+  <section class="hero" data-hero>
+    <div class="hero-sticky">
+      <div class="hero-backdrop"></div>
+      <video class="hero-video is-v2" data-video="2" muted playsinline preload="auto"
+        src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260712_221651_c3c6edb9-c684-4a9f-b193-fee556ca5622.mp4"></video>
+      <video class="hero-video is-v1" data-video="1" muted playsinline preload="auto"
+        src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260712_221520_90005dc3-c311-4138-a49f-e22a719f7d8a.mp4"></video>
+    </div>
+  </section>
+
+  <!-- Section 4: next -->
+  <section class="next" aria-label="Next"></section>
+</main>
+
+<!-- Hero UI overlay -->
+<div class="hero-ui grid" data-hero-ui>
+  <div class="hero-left">
+    <h1 class="hero-title" data-reveal="chars" data-stagger="0.025">Orven®</h1>
+    <p class="hero-caption" data-reveal="words">Performance optics engineered for crystal vision. Precision-crafted lenses tested for durability. Superior technology. Built for excellence</p>
+  </div>
+  <div class="hero-right">
+    <div class="hero-info">
+      <span class="hero-info-label" data-reveal="words">Info</span>
+      <p class="hero-info-text" data-reveal="words">Advanced lens engineering meets optical excellence. Every frame tested for impact resistance. Precision optics drive performance vision forward</p>
+    </div>
+    <div class="hero-meta" data-reveal="words"><span>(Drop)</span><span>(2026)</span></div>
+  </div>
+</div>
+
+<!-- Section 3: feature panels -->
+<div class="panels grid" data-panels>
+  <article class="panel is-right" data-panel="right">
+    <span class="panel-bar"></span>
+    <div class="panel-body">
+      <p class="panel-text" data-reveal="words">Precision-ground lenses hold razor clarity from edge to edge. Tuned to kill glare, lift contrast, and stay flawless through speed, sweat, and grit.</p>
+      <ul class="specs">
+        <li class="spec"><span class="spec-bar"></span><span class="spec-label">Clarity</span><span class="spec-value">98%</span></li>
+        <li class="spec"><span class="spec-bar"></span><span class="spec-label">Contrast</span><span class="spec-value">94%</span></li>
+        <li class="spec"><span class="spec-bar"></span><span class="spec-label">UV Filter</span><span class="spec-value">400nm</span><span class="spec-value">100%</span></li>
+      </ul>
+    </div>
+  </article>
+  <article class="panel is-left" data-panel="left">
+    <span class="panel-bar"></span>
+    <div class="panel-body">
+      <p class="panel-text" data-reveal="words">Aerospace-grade polymer flexes under load and springs back unbroken. Built to swallow impact, shed heat, and stay locked through every hard mile.</p>
+      <ul class="specs">
+        <li class="spec"><span class="spec-bar"></span><span class="spec-label">Frame Weight</span><span class="spec-value">22g</span></li>
+        <li class="spec"><span class="spec-bar"></span><span class="spec-label">Impact Rating</span><span class="spec-value">Z87+</span></li>
+        <li class="spec"><span class="spec-bar"></span><span class="spec-label">Field</span><span class="spec-value">180 degrees</span><span class="spec-value">Wide</span></li>
+      </ul>
+    </div>
+  </article>
+</div>
+
+<script>
+(() => {
+  const SCRUB1_VH = 3, FADE_VH = 3, SCRUB2_VH = 5;
+  const LERP = 0.09;
+  const clamp01 = (v) => Math.min(1, Math.max(0, v));
+  const range = (p, a, b) => clamp01((p - a) / (b - a));
+
+  /* ── Dev grid ── */
+  const devGrid = document.querySelector("[data-dev-grid]");
+  window.addEventListener("keydown", (e) => {
+    if (e.key.toLowerCase() !== "g" || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (/input|textarea|select/i.test(e.target.tagName) || e.target.isContentEditable) return;
+    devGrid.classList.toggle("is-on");
+  });
+
+  /* ── Word/char stagger reveal ── */
+  function splitReveal(el, mode = "words", stagger = 0.05) {
+    const label = el.textContent.replace(/\s+/g, " ").trim();
+    el.setAttribute("aria-label", label);
+    const frag = document.createDocumentFragment();
+    let i = 0;
+    const word = (text) => {
+      const s = document.createElement("span");
+      s.className = "reveal-word";
+      s.textContent = text;
+      s.style.setProperty("--i", i++);
+      s.style.setProperty("--stagger", `${stagger}s`);
+      s.setAttribute("aria-hidden", "true");
+      return s;
+    };
+    const space = () => document.createTextNode(" "); // collapses at line wraps, unlike a spaced span
+    // Element children (e.g. the meta spans) are split in place so their layout survives.
+    const targets = el.children.length ? [...el.children] : [el];
+    for (const t of targets) {
+      const text = t.textContent.replace(/\s+/g, " ").trim();
+      t.textContent = "";
+      if (mode === "chars") [...text].forEach((ch) => t.appendChild(ch === " " ? space() : word(ch)));
+      else text.split(" ").forEach((w, n) => { if (n) t.appendChild(space()); t.appendChild(word(w)); });
+    }
+    el.classList.add("reveal");
+    return el;
+  }
+  const reveal = (el, on) => {
+    // on: true → active, false → exit, null → hidden (reset)
+    el.classList.toggle("reveal-active", on === true);
+    el.classList.toggle("reveal-exit", on === false);
+  };
+  document.querySelectorAll("[data-reveal]").forEach((el) => splitReveal(el, el.dataset.reveal, el.dataset.stagger ? +el.dataset.stagger : 0.05));
+
+  const heroUI = document.querySelector("[data-hero-ui]");
+  const heroReveals = [...heroUI.querySelectorAll(".reveal")];
+  const panelEls = {
+    right: document.querySelector('[data-panel="right"]'),
+    left: document.querySelector('[data-panel="left"]'),
+  };
+  const panelText = {
+    right: panelEls.right.querySelector(".reveal"),
+    left: panelEls.left.querySelector(".reveal"),
+  };
+
+  // Hero title cluster reveals immediately on load.
+  requestAnimationFrame(() => requestAnimationFrame(() => heroReveals.forEach((el) => reveal(el, true))));
+
+  /* ── Video scrub engine (RAF-lerp) ── */
+  const hero = document.querySelector("[data-hero]");
+  const v1 = document.querySelector('[data-video="1"]');
+  const v2 = document.querySelector('[data-video="2"]');
+  const scrubbers = [v1, v2].map((video) => ({ video, target: 0, current: 0, lastSeek: 0, ready: false }));
+  const [s1, s2] = scrubbers;
+  let raf = 0;
+
+  const prime = (s) => {
+    const onMeta = () => {
+      s.ready = true;
+      // iOS Safari only paints seeks after the element has played once.
+      const p = s.video.play();
+      if (p && p.then) p.then(() => s.video.pause()).catch(() => {});
+      else s.video.pause();
+      wake();
+    };
+    if (s.video.readyState >= 1) onMeta(); else s.video.addEventListener("loadedmetadata", onMeta, { once: true });
+  };
+  scrubbers.forEach(prime);
+
+  const tick = (now) => {
+    let busy = false;
+    for (const s of scrubbers) {
+      const d = s.video.duration;
+      if (!s.ready || !Number.isFinite(d)) continue;
+      const diff = s.target - s.current;
+      if (Math.abs(diff) > 0.001) { s.current += diff * LERP; busy = true; } else s.current = s.target;
+      const drift = Math.abs(s.video.currentTime - s.current);
+      if (drift > 0.02) {
+        busy = true;
+        if (now - s.lastSeek >= 30) { s.video.currentTime = s.current; s.lastSeek = now; }
+      }
+    }
+    raf = busy ? requestAnimationFrame(tick) : 0;
+  };
+  function wake() { if (!raf) raf = requestAnimationFrame(tick); }
+
+  /* ── Scroll timeline ── */
+  const onScroll = () => {
+    const vh = window.innerHeight;
+    const y = window.scrollY - hero.offsetTop;
+    const p1 = range(y, 0, SCRUB1_VH * vh);
+    const p2 = range(y, SCRUB1_VH * vh, (SCRUB1_VH + FADE_VH) * vh);
+    const p3 = range(y, (SCRUB1_VH + FADE_VH) * vh, (SCRUB1_VH + FADE_VH + SCRUB2_VH) * vh);
+
+    // Phase 1: video 1 scrub, hero UI out over the last 20%.
+    if (Number.isFinite(v1.duration)) s1.target = p1 * v1.duration;
+    const uiFade = range(p1, 0.8, 1);
+    heroUI.style.opacity = 1 - uiFade;
+    heroUI.style.transform = uiFade ? `translateY(${-120 * uiFade}px)` : "";
+    heroUI.style.visibility = uiFade >= 1 ? "hidden" : "visible";
+    const exiting = uiFade > 0.15;
+    heroReveals.forEach((el) => reveal(el, !exiting));
+
+    // Phase 2: crossfade.
+    v1.style.opacity = 1 - p2;
+    v1.style.filter = p2 > 0 ? `blur(${80 * p2}px)` : "none";
+    v2.style.opacity = p2;
+
+    // Phase 3: video 2 scrub (last frame at 80%), panels travel through the viewport.
+    if (Number.isFinite(v2.duration)) s2.target = Math.min(1, p3 / 0.8) * v2.duration;
+    placePanel("right", range(p3, 0, 0.4), vh);
+    placePanel("left", range(p3, 0.45, 0.85), vh);
+
+    wake();
+  };
+
+  const PADDING_TOP = 82;
+  const placePanel = (key, sub, vh) => {
+    const el = panelEls[key];
+    const h = el.offsetHeight;
+    const start = vh + 60 - PADDING_TOP;   // just below the fold
+    const end = -(PADDING_TOP + h);        // fully above the fold
+    // `top`, not transform: keeps mix-blend-mode on one compositing layer.
+    el.style.top = `${start + (end - start) * sub}px`;
+    const t = panelText[key];
+    if (sub > 0.12 && sub < 0.88) reveal(t, true);
+    else if (sub >= 0.88) reveal(t, false);
+    else reveal(t, null);
+  };
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll);
+  [v1, v2].forEach((v) => v.addEventListener("loadedmetadata", onScroll));
+  onScroll();
+})();
+</script>
+</body>
+</html>
