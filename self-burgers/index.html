@@ -351,12 +351,16 @@ const CONFIG = {
       layers: { cuts: [0.25, 0.355, 0.492, 0.648, 0.805], feather: 0.012, x: [0.325, 0.618], centre: 0.52, press: 0.3 } },
     stack: { src: "images/scenes/stack.jpg", w: 1399, h: 768, view: [0, 0, 0.935, 0.935], focus: [0.5, 0.5], zoom: [1.05, 1],
       patches: [{ x: 0.015, y: 0.42, w: 0.29, h: 0.22, bg: "#f0efeb", blur: 14 }] },
-    combo: { src: "images/scenes/combo.jpg", w: 1376, h: 768, view: [0, 0, 1, 0.89], focus: [0.36, 0.5], zoom: [1, 1.05] },
+    /* The burger in the air over the same paper: dissolved in over the hero as it "lifts". Same framing and patch as the hero. */
+    heroLift: { src: "images/scenes/hero-lift.jpg", w: 1515, h: 688, lift: 0.175, view: [0, 0, 0.94, 0.92], focus: [0.54, 0.55], zoom: [1, 1.04],
+      patches: [{ x: 0, y: 0, w: 0.4, h: 1, bg: "linear-gradient(to right, #0b0a0e 0%, #0b0a0e 76%, rgba(11,10,14,0) 100%)" }] },
+    /* The open combo box, close. */
+    combo: { src: "images/scenes/combo-open.jpg", w: 1570, h: 1536, view: [0, 0, 1, 1], focus: [0.5, 0.62], zoom: [1, 1.06] },
     /* The closed box on the right of the combo photo: the camera settles on it for the last phase. */
     box: { src: "images/scenes/combo.jpg", w: 1376, h: 768, view: [0, 0, 1, 0.89], focus: [0.74, 0.56], zoom: [1.02, 1.45] },
   },
   /* Which stills stand in for each video, bottom to top. Slot 3 shares the combo photo and pushes in. */
-  slots: [["hero"], ["explode"], ["stack", "combo"], ["box"]],
+  slots: [["hero", "heroLift"], ["explode"], ["stack", "combo"], ["box"]],
   hero: {
     label: "★ SMASHED FRESH DAILY",
     title: "BUILT LIKE<br>SELF.",
@@ -401,13 +405,13 @@ const CONFIG = {
         sizes: [["Single", "$7.46"], ["Double", "$10.34"], ["Triple", "$13.79"]] },
       { name: "LAYUP BURGER", desc: "Bacon, cheddar, grilled onions, BBQ glaze.", img: "images/scenes/stack.jpg", crop: [0.46, 0.66, 1.9], // IMG_2
         sizes: [["Single", "$9.19"], ["Double", "$13.79"], ["Triple", "$16.69"]] },
-      { name: "HOOK SHOT BURGER", desc: "Jalapeños, pepper jack, crispy onions, chipotle mayo.", img: "images/scenes/combo.jpg", crop: [0.22, 0.64, 2.6], // IMG_3
+      { name: "HOOK SHOT BURGER", desc: "Jalapeños, pepper jack, crispy onions, chipotle mayo.", img: "images/scenes/combo-open.jpg", crop: [0.35, 0.64, 1.9], // IMG_3
         sizes: [["Single", "$14.04"], ["Double", "$19.54"], ["Triple", "$22.10"]] },
     ],
     sides: [
       { name: "TIMEOUT FRIES", desc: "Skin-on, sea salt.", img: "images/scenes/stack.jpg", crop: [0.17, 0.14, 3.1], emoji: "🍟", // IMG_4
         sizes: [["Regular", "$3.16"], ["Large", "$4.49"]] },
-      { name: "SELF LOADED FRIES", desc: "Cheese sauce, bacon, pickles, SELF sauce.", img: "images/scenes/combo.jpg", crop: [0.37, 0.56, 3], emoji: "🍟", // IMG_5
+      { name: "SELF LOADED FRIES", desc: "Cheese sauce, bacon, pickles, SELF sauce.", img: "images/scenes/combo-open.jpg", crop: [0.56, 0.5, 2.3], emoji: "🍟", // IMG_5
         sizes: [["One size", "$6.99"]] },
       { name: "OVERTIME MILKSHAKES", desc: "Oreo / Biscoff / Strawberry.", img: "images/scenes/stack.jpg", crop: [0.84, 0.46, 2.5], emoji: "🥤", // IMG_6
         sizes: [["Regular", "$5.99"], ["Large", "$6.99"]] },
@@ -784,6 +788,17 @@ function update() {
   const heroS = stillByKey("hero"), exS = stillByKey("explode"), stackS = stillByKey("stack"), comboS = stillByKey("combo", 2), boxS = stillByKey("box");
   const exZoom = prog(p2, 0, 0.45);
   if (heroS) heroS.el.style.transform = zoomAt(heroS.scene, p1);
+  // The burger leaves the paper: a quick dissolve to the photo of it in the air, drifting up as it goes.
+  const liftS = stillByKey("heroLift");
+  if (liftS && heroS) {
+    // The two photos are offset so their burgers coincide throughout the dissolve: the burger rises by
+    // LIFT of the image height while the paper stays behind, so it reads as one burger lifting, not two.
+    const e = easeOutCubic(prog(p1, 0.3, 0.75));
+    const D = CONFIG.scenes.heroLift.lift * heroS.el.offsetHeight;
+    heroS.el.style.transform = `translate3d(0, ${-D * e}px, 0) ${zoomAt(heroS.scene, p1)}`;
+    liftS.el.style.transform = `translate3d(0, ${D * (1 - e)}px, 0) ${zoomAt(liftS.scene, p1)}`;
+    liftS.el.style.opacity = prog(p1, 0.3, 0.6);
+  }
   if (exS) {
     exS.el.style.transform = zoomAt(exS.scene, exZoom);
     // Pressed together while the hero fades out, fully apart by 45% of the explode phase.
