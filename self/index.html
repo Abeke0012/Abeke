@@ -1,22 +1,22 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SELF — Smash Burgers, Built Like You</title>
-<meta name="description" content="Double smashed. Double cheese. Zero excuses. Order the Game Day Combo ahead and skip the line — open daily 11:00–23:00.">
+<title>SELF — бургерная, где решаешь ты</title>
+<meta name="description" content="Собери свой бургер: булочка, до 4 котлет, начинки, соусы, гарнир и напиток — цена видна сразу. Астана, ул. Бұқарбай батыра, 22, ежедневно 11:00–05:00.">
 <meta name="theme-color" content="#0b0b0b">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script type="importmap">
 { "imports": { "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.mjs" } }
 </script>
 <style>
 :root {
-  --font-display: "Anton", "Impact", system-ui, sans-serif;
+  --font-display: "Oswald", "Arial Narrow", system-ui, sans-serif;
   --font-sans: "Inter", system-ui, sans-serif;
-  --font-mono: "Space Mono", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 :root {
   /* Palette */
@@ -48,10 +48,10 @@
   --raw-font-size-lineup: 15rem;
   --raw-font-size-footer-mark: 22rem;
   --raw-font-size-count: 11rem;
-  --raw-font-size-display-phone: 3.5rem;
+  --raw-font-size-display-phone: 2.85rem;
   --raw-font-size-chapter-phone: 2.75rem;
   --raw-font-size-lineup-phone: 4.5rem;
-  --raw-font-size-display-tablet: 6rem;
+  --raw-font-size-display-tablet: 5.5rem;
   --raw-font-size-chapter-tablet: 3.75rem;
   --raw-font-size-lineup-tablet: 9rem;
   --raw-leading-display: 0.88;
@@ -117,7 +117,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .mono { font-family: var(--font-mono); }
 .label { font-family: var(--font-mono); font-size: var(--raw-font-size-label); text-transform: uppercase; letter-spacing: var(--raw-tracking-label); line-height: 1.3; }
 .fine { font-family: var(--font-mono); font-size: var(--raw-font-size-fine); text-transform: uppercase; letter-spacing: var(--raw-tracking-label); line-height: 1.3; }
-.display { font-family: var(--font-display); font-weight: 400; text-transform: uppercase; line-height: var(--raw-leading-display); letter-spacing: var(--raw-tracking-display); }
+.display { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; line-height: var(--raw-leading-display); letter-spacing: var(--raw-tracking-display); }
 .ink { color: transparent; background-color: currentColor; background-image: var(--ink-noise); background-size: 180px 180px; -webkit-background-clip: text; background-clip: text; }
 .on-paper { --ink-noise: var(--ink-noise-light); }
 .lede { font-family: var(--font-sans); font-size: var(--raw-font-size-lede); line-height: var(--raw-leading-copy); }
@@ -232,7 +232,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .chapter .lede { margin-top: 1.25rem; max-width: var(--raw-size-chapter-lede); opacity: .75; }
 .chapter .meta { margin-top: 1.25rem; opacity: .6; }
 .chapter-hero { top: var(--raw-size-hero-copy-y); translate: 0 0; width: var(--raw-size-hero-copy); }
-.chapter-hero h1 { font-size: var(--raw-font-size-display); }
+.chapter-hero h1 { font-size: 8.25rem; width: max-content; max-width: calc(100vw - 2 * var(--raw-size-gutter)); }
 .chapter-hero h1 > span[aria-hidden] > span { white-space: nowrap; } /* two lines, as set */
 .chapter-hero .ctas { display: flex; gap: 12px; margin-top: 2rem; flex-wrap: wrap; }
 .chapter-lid { left: 50%; top: 18%; translate: -50% 0; width: 40rem; text-align: center; }
@@ -338,6 +338,115 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .footer-mark .te-line { line-height: 0.95; }
 .footer-copy { text-align: right; opacity: .45; }
 @media (max-width: 639.98px) { .footer-cols { grid-template-columns: 1fr; } .footer-mark { font-size: 9rem; } }
+
+.header-mark, .preloader .pl-mark { font-weight: 700; }
+
+/* ═════ Menu intro ═════ */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 5rem; border-top: 1px solid rgba(17,17,17,.2); }
+.stat { display: flex; flex-direction: column; gap: 0.75rem; padding: 1.5rem 1.5rem 1.5rem 0; }
+.stat + .stat { padding-left: 1.5rem; border-left: 1px solid rgba(17,17,17,.2); }
+.stat .fine { opacity: .55; }
+.stat b { font-size: 3.5rem; line-height: 1; white-space: nowrap; }
+.how { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 3rem; counter-reset: none; }
+.how li { background: var(--raw-color-paper-100); border-radius: 6px; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.how li .fine { color: var(--accent); }
+.how li b { font-family: var(--font-display); font-size: 1.75rem; text-transform: uppercase; line-height: 1; }
+.how li p { font-size: var(--raw-font-size-label); line-height: 1.45; opacity: .7; }
+.block-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-top: 7rem; }
+.block-head h2, .block-head h3 { font-size: var(--raw-font-size-chapter); }
+.block-head .lede { max-width: 24rem; opacity: .65; }
+.block-head + .grid { margin-top: 3rem; }
+.card-comp { font-size: var(--raw-font-size-fine); opacity: .6; margin-top: 0.35rem; line-height: 1.4; }
+@media (max-width: 1023.98px) {
+  .stats, .how { grid-template-columns: 1fr; }
+  .stat + .stat { padding-left: 0; border-left: 0; border-top: 1px solid rgba(17,17,17,.2); }
+  .block-head { flex-direction: column; align-items: flex-start; gap: 1rem; margin-top: 5rem; }
+  .block-head h2, .block-head h3 { font-size: var(--raw-font-size-chapter-tablet); }
+}
+@media (max-width: 639.98px) { .stat b { font-size: 2.75rem; } .block-head h2, .block-head h3 { font-size: var(--raw-font-size-chapter-phone); } }
+
+/* ═════ Builder ═════ */
+.builder { position: relative; background: var(--surface-inverse); color: var(--foreground-inverse); padding: 2rem var(--raw-size-gutter) 8rem; }
+.builder > .block-head { margin-top: 0; padding-top: 4rem; border-top: 1px solid rgba(17,17,17,.2); }
+.builder-grid { display: grid; grid-template-columns: minmax(0, 1fr) 26rem; gap: 4rem; margin-top: 3rem; align-items: start; }
+.step { padding-top: 1.25rem; border-top: 1px solid var(--raw-color-ink-950); }
+.step + .step { margin-top: 3.5rem; }
+.step-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.step-head h3 { font-family: var(--font-display); font-size: 2.25rem; text-transform: uppercase; line-height: 1; }
+.step-head h3 .fine { color: var(--accent); margin-right: 0.75rem; vertical-align: middle; }
+.step-note { opacity: .55; text-align: right; }
+.step-sub { margin: 1.25rem 0 0.25rem; opacity: .5; }
+.rows { margin-top: 0.75rem; }
+.row { display: grid; grid-template-columns: 1.5rem minmax(0, 1fr) 4.5rem 6rem auto; align-items: center; gap: 0.75rem; width: 100%; min-height: 3rem; padding: 0.5rem 0; border-bottom: 1px solid rgba(17,17,17,.12); text-align: left; transition: background-color var(--raw-duration-fast); }
+.row:hover { background: rgba(17,17,17,.035); }
+.row .box { width: 1.1rem; height: 1.1rem; border: 1.5px solid var(--raw-color-ink-950); display: grid; place-items: center; transition: background-color var(--raw-duration-fast), border-color var(--raw-duration-fast); }
+.row[data-kind="one"] .box { border-radius: 50%; }
+.row .box::after { content: ""; width: 0.45rem; height: 0.45rem; background: #fff; transform: scale(0); transition: transform var(--raw-duration-fast) var(--ease-expo); }
+.row[data-kind="one"] .box::after { border-radius: 50%; }
+.row.is-on .box { background: var(--accent); border-color: var(--accent); }
+.row.is-on .box::after { transform: scale(1); }
+.row .nm { font-size: var(--raw-font-size-base); font-weight: 500; }
+.row .wt, .row .pr { font-family: var(--font-mono); font-size: var(--raw-font-size-label); white-space: nowrap; }
+.row .wt { opacity: .5; }
+.row .pr { text-align: right; font-weight: 700; }
+.row .qty { display: flex; align-items: center; gap: 0.25rem; font-family: var(--font-mono); font-size: var(--raw-font-size-label); }
+.row .qty button { width: 1.9rem; height: 1.9rem; border-radius: 50%; border: 1px solid rgba(17,17,17,.3); line-height: 1; }
+.row .qty button:disabled { opacity: .3; cursor: default; }
+.row .qty output { min-width: 1.25rem; text-align: center; font-weight: 700; }
+.row.is-on .qty output { color: var(--accent); }
+.row.is-blocked { opacity: .4; }
+.row-end { width: 0; }
+.receipt { position: sticky; top: 5.5rem; background: var(--raw-color-char-950); color: #fff; border-radius: 8px; padding: 1.5rem; --ink-noise: var(--ink-noise-dark); }
+.stack { position: relative; height: 13rem; display: flex; flex-direction: column-reverse; align-items: center; justify-content: flex-start; padding-bottom: 0.5rem; border-bottom: 1px dashed rgba(255,255,255,.2); }
+.stack-empty { position: absolute; left: 0; right: 0; top: 50%; text-align: center; opacity: .45; }
+.layer { flex: none; width: 70%; border-radius: 4px; will-change: transform, opacity; }
+.layer.bun-bottom { border-radius: 4px 4px 14px 14px; }
+.layer.bun-top { border-radius: 60% 60% 6px 6px / 90% 90% 6px 6px; }
+.layer.wide { width: 78%; }
+.layer.thin { width: 74%; }
+.receipt-title { margin-top: 1.25rem; opacity: .5; }
+.lines { margin-top: 0.75rem; max-height: 14rem; overflow: auto; font-size: var(--raw-font-size-label); }
+.lines li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.3rem 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+.lines li span:last-child { font-family: var(--font-mono); white-space: nowrap; opacity: .8; }
+.lines li.is-empty { opacity: .45; justify-content: flex-start; border: 0; }
+.mode { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 1.25rem; }
+.mode button { display: flex; flex-direction: column; align-items: flex-start; gap: 0.2rem; padding: 0.65rem 0.8rem; border-radius: 6px; border: 1px solid rgba(255,255,255,.25); font-family: var(--font-mono); font-size: var(--raw-font-size-fine); letter-spacing: .08em; text-align: left; transition: background-color var(--raw-duration-fast), border-color var(--raw-duration-fast); }
+.mode button small { font-size: 10px; opacity: .6; letter-spacing: .04em; text-transform: none; }
+.mode button[aria-checked="true"] { border-color: var(--accent); background: rgba(255,90,31,.14); }
+.total { display: flex; align-items: baseline; justify-content: space-between; margin-top: 1.25rem; }
+.total b { font-size: 3rem; line-height: 1; }
+.discount { color: var(--accent); min-height: 1em; margin-top: 0.25rem; text-align: right; }
+.hint-line { opacity: .5; margin-top: 0.75rem; }
+.receipt-actions { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; }
+.receipt-actions .pill { flex: 1; }
+.receipt-actions .pill:disabled { opacity: .35; cursor: not-allowed; }
+.reset { opacity: .55; }
+.reset:hover { opacity: 1; }
+.copied { margin-top: 0.75rem; color: var(--raw-color-cheese-400); min-height: 1em; }
+.bar { display: none; }
+@media (max-width: 1023.98px) {
+  .builder-grid { grid-template-columns: 1fr; }
+  .receipt { position: relative; top: 0; }
+  .bar { position: sticky; bottom: 0.75rem; z-index: 5; display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; padding: 0.6rem 0.6rem 0.6rem 1.25rem; border-radius: 999px; background: var(--raw-color-char-950); color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+  .bar b { font-size: 1.5rem; line-height: 1; margin-right: auto; }
+  .bar .fine { opacity: .6; }
+}
+@media (max-width: 639.98px) {
+  .row { grid-template-columns: 1.25rem minmax(0, 1fr) auto auto; gap: 0.5rem; }
+  .row .wt { display: none; }
+  .row .pr { font-size: var(--raw-font-size-fine); }
+  .step-head { flex-direction: column; gap: 0.5rem; }
+  .step-note { text-align: left; }
+  .step-head h3 { font-size: 1.75rem; }
+  .receipt { padding: 1.25rem; }
+}
+
+/* ═════ Contacts ═════ */
+.contacts { display: grid; gap: 0.75rem; margin-top: 2rem; }
+.contacts div { display: grid; grid-template-columns: 9rem 1fr; gap: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,.12); }
+.contacts dt { opacity: .5; }
+.contacts dd { text-transform: none; letter-spacing: .02em; font-family: var(--font-sans); font-size: var(--raw-font-size-label); }
+@media (max-width: 639.98px) { .contacts div { grid-template-columns: 1fr; gap: 0.25rem; } }
 </style>
 </head>
 <body>
@@ -346,7 +455,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 <!-- Preloader -->
 <div class="preloader" data-preloader aria-hidden="true">
-  <p class="fine" style="color:rgba(255,255,255,.45)">// SMASHING NOW</p>
+  <p class="fine" style="color:rgba(255,255,255,.45)">// СОБИРАЕМ</p>
   <p class="pl-count" data-pl-count>000</p>
   <span class="pl-mark">SELF</span>
   <svg viewBox="0 0 160 160" fill="none">
@@ -361,35 +470,35 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 <!-- Header -->
 <header class="header" data-header>
-  <a href="#top" aria-label="SELF home" class="header-mark">SELF</a>
-  <nav aria-label="Primary" class="header-nav" data-nav-clip>
-    <a href="#lineup" data-ul>Menu</a>
-    <a href="#combo" data-ul>Combos</a>
-    <a href="#order" data-ul>Locations</a>
-    <a href="#story" data-ul>Our Story</a>
+  <a href="#top" aria-label="SELF — на главную" class="header-mark">SELF</a>
+  <nav aria-label="Основное" class="header-nav" data-nav-clip>
+    <a href="#menu" data-ul>Меню</a>
+    <a href="#build" data-ul>Собрать</a>
+    <a href="#combos" data-ul>Комбо</a>
+    <a href="#order" data-ul>Контакты</a>
   </nav>
   <div class="header-right" data-right-clip>
-    <span class="header-open"><span class="dot" data-pulse></span>OPEN · 11:00–23:00</span>
-    <a href="#order" class="pill pill--filled pill--compact" data-pill>ORDER NOW</a>
-    <button type="button" class="toggle" data-toggle aria-expanded="false" aria-controls="panel" aria-label="Open menu"><span></span><span></span></button>
+    <span class="header-open"><span class="dot" data-pulse></span>ОТКРЫТО · 11:00–05:00</span>
+    <a href="#build" class="pill pill--filled pill--compact" data-pill>СОБРАТЬ</a>
+    <button type="button" class="toggle" data-toggle aria-expanded="false" aria-controls="panel" aria-label="Открыть меню"><span></span><span></span></button>
   </div>
 </header>
 <div class="panel" id="panel" data-panel data-lenis-prevent>
   <div>
-    <p class="fine" style="opacity:.5">// NAVIGATION</p>
+    <p class="fine" style="opacity:.5">// НАВИГАЦИЯ</p>
     <ol>
-      <li><a href="#lineup"><span class="fine">01</span>Menu</a></li>
-      <li><a href="#combo"><span class="fine">02</span>Combos</a></li>
-      <li><a href="#order"><span class="fine">03</span>Locations</a></li>
-      <li><a href="#story"><span class="fine">04</span>Our Story</a></li>
+      <li><a href="#menu"><span class="fine">01</span>Меню</a></li>
+      <li><a href="#build"><span class="fine">02</span>Собрать</a></li>
+      <li><a href="#combos"><span class="fine">03</span>Комбо</a></li>
+      <li><a href="#order"><span class="fine">04</span>Контакты</a></li>
     </ol>
   </div>
-  <a href="#order" class="pill pill--filled" data-pill>ORDER NOW</a>
+  <a href="#build" class="pill pill--filled" data-pill>СОБРАТЬ БУРГЕР</a>
 </div>
 
 <main id="top">
 <!-- 1 — Story -->
-<section id="story" class="story" aria-label="The SELF burger, layer by layer" data-header-theme="dark" data-story>
+<section id="story" class="story" aria-label="Бургер SELF, слой за слоем" data-header-theme="dark" data-story>
   <div class="stage" data-stage>
     <div class="stage-surface" data-stage-surface></div>
     <div class="frames" data-frames></div>
@@ -397,56 +506,56 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
     <div class="copy" data-copy>
       <!-- C1 Hero -->
       <div class="chapter chapter-hero is-left" data-chapter="0">
-        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>SELF BURGERS · EST. 2026</p>
-        <h1 class="display ink" data-te="lines" data-delay="80">BUILT LIKE<br>SELF.</h1>
-        <p class="lede" data-te="words" data-delay="260" data-stagger="18">Two patties smashed thin on a screaming-hot griddle, melted American cheese, a toasted brioche bun. Double smashed. Double cheese. Zero excuses.</p>
+        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>SELF · БУРГЕРНАЯ, ГДЕ РЕШАЕШЬ ТЫ</p>
+        <h1 class="display ink" data-te="lines" data-delay="80">ТВОЙ БУРГЕР.<br>ТВОИ ПРАВИЛА.</h1>
+        <p class="lede" data-te="words" data-delay="260" data-stagger="18">Здесь нет одного «стандартного» бургера. Выбираешь булочку, котлеты, начинки, соусы, гарнир и напиток и сразу видишь цену. Без скрытых доплат.</p>
         <div class="ctas" data-rise="420">
-          <a href="#order" class="pill pill--filled" data-pill>ORDER NOW</a>
-          <a href="#lineup" class="pill pill--outline" data-pill>SEE THE MENU</a>
+          <a href="#build" class="pill pill--filled" data-pill>СОБРАТЬ БУРГЕР</a>
+          <a href="#menu" class="pill pill--outline" data-pill>МЕНЮ</a>
         </div>
       </div>
       <!-- C2 Lift -->
       <div class="chapter is-right" data-chapter="1">
-        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>01 — THE PATTY</p>
-        <h2 class="display ink" data-te="lines" data-delay="80">SMASHED<br>TO ORDER.</h2>
-        <p class="lede" data-te="words" data-delay="260">Fresh beef, pressed flat the second it hits the steel for lace-crisp edges and a juicy middle. Nothing waits under a lamp.</p>
+        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>01 — КОТЛЕТЫ</p>
+        <h2 class="display ink" data-te="lines" data-delay="80">ХОТЬ<br>ЧЕТЫРЕ.</h2>
+        <p class="lede" data-te="words" data-delay="260">Говяжья, куриная, филе, томлёное мясо или сёмга. Бери сразу несколько видов: до четырёх котлет в одном бургере.</p>
       </div>
       <!-- C3 Explode -->
       <div class="chapter is-left on-paper" data-chapter="2">
-        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>02 — THE BUILD</p>
-        <h2 class="display ink" data-te="lines" data-delay="80">SIX LAYERS.<br>ZERO FILLER.</h2>
-        <p class="lede" data-te="words" data-delay="260" data-name-hover>Every layer earns its place. Hover a name to see it.</p>
+        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>02 — СБОРКА</p>
+        <h2 class="display ink" data-te="lines" data-delay="80">СЛОЙ<br>ЗА СЛОЕМ.</h2>
+        <p class="lede" data-te="words" data-delay="260" data-name-hover>Каждый слой и его цена видны сразу. Никаких сюрпризов в конце.</p>
       </div>
       <!-- C4 Stack -->
       <div class="chapter is-left on-paper" data-chapter="3">
-        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>03 — THE STARTING LINEUP</p>
-        <h2 class="display ink" data-te="lines" data-delay="80">THE STACK</h2>
-        <p class="lede" data-te="words" data-delay="260">Burger. Fries. Sauce. A cookie shake. The four that start every game.</p>
-        <p class="fine meta" data-rise="420">BURGER — 780 KCAL  ·  FRIES — 320  ·  SHAKE — 540</p>
+        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>03 — К БУРГЕРУ</p>
+        <h2 class="display ink" data-te="lines" data-delay="80">ГАРНИР<br>И НАПИТОК</h2>
+        <p class="lede" data-te="words" data-delay="260">Фри, батат, наггетсы, сырные шарики и домашние лимонады. Добавляются к сборке в одно касание.</p>
+        <p class="fine meta" data-rise="420">ФРИ — 950 ТГ  ·  БАТАТ — 1 500 ТГ  ·  ЛИМОНАД — 980 ТГ</p>
       </div>
       <!-- C5 Combo -->
       <div class="chapter is-right" data-chapter="4" id="combo">
-        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>04 — FOR THE WHOLE GAME</p>
-        <h2 class="display ink" data-te="lines" data-delay="80">GAME DAY<br>COMBO</h2>
-        <p class="lede" data-te="words" data-delay="260">Burger, sauces, fries and a SELF shake, packed hot in one box for pickup or delivery.</p>
-        <div class="price-row" data-rise="420"><span class="price-pill"><span data-dr="420">$18.99</span></span><span class="fine" style="opacity:.6">SAVE $4.20</span></div>
+        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>04 — ГОТОВЫЕ КОМБО</p>
+        <h2 class="display ink" data-te="lines" data-delay="80">НЕ ХОЧЕШЬ<br>СОБИРАТЬ?</h2>
+        <p class="lede" data-te="words" data-delay="260">Возьми готовое комбо и доработай его под себя одним движением.</p>
+        <div class="price-row" data-rise="420"><span class="price-pill"><span data-dr="420">3 130 тг</span></span><span class="fine" style="opacity:.6">КЛАССИКА SELF</span></div>
       </div>
       <!-- C6 Open box -->
       <div class="chapter is-left" data-chapter="5">
-        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>05 — THE FINAL BUZZER</p>
-        <h2 class="display ink" data-te="lines" data-delay="80">OVERTIME<br>SHAKES</h2>
-        <p class="lede" data-te="words" data-delay="260">Oreo, Biscoff and strawberry, blended thick enough to stand a straw in.</p>
+        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>05 — САМОВЫВОЗ</p>
+        <h2 class="display ink" data-te="lines" data-delay="80">−10%<br>С СОБОЙ.</h2>
+        <p class="lede" data-te="words" data-delay="260">Заказ готов через 20 минут. Забирай на Бұқарбай батыра, 22 со скидкой десять процентов.</p>
       </div>
       <!-- C7 Lid shut -->
       <div class="chapter chapter-lid" data-chapter="6">
-        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>06 — PACKED</p>
-        <h2 class="display ink" data-te="lines" data-delay="80">MADE FRESH.<br>MADE BOLD.</h2>
-        <div class="ctas" data-rise="420"><a href="#order" class="pill pill--filled" data-pill>ORDER THE COMBO</a></div>
+        <p class="label eyebrow"><span class="rule rule-x" data-rule></span>06 — ДОСТАВКА</p>
+        <h2 class="display ink" data-te="lines" data-delay="80">40 МИНУТ<br>ДО ДВЕРИ.</h2>
+        <div class="ctas" data-rise="420"><a href="#build" class="pill pill--filled" data-pill>СОБРАТЬ ЗАКАЗ</a></div>
       </div>
     </div>
     <div class="callouts" data-callouts></div>
     <div class="callout-list" data-callout-list></div>
-    <p class="fine scroll-hint" data-hint>SCROLL TO BUILD <i data-hint-arrow>↓</i></p>
+    <p class="fine scroll-hint" data-hint>ЛИСТАЙ ВНИЗ <i data-hint-arrow>↓</i></p>
     <aside class="counter" data-counter aria-hidden="true">
       <span data-counter-num>01</span>
       <span class="track"><span class="fill" data-counter-fill></span></span>
@@ -457,49 +566,97 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   </div>
 </section>
 
-<!-- 2 — Lineup -->
-<section id="lineup" class="lineup" aria-label="Menu" data-header-theme="light">
-  <h2 class="display ink lineup-title" data-lineup-title>THE LINEUP.</h2>
-  <p class="label lineup-sub" data-inview-fade>PICK YOUR PLAYER</p>
+<!-- 2 — Menu -->
+<section id="menu" class="lineup" aria-label="Меню" data-header-theme="light">
+  <h2 class="display ink lineup-title" data-lineup-title>МЕНЮ.</h2>
+  <p class="label lineup-sub" data-inview-fade>ТВОЙ БУРГЕР. ТВОИ ПРАВИЛА.</p>
   <span class="rule rule-x lineup-sub-rule" data-rule-io></span>
+  <div class="stats">
+    <div class="stat" data-stat><span class="fine">ЦЕНА ОТ</span><b class="display"><span data-dr-io="0">1 340</span> ТГ</b></div>
+    <div class="stat" data-stat><span class="fine">ПОЗИЦИЙ В МЕНЮ</span><b class="display"><span data-dr-io="120">56</span></b></div>
+    <div class="stat" data-stat><span class="fine">ДОСТАВКА</span><b class="display"><span data-dr-io="240">40</span> МИН – 1 Ч</b></div>
+  </div>
+  <ol class="how">
+    <li data-how><span class="fine">01</span><b>Выбираешь.</b><p>Булочку, котлету и всё, что после. Ничего не добавляем за тебя и не прячем состав.</p></li>
+    <li data-how><span class="fine">02</span><b>Собираешь.</b><p>Каждый слой и его цена видны сразу, без сюрпризов в конце.</p></li>
+    <li data-how><span class="fine">03</span><b>Получаешь как удобно.</b><p>Курьер до двери за 40 минут – 1 час или самовывоз с ближайшей точки.</p></li>
+  </ol>
+  <div class="block-head" id="combos">
+    <h3 class="display ink" data-te-io="lines">ГОТОВЫЕ КОМБО</h3>
+    <p class="lede">Не хочешь собирать — возьми готовое и доработай под себя одним движением.</p>
+  </div>
   <div class="grid" data-grid></div>
-  <div class="more">
-    <div class="more-slide" data-more-slide aria-hidden="true"><img data-asset="combo-boxes.jpg" alt="" loading="lazy" decoding="async"></div>
-    <a href="#lineup" class="pill pill--outline" data-pill data-more>VIEW FULL MENU</a>
+</section>
+
+<!-- 3 — Builder -->
+<section id="build" class="builder on-paper" aria-label="Собрать бургер" data-header-theme="light">
+  <div class="block-head">
+    <h2 class="display ink" data-te-io="lines">СОБЕРИ СВОЙ.</h2>
+    <p class="lede">Отмечай всё, что хочешь видеть в бургере. Состав и цена собираются справа.</p>
+  </div>
+  <div class="builder-grid">
+    <div class="steps" data-steps></div>
+    <aside class="receipt" id="receipt" data-receipt aria-label="Твой заказ">
+      <div class="stack" data-stack aria-hidden="true"><p class="stack-empty fine" data-stack-empty>Начни с булочки ↓</p></div>
+      <p class="fine receipt-title">// ТВОЙ ЗАКАЗ</p>
+      <ul class="lines" data-lines></ul>
+      <div class="mode" role="radiogroup" aria-label="Способ получения">
+        <button type="button" role="radio" aria-checked="true" data-mode="delivery">ДОСТАВКА<small>40 мин – 1 ч</small></button>
+        <button type="button" role="radio" aria-checked="false" data-mode="pickup">САМОВЫВОЗ<small>20 мин · −10%</small></button>
+      </div>
+      <div class="total"><span class="fine">ИТОГО</span><b class="display" data-total-wrap><span data-total>0</span> ТГ</b></div>
+      <p class="fine discount" data-discount></p>
+      <p class="fine hint-line" data-need>Нужны булочка и хотя бы одна котлета.</p>
+      <div class="receipt-actions">
+        <button type="button" class="pill pill--filled" data-checkout disabled>ОФОРМИТЬ</button>
+        <button type="button" class="reset fine" data-reset>СБРОСИТЬ</button>
+      </div>
+      <p class="fine copied" data-copied role="status"></p>
+    </aside>
+  </div>
+  <div class="bar" data-bar>
+    <span class="fine"><span data-bar-count>0</span> ПОЗ.</span>
+    <b class="display"><span data-bar-total>0</span> ТГ</b>
+    <a href="#receipt" class="pill pill--filled pill--compact" data-bar-go>К ЗАКАЗУ</a>
   </div>
 </section>
 
-<!-- 3 — Order -->
-<section id="order" class="order" aria-label="Order" data-header-theme="dark">
+<!-- 4 — Order -->
+<section id="order" class="order" aria-label="Доставка и самовывоз" data-header-theme="dark">
   <span class="order-rule" data-order-rule></span>
   <div class="order-grid">
     <div>
-      <h2 class="display ink" data-te-io="lines">HUNGRY?<br>ORDER AHEAD.</h2>
-      <p class="lede" data-te-io="words" data-delay="200">Skip the line. Your combo is on the counter in 8 minutes.</p>
-      <div class="ctas"><a href="#order" class="pill pill--filled" data-pill>ORDER PICKUP</a><a href="#order" class="pill pill--outline" data-pill>DELIVERY</a></div>
+      <h2 class="display ink" data-te-io="lines">ГОЛОДЕН?<br>ЗАБИРАЙ.</h2>
+      <p class="lede" data-te-io="words" data-delay="200">Курьер привезёт до двери за 40 минут – 1 час. На самовывозе заказ готов через 20 минут, и он на 10% дешевле.</p>
+      <dl class="contacts fine">
+        <div><dt>АДРЕС</dt><dd>Астана, ул. Бұқарбай батыра, 22</dd></div>
+        <div><dt>РЕЖИМ РАБОТЫ</dt><dd>Ежедневно, 11:00–05:00</dd></div>
+        <div><dt>САМОВЫВОЗ</dt><dd>Готовность за 20 минут, скидка −10%</dd></div>
+      </dl>
+      <div class="ctas"><a href="#build" class="pill pill--filled" data-pill>САМОВЫВОЗ −10%</a><a href="#build" class="pill pill--outline" data-pill>ДОСТАВКА</a></div>
     </div>
     <div>
       <div class="facts fine">
-        <span><span data-dr-io="0">08</span> MIN</span>
-        <span><span data-dr-io="120">100</span>% BEEF</span>
-        <span data-dr-io="240">11:00–23:00</span>
+        <span><span data-dr-io="0">20</span> МИН</span>
+        <span>−<span data-dr-io="120">10</span>%</span>
+        <span data-dr-io="240">11:00–05:00</span>
       </div>
-      <div class="order-frame"><img data-order-img data-asset="combo-closed.jpg" alt="A closed SELF BURGERS box on a steel counter" loading="lazy" decoding="async"></div>
+      <div class="order-frame"><img data-order-img data-asset="combo-closed.jpg" alt="Закрытая коробка SELF на стальной стойке" loading="lazy" decoding="async"></div>
     </div>
   </div>
 </section>
 </main>
 
-<!-- 4 — Footer -->
-<footer class="footer" data-header-theme="dark" aria-label="Footer">
+<!-- 5 — Footer -->
+<footer class="footer" data-header-theme="dark" aria-label="Подвал">
   <div class="footer-cols fine">
-    <p>128 GRIDIRON AVE</p>
-    <p>MON–SUN 11:00–23:00</p>
-    <p class="links"><a href="https://instagram.com" data-ul-rule>INSTAGRAM</a>·<a href="https://tiktok.com" data-ul-rule>TIKTOK</a>·<a href="#careers" data-ul-rule>CAREERS</a></p>
+    <p>АСТАНА, УЛ. БҰҚАРБАЙ БАТЫРА, 22</p>
+    <p>ЕЖЕДНЕВНО 11:00–05:00</p>
+    <p class="links"><a href="https://instagram.com" data-ul-rule>INSTAGRAM</a>·<a href="https://tiktok.com" data-ul-rule>TIKTOK</a>·<a href="#menu" data-ul-rule>МЕНЮ</a></p>
   </div>
   <span class="rule rule-x footer-rule" style="transform:none"></span>
   <p class="display ink footer-mark" data-te-io="lines" aria-label="SELF">SELF</p>
-  <p class="fine footer-copy">© 2026 SELF BURGERS</p>
+  <p class="fine footer-copy">© 2026 SELF · ТВОЙ БУРГЕР. ТВОИ ПРАВИЛА.</p>
 </footer>
 
 <script type="module">
@@ -925,12 +1082,12 @@ const P_SMOOTH = 0.14;
    frames are offset by this so their burgers coincide: one burger rises instead of two ghosting. */
 const LIFT_ALIGN = 0.175;
 const CALLOUTS = [
-  { at: [850, 168], label: "BUTTERY TOASTED BUN", sub: "Brioche, kissed on the flat-top" },
-  { at: [848, 248], label: "SIGNATURE SAUCE", sub: "SELF sauce. Don't ask." },
-  { at: [846, 350], label: "CARAMELIZED ONIONS", sub: "Low and slow, 40 minutes" },
-  { at: [840, 452], label: "MELTED AMERICAN CHEESE", sub: "Two slices, to the edge" },
-  { at: [846, 568], label: "JUICY BEEF PATTY", sub: "Smashed thin, lace-crisp" },
-  { at: [842, 672], label: "TOASTED BUN", sub: "Holds it all together" },
+  { at: [850, 168], label: "БУЛОЧКА БРИОШЬ", sub: "80 г · 500 тг" },
+  { at: [848, 248], label: "СОУС НА ВЫБОР", sub: "До трёх на бургер · от 250 тг" },
+  { at: [846, 350], label: "КАРАМЕЛИЗИРОВАННЫЙ ЛУК", sub: "20 г · 180 тг" },
+  { at: [840, 452], label: "СЫР", sub: "20 г · 250 тг" },
+  { at: [846, 568], label: "ГОВЯЖЬЯ КОТЛЕТА", sub: "120 г · 1 790 тг" },
+  { at: [842, 672], label: "НИЖНЯЯ БУЛОЧКА", sub: "Держит всё вместе" },
 ];
 const CALLOUT_STEP = 0.12;
 
@@ -1076,10 +1233,10 @@ const callouts = CALLOUTS.map((c, i) => {
   return item;
 });
 chapters[2].units.push({ enter() {}, reset() { callouts.forEach((c) => c.hide()); }, jump() {} });
-/* Hovering the word "name" in the C3 lede pulses the six callouts in order. */
+/* Hovering the word "слой" in the C3 lede pulses the six callouts in order. */
 {
   const lede = $("[data-name-hover]");
-  const word = [...lede.querySelectorAll(".te-word")].find((w) => /^name\b/i.test(w.textContent));
+  const word = [...lede.querySelectorAll(".te-word")].find((w) => /^слой/i.test(w.textContent));
   if (word) {
     word.style.textDecoration = "underline"; word.style.textUnderlineOffset = "3px"; word.style.cursor = "help"; word.style.pointerEvents = "auto";
     word.addEventListener("mouseenter", () => {
@@ -1230,7 +1387,7 @@ const header = $("[data-header]");
     open = v;
     panel.classList.toggle("open", v);
     toggle.setAttribute("aria-expanded", String(v));
-    toggle.setAttribute("aria-label", v ? "Close menu" : "Open menu");
+    toggle.setAttribute("aria-label", v ? "Закрыть меню" : "Открыть меню");
     header.classList.toggle("is-light", false);
     v ? stopScroll() : startScroll();
   };
@@ -1284,13 +1441,107 @@ const runPreloader = () => {
   setTimeout(done, MAX_WAIT + 2000);
 };
 
-/* ═══════════════════ 2 — The lineup ═══════════════════ */
-const CARDS = [
-  { photo: "card-burger.jpg", cat: "BURGER", name: "FREE THROW SHOT", desc: "Double smash, American cheese, crispy onions, bacon, SELF sauce.", prices: ["$9.46", "$12.34", "$15.79"] },
-  { photo: "card-fries.jpg", cat: "SIDE", name: "TIMEOUT FRIES", desc: "Skin-on, double-fried, sea salt.", prices: ["$3.99"] },
-  { photo: "card-shake.jpg", cat: "SHAKE", name: "OVERTIME SHAKE", desc: "Cookies & cream, chocolate drizzle, whipped top.", prices: ["$6.49"] },
-  { photo: "card-combo.jpg", cat: "COMBO", name: "GAME DAY COMBO", desc: "Burger + fries + shake + two sauces, one box.", prices: ["$18.99"] },
+/* ═══════════════════ 2 — The menu (from the SELF price list) ═══════════════════ */
+const MENU = [
+  { key: "bun", title: "Булочка", note: "Одна на бургер", kind: "one", items: [
+    { id: "bun-sesame", name: "Классическая с кунжутом", wt: "80 г", price: 450, color: "#e8a04a" },
+    { id: "bun-brioche", name: "Бриошь", wt: "80 г", price: 500, color: "#df8f34" },
+    { id: "bun-black", name: "Чёрная", wt: "80 г", price: 500, color: "#3a3431" },
+  ] },
+  { key: "patty", title: "Котлеты", note: "Можно разные виды — до 4 котлет в одном бургере", kind: "qty", max: 4, items: [
+    { id: "beef", name: "Говяжья котлета", wt: "120 г", price: 1790, color: "#4a2b1a", h: 22 },
+    { id: "chicken", name: "Куриная котлета", wt: "120 г", price: 890, color: "#b97a42", h: 20 },
+    { id: "fillet", name: "Куриное филе", wt: "120 г", price: 1090, color: "#d9a066", h: 18 },
+    { id: "braised", name: "Томлёное мясо", wt: "120 г", price: 1590, color: "#6b3220", h: 20 },
+    { id: "salmon", name: "Сёмга", wt: "120 г", price: 2790, color: "#f0845a", h: 18 },
+  ] },
+  { key: "extra", title: "Ингредиенты", note: "Сколько хочешь", kind: "many", items: [
+    { id: "caramel-onion", name: "Карамелизированный лук", wt: "20 г", price: 180, color: "#b8743a", h: 7 },
+    { id: "onion-rings", name: "Луковые кольца", wt: "30 г", price: 250, color: "#e3b566", h: 12 },
+    { id: "potato-patty", name: "Картофельная котлета", wt: "50 г", price: 300, color: "#e8c066", h: 14 },
+    { id: "pickles", name: "Солёные огурцы", wt: "20 г", price: 150, color: "#7d9a3c", h: 6 },
+    { id: "tomato", name: "Помидор", wt: "25 г", price: 150, color: "#d7263d", h: 8 },
+    { id: "red-onion", name: "Красный лук", wt: "15 г", price: 120, color: "#9b3b6e", h: 5 },
+    { id: "onion", name: "Лук", wt: "15 г", price: 100, color: "#efe4c8", h: 5 },
+    { id: "iceberg", name: "Айсберг", wt: "20 г", price: 120, color: "#9fcf6a", h: 8, wide: true },
+    { id: "cucumber", name: "Свежие огурцы", wt: "20 г", price: 150, color: "#5fae5a", h: 6 },
+    { id: "cheese", name: "Сыр", wt: "20 г", price: 250, color: "#f5b82e", h: 6, wide: true },
+    { id: "mushrooms", name: "Обжаренные шампиньоны", wt: "30 г", price: 300, color: "#a07850", h: 9 },
+    { id: "arugula", name: "Руккола", wt: "10 г", price: 200, color: "#4f8a3a", h: 6, wide: true },
+    { id: "lettuce", name: "Лист салата", wt: "15 г", price: 100, color: "#7cc05a", h: 7, wide: true },
+    { id: "pepper", name: "Стручковый перец", wt: "20 г", price: 180, color: "#e0452b", h: 6 },
+    { id: "jalapeno", name: "Халапеньо", wt: "15 г", price: 180, color: "#3f8f3a", h: 6 },
+  ] },
+  { key: "sauce", title: "Соусы", note: "До 3 соусов на один бургер", kind: "many", max: 3, items: [
+    { id: "piquant", name: "Пикант", wt: "30 г", price: 250, color: "#e0572a" },
+    { id: "bbq", name: "BBQ", wt: "30 г", price: 250, color: "#6e2a17" },
+    { id: "cream-cheese", name: "Сливочно-сырный", wt: "30 г", price: 300, color: "#f3e3b5" },
+    { id: "ranch", name: "Ранч", wt: "30 г", price: 250, color: "#f4f1e6" },
+    { id: "cheese-sauce", name: "Сырный", wt: "30 г", price: 300, color: "#f7c948" },
+    { id: "tabasco", name: "Табаско", wt: "20 г", price: 300, color: "#c1121f" },
+    { id: "teriyaki", name: "Терияки", wt: "30 г", price: 250, color: "#4a2412" },
+    { id: "cherry", name: "Вишнёвый", wt: "30 г", price: 300, color: "#8e1330" },
+    { id: "1000", name: "1000 островов", wt: "30 г", price: 250, color: "#f2a07a" },
+  ] },
+  { key: "side", title: "Гарниры", note: "По желанию", kind: "qty", max: 9, items: [
+    { id: "fries", name: "Картофель фри", wt: "120 г", price: 950 },
+    { id: "wedges", name: "Картофель по-деревенски", wt: "150 г", price: 1100 },
+    { id: "nuggets", name: "Наггетсы", wt: "150 г", price: 1500 },
+    { id: "rings-side", name: "Луковые кольца", wt: "120 г", price: 1350 },
+    { id: "sweet-potato", name: "Батат", wt: "120 г", price: 1500 },
+    { id: "cheese-balls", name: "Сырные шарики", wt: "120 г", price: 1500 },
+  ] },
+  { key: "drink", title: "Напитки", note: "По желанию", kind: "qty", max: 9, groups: [
+    ["Лимонады", [
+      { id: "mojito-05", name: "Лимонад Мохито", wt: "500 мл", price: 980 },
+      { id: "mojito-1", name: "Лимонад Мохито", wt: "1 л", price: 1880 },
+      { id: "melon-05", name: "Лимонад Арбуз-клубника", wt: "500 мл", price: 980 },
+      { id: "melon-1", name: "Лимонад Арбуз-клубника", wt: "1 л", price: 1880 },
+      { id: "cran-05", name: "Лимонад клюквенный", wt: "500 мл", price: 980 },
+      { id: "cran-1", name: "Лимонад клюквенный", wt: "1 л", price: 1880 },
+    ]],
+    ["Газировка", [
+      { id: "cola-05", name: "Coca-Cola", wt: "500 мл", price: 880 },
+      { id: "cola-1", name: "Coca-Cola", wt: "1 л", price: 1580 },
+      { id: "zero-05", name: "Coca-Cola Zero", wt: "500 мл", price: 880 },
+      { id: "zero-1", name: "Coca-Cola Zero", wt: "1 л", price: 1580 },
+      { id: "fanta-05", name: "Fanta", wt: "500 мл", price: 880 },
+      { id: "fanta-1", name: "Fanta", wt: "1 л", price: 1580 },
+      { id: "sprite-05", name: "Sprite", wt: "500 мл", price: 880 },
+      { id: "sprite-1", name: "Sprite", wt: "1 л", price: 1580 },
+    ]],
+    ["Вода", [
+      { id: "borjomi-05", name: "Borjomi", wt: "500 мл", price: 1080 },
+      { id: "borjomi-075", name: "Borjomi", wt: "750 мл", price: 1780 },
+      { id: "tassay-1", name: "Tassay", wt: "1 л", price: 1080 },
+      { id: "tassay-05", name: "Tassay", wt: "500 мл", price: 680 },
+    ]],
+  ] },
 ];
+const COMBOS = [
+  { photo: "card-burger.jpg", name: "Классика Self", items: ["bun-sesame", "beef", "cheese", "tomato", "iceberg", "red-onion", "bbq"] },
+  { photo: "burger-exploded.jpg", name: "Кантри с курицей", items: ["bun-brioche", "fillet", "cheese", "iceberg", "tomato", "caramel-onion", "ranch"] },
+  { photo: "the-stack.jpg", name: "Огненный халапеньо", items: ["bun-sesame", "chicken", "jalapeno", "cheese", "onion-rings", "piquant", "fries"] },
+  { photo: "card-combo.jpg", name: "Томлёный BBQ", items: ["bun-brioche", "braised", "caramel-onion", "cheese", "pickles", "bbq"] },
+];
+const ITEM = new Map();
+for (const g of MENU) for (const it of g.groups ? g.groups.flatMap((x) => x[1]) : g.items) ITEM.set(it.id, { ...it, group: g });
+const tg = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+const nameLower = (it) => it.name.charAt(0).toLowerCase() + it.name.slice(1);
+
+/* ── Builder state ── */
+const order = { bun: null, qty: new Map(), picks: { extra: [], sauce: [] }, mode: "delivery" };
+const pattyCount = () => MENU[1].items.reduce((n, it) => n + (order.qty.get(it.id) || 0), 0);
+const lineItems = () => {
+  const out = [];
+  if (order.bun) out.push([ITEM.get(order.bun), 1]);
+  for (const [id, q] of order.qty) if (q > 0 && ITEM.get(id).group.key === "patty") out.push([ITEM.get(id), q]);
+  for (const id of order.picks.extra) out.push([ITEM.get(id), 1]);
+  for (const id of order.picks.sauce) out.push([ITEM.get(id), 1]);
+  for (const [id, q] of order.qty) if (q > 0 && ITEM.get(id).group.key !== "patty") out.push([ITEM.get(id), q]);
+  return out;
+};
+
 {
   // Title: line reveal plus a per-character stamp.
   const title = $("[data-lineup-title]");
@@ -1304,7 +1555,7 @@ const CARDS = [
       inner.textContent = "";
       for (const ch of text) {
         const box = document.createElement("span"); box.className = "te-char";
-        const g = document.createElement("span"); g.className = "ink"; g.textContent = ch === " " ? " " : ch;
+        const g = document.createElement("span"); g.className = "ink"; g.textContent = ch === " " ? " " : ch;
         box.appendChild(g); inner.appendChild(box);
         const s = new Spring(0, dur(700, "easeOutCubic"));
         s.onChange = (v) => { g.style.transform = `translateY(${lerp(100, 0, v)}%)`; };
@@ -1319,36 +1570,40 @@ const CARDS = [
   inview($("[data-inview-fade]"), { from: { opacity: 0 }, to: { opacity: 0.55 }, delay: 300 });
   const subRule = ruleDraw($("[data-rule-io]"), "x", 400);
   onEnter($("[data-rule-io]"), () => subRule.enter());
+  $$("[data-stat], [data-how]").forEach((el, i) => inview(el, { from: { opacity: 0, y: 40 }, to: { opacity: 1, y: 0 }, config: [90, 26], delay: (i % 3) * 90 }));
 
+  // Ready-made combos.
   const grid = $("[data-grid]");
-  CARDS.forEach((c, order) => {
+  COMBOS.forEach((c, n) => {
+    const items = c.items.map((id) => ITEM.get(id));
+    const price = items.reduce((t, it) => t + it.price, 0);
     const wrap = document.createElement("div");
     wrap.className = "lean";
     wrap.innerHTML = `
       <div class="lean-in">
         <article class="card on-paper">
-          <div class="card-top fine"><span data-idx>${String(order + 1).padStart(2, "0")}</span><span>${c.cat}</span></div>
-          <div class="card-media"><div data-float><img src="${assetUrl(c.photo)}" alt="${c.name}" loading="lazy" decoding="async"></div></div>
-          <h3 class="display ink card-name" data-name>${c.name}</h3>
-          <p class="card-desc">${c.desc}</p>
-          <div class="card-price">
-            <span class="p" data-price>${c.prices[0]}</span>
-            ${c.prices.length > 1 ? `<span class="sizes">${["SINGLE", "DOUBLE", "TRIPLE"].map((s, i) => `<button type="button" class="${i ? "" : "is-on"}" data-size="${i}">${s}</button>`).join("")}</span>` : ""}
-          </div>
-          <a href="#order" class="pill pill--outline" data-card-pill>ADD TO ORDER</a>
+          <div class="card-top fine"><span data-idx>${String(n + 1).padStart(2, "0")}</span><span>КОМБО</span></div>
+          <div class="card-media"><div data-float><img src="${assetUrl(c.photo)}" alt="" loading="lazy" decoding="async"></div></div>
+          <h3 class="display ink card-name" data-name></h3>
+          <p class="card-comp"></p>
+          <div class="card-price"><span class="p"><span data-price>${tg(price)}</span> ТГ</span><span class="fine" style="opacity:.5">${items.length} СЛОЁВ</span></div>
+          <a href="#build" class="pill pill--outline" data-card-pill>СОБРАТЬ НА ОСНОВЕ</a>
         </article>
       </div>`;
+    wrap.querySelector("[data-name]").textContent = c.name;
+    wrap.querySelector(".card-comp").textContent = items.map((it, i) => (i ? nameLower(it) : it.name)).join(", ");
     grid.appendChild(wrap);
     const card = wrap.querySelector(".card");
     const img = wrap.querySelector("img");
     img.addEventListener("error", () => reportFailure(img.src));
-    pill(wrap.querySelector("[data-card-pill]"));
-    // Reveal.
-    inview(wrap, { from: { opacity: 0, y: 60, filter: "blur(8px)" }, to: { opacity: 1, y: 0, filter: "blur(0px)" }, config: [90, 26], delay: order * 90, trigger: grid });
-    const idx = digitRoll(wrap.querySelector("[data-idx]"), { delay: order * 90 + 160 });
-    const price = digitRoll(wrap.querySelector("[data-price]"), { delay: order * 90 + 240 });
+    const go = wrap.querySelector("[data-card-pill]");
+    pill(go);
+    go.addEventListener("click", () => loadCombo(c));
+    inview(wrap, { from: { opacity: 0, y: 60, filter: "blur(8px)" }, to: { opacity: 1, y: 0, filter: "blur(0px)" }, config: [90, 26], delay: n * 90, trigger: grid });
+    const idx = digitRoll(wrap.querySelector("[data-idx]"), { delay: n * 90 + 160 });
+    const pr = digitRoll(wrap.querySelector("[data-price]"), { delay: n * 90 + 240 });
     const name = tween(wrap.querySelector("[data-name]"), { opacity: 0, y: 16 }, { opacity: 1, y: 0 }, [90, 26]);
-    onEnter(grid, () => { idx.play(); price.play(); name.start(1, { delay: order * 90 + 300 }); }, "0px");
+    onEnter(grid, () => { idx.play(); pr.play(); name.start(1, { delay: n * 90 + 300 }); }, "0px");
     // The product floats inside the card: lags the lean on its own spring, lifts on hover.
     const float = wrap.querySelector("[data-float]");
     const fx = new Spring(0, { tension: 90, friction: 22, precision: 0.001 }), fy = new Spring(0, { tension: 90, friction: 22, precision: 0.001 });
@@ -1358,19 +1613,171 @@ const CARDS = [
     pointerLean(wrap, wrap.querySelector(".lean-in"), (dx, dy) => { fx.start(dx); fy.start(dy); });
     card.addEventListener("mouseenter", () => { if (!hoverOff()) hv.start(1); });
     card.addEventListener("mouseleave", () => hv.start(0));
-    // Sizes re-roll the price.
-    wrap.querySelectorAll("[data-size]").forEach((b) => b.addEventListener("click", () => {
-      wrap.querySelectorAll("[data-size]").forEach((x) => x.classList.toggle("is-on", x === b));
-      price.set(c.prices[+b.dataset.size]);
-    }));
+  });
+}
+
+/* ═══════════════════ 3 — The builder ═══════════════════ */
+const rowEls = new Map();
+let renderOrder = () => {};
+const loadCombo = (c) => {
+  order.bun = null; order.qty.clear(); order.picks.extra = []; order.picks.sauce = [];
+  for (const id of c.items) {
+    const it = ITEM.get(id), k = it.group.key;
+    if (k === "bun") order.bun = id;
+    else if (it.group.kind === "qty") order.qty.set(id, (order.qty.get(id) || 0) + 1);
+    else order.picks[k].push(id);
+  }
+  renderOrder();
+};
+{
+  const host = $("[data-steps]");
+  const rowHtml = (it, kind) => `
+    <span class="box" aria-hidden="true"></span><span class="nm"></span><span class="wt">${it.wt}</span><span class="pr">${tg(it.price)} тг</span>
+    ${kind === "qty" ? `<span class="qty"><button type="button" data-minus aria-label="Убрать: ${it.name} ${it.wt}">−</button><output>0</output><button type="button" data-plus aria-label="Добавить: ${it.name} ${it.wt}">+</button></span>` : `<span class="row-end"></span>`}`;
+  const makeRow = (it, g) => {
+    const row = document.createElement(g.kind === "qty" ? "div" : "button");
+    row.className = "row"; row.dataset.kind = g.kind;
+    if (g.kind !== "qty") { row.type = "button"; row.setAttribute("aria-pressed", "false"); }
+    row.innerHTML = rowHtml(it, g.kind);
+    row.querySelector(".nm").textContent = it.name;
+    if (g.kind === "qty") {
+      const add = (d) => {
+        const q = (order.qty.get(it.id) || 0) + d;
+        if (q < 0) return;
+        if (d > 0 && (g.key === "patty" ? pattyCount() >= g.max : q > g.max)) return;
+        order.qty.set(it.id, q);
+        renderOrder();
+      };
+      row.querySelector("[data-plus]").addEventListener("click", (ev) => { ev.stopPropagation(); add(1); });
+      row.querySelector("[data-minus]").addEventListener("click", (ev) => { ev.stopPropagation(); add(-1); });
+      row.addEventListener("click", () => { if (!order.qty.get(it.id)) add(1); });
+      row.style.cursor = "pointer";
+    } else {
+      row.addEventListener("click", () => {
+        if (g.kind === "one") order.bun = order.bun === it.id ? null : it.id;
+        else {
+          const list = order.picks[g.key], at = list.indexOf(it.id);
+          if (at >= 0) list.splice(at, 1);
+          else if (!g.max || list.length < g.max) list.push(it.id);
+          else return;
+        }
+        renderOrder();
+      });
+    }
+    rowEls.set(it.id, row);
+    return row;
+  };
+  MENU.forEach((g, n) => {
+    const step = document.createElement("div");
+    step.className = "step";
+    step.innerHTML = `<div class="step-head"><h3><span class="fine">${String(n + 1).padStart(2, "0")}</span></h3><p class="fine step-note"></p></div>`;
+    step.querySelector("h3").append(g.title);
+    step.querySelector(".step-note").textContent = g.note;
+    const addRows = (items) => { const rows = document.createElement("div"); rows.className = "rows"; items.forEach((it) => rows.appendChild(makeRow(it, g))); step.appendChild(rows); };
+    if (g.groups) g.groups.forEach(([t, items]) => { const h = document.createElement("p"); h.className = "fine step-sub"; h.textContent = t; step.appendChild(h); addRows(items); });
+    else addRows(g.items);
+    host.appendChild(step);
+    inview(step, { from: { opacity: 0, y: 40 }, to: { opacity: 1, y: 0 }, config: [90, 26] });
   });
 
-  // VIEW FULL MENU: the combo photo slides in behind the button.
-  const more = $("[data-more]");
-  const slide = $("[data-more-slide]");
-  const s = tween(slide, { transform: "translate3d(150px, 150px, 0) rotate(-6deg)", opacity: 0 }, { transform: "translate3d(0px, 0px, 0) rotate(-6deg)", opacity: 1 }, [120, 26]);
-  more.addEventListener("mouseenter", () => { if (!hoverOff()) s.start(1); });
-  more.addEventListener("mouseleave", () => s.jump(0));
+  // Receipt.
+  const stackEl = $("[data-stack]"), emptyEl = $("[data-stack-empty]"), linesEl = $("[data-lines]");
+  const total = digitRoll($("[data-total]")), barTotal = digitRoll($("[data-bar-total]")), barCount = $("[data-bar-count]");
+  total.jump(); barTotal.jump();
+  const discountEl = $("[data-discount]"), needEl = $("[data-need]"), checkout = $("[data-checkout]"), copied = $("[data-copied]");
+  const layers = new Map(); // key → { el, s }
+  const layerSpec = () => {
+    const out = [];
+    const bun = order.bun && ITEM.get(order.bun);
+    if (bun) out.push({ key: "bun-b", color: bun.color, h: 20, cls: "bun-bottom" });
+    for (const [id, q] of order.qty) { const it = ITEM.get(id); if (it.group.key === "patty") for (let i = 0; i < q; i++) out.push({ key: `${id}:${i}`, color: it.color, h: it.h, cls: "wide" }); }
+    for (const id of order.picks.extra) { const it = ITEM.get(id); out.push({ key: id, color: it.color, h: it.h, cls: it.wide ? "wide" : "" }); }
+    for (const id of order.picks.sauce) out.push({ key: id, color: ITEM.get(id).color, h: 4, cls: "thin" });
+    if (bun) out.push({ key: "bun-t", color: bun.color, h: 40, cls: "bun-top" });
+    return out;
+  };
+  const renderStack = () => {
+    const spec = layerSpec();
+    const room = stackEl.clientHeight - 24;
+    const need = spec.reduce((t, l) => t + l.h + 2, 0);
+    const k = need > room ? room / need : 1;
+    const keep = new Set(spec.map((l) => l.key));
+    for (const [key, l] of layers) if (!keep.has(key)) { l.s.stop(); l.el.remove(); layers.delete(key); }
+    spec.forEach((l, i) => {
+      let rec = layers.get(l.key);
+      if (!rec) {
+        const el = document.createElement("span");
+        const s = new Spring(0, { tension: 260, friction: 22, precision: 0.001 });
+        s.onChange = (v) => { el.style.opacity = clamp01(v * 2); el.style.transform = `translate3d(0, ${lerp(-90, 0, v)}px, 0)`; };
+        s.onChange(0);
+        REDUCED ? s.jump(1) : s.start(1);
+        rec = { el, s }; layers.set(l.key, rec);
+      }
+      rec.el.className = `layer ${l.cls}`;
+      rec.el.style.background = l.color;
+      rec.el.style.height = `${Math.max(2, l.h * k)}px`;
+      rec.el.style.marginTop = `${2 * k}px`;
+      if (stackEl.children[i + 1] !== rec.el) stackEl.insertBefore(rec.el, stackEl.children[i + 1] || null);
+    });
+    emptyEl.style.opacity = spec.length ? 0 : 0.45;
+  };
+  renderOrder = () => {
+    const pc = pattyCount();
+    for (const [id, row] of rowEls) {
+      const it = ITEM.get(id), g = it.group;
+      let on, blocked = false;
+      if (g.kind === "one") on = order.bun === id;
+      else if (g.kind === "many") { on = order.picks[g.key].includes(id); blocked = !on && !!g.max && order.picks[g.key].length >= g.max; row.setAttribute("aria-pressed", String(on)); }
+      else {
+        const q = order.qty.get(id) || 0; on = q > 0;
+        row.querySelector("output").textContent = q;
+        row.querySelector("[data-minus]").disabled = q === 0;
+        row.querySelector("[data-plus]").disabled = g.key === "patty" ? pc >= g.max : q >= g.max;
+        blocked = !on && g.key === "patty" && pc >= g.max;
+      }
+      if (g.kind === "one") row.setAttribute("aria-pressed", String(on));
+      row.classList.toggle("is-on", on);
+      row.classList.toggle("is-blocked", blocked);
+    }
+    const items = lineItems();
+    linesEl.innerHTML = "";
+    if (!items.length) linesEl.innerHTML = `<li class="is-empty">Пока пусто — ничего не добавляем за тебя.</li>`;
+    for (const [it, q] of items) {
+      const li = document.createElement("li");
+      const a = document.createElement("span"); a.textContent = `${it.name}${/мл|л$/.test(it.wt) ? ` ${it.wt}` : ""}${q > 1 ? ` × ${q}` : ""}`;
+      const b = document.createElement("span"); b.textContent = `${tg(it.price * q)} тг`;
+      li.append(a, b); linesEl.appendChild(li);
+    }
+    const sum = items.reduce((t, [it, q]) => t + it.price * q, 0);
+    const pickup = order.mode === "pickup";
+    const final = pickup ? Math.round(sum * 0.9) : sum;
+    total.set(tg(final)); barTotal.set(tg(final));
+    barCount.textContent = items.reduce((t, [, q]) => t + q, 0);
+    discountEl.textContent = pickup && sum ? `Скидка самовывоза −${tg(sum - final)} тг` : "";
+    const ok = !!order.bun && pc > 0;
+    checkout.disabled = !ok;
+    needEl.textContent = ok ? (pickup ? "Готовность за 20 минут · ул. Бұқарбай батыра, 22" : "Курьер привезёт за 40 минут – 1 час") : !order.bun && !pc ? "Нужны булочка и хотя бы одна котлета." : !order.bun ? "Осталось выбрать булочку." : "Добавь хотя бы одну котлету.";
+    copied.textContent = "";
+    renderStack();
+  };
+  $$("[data-mode]").forEach((b) => b.addEventListener("click", () => {
+    order.mode = b.dataset.mode;
+    $$("[data-mode]").forEach((x) => x.setAttribute("aria-checked", String(x === b)));
+    renderOrder();
+  }));
+  $("[data-reset]").addEventListener("click", () => loadCombo({ items: [] }));
+  checkout.addEventListener("click", async () => {
+    const items = lineItems();
+    const sum = items.reduce((t, [it, q]) => t + it.price * q, 0);
+    const pickup = order.mode === "pickup";
+    const text = [`SELF — мой заказ (${pickup ? "самовывоз" : "доставка"})`, ...items.map(([it, q]) => `• ${it.name} ${it.wt}${q > 1 ? ` × ${q}` : ""} — ${tg(it.price * q)} тг`), `Итого: ${tg(pickup ? Math.round(sum * 0.9) : sum)} тг`].join("\n");
+    try { await navigator.clipboard.writeText(text); copied.textContent = "Состав заказа скопирован — отправь его нам или назови на кассе."; }
+    catch { copied.textContent = "Состав заказа готов: назови его на кассе или курьеру."; }
+  });
+  pill(checkout);
+  pill($("[data-bar-go]"));
+  renderOrder();
+  window.addEventListener("resize", renderStack);
 }
 
 /* ═══════════════════ 3 — Order band ═══════════════════ */
