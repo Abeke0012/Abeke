@@ -1,0 +1,7 @@
+node_modules/
+.env
+*.xlsx
+*.pending.jsonl
+*.tmp
+.wwebjs_auth/
+.wwebjs_cache/

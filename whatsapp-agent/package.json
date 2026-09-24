@@ -1,0 +1,24 @@
+{
+  "name": "whatsapp-ai-agent",
+  "version": "1.0.0",
+  "description": "AI agent that answers WhatsApp customer messages and logs every conversation to Excel.",
+  "type": "module",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.3",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "openai": "^7.23.0"
+  },
+  "optionalDependencies": {
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.34.7"
+  }
+}
