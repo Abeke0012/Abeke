@@ -47,6 +47,16 @@
  *
  *       npm start          # or `npm run dev` to restart on file changes
  *
+ *  5. Open the control panel:  http://localhost:3000
+ *
+ *     Log in with DASHBOARD_USER / DASHBOARD_PASSWORD (if no password is set, a
+ *     random one is generated and printed at startup). From the panel you can see
+ *     live activity and stats, read every conversation and reply by hand, pause
+ *     auto-replies, edit the business info / rules / model, and try the agent in a
+ *     test chat. In webjs mode the login QR code is also shown there.
+ *     Settings are saved to SETTINGS_FILE_PATH (default ./agent-settings.json) and
+ *     override the matching .env values from then on.
+ *
  *     GET /health returns status JSON. Every processed message prints:
  *       [WHATSAPP AGENT] Processed message from +XXXXX. Intent: Lead. Reply Sent.
  *     and is appended to the "Leads & Conversations" sheet in EXCEL_FILE_PATH.
@@ -58,10 +68,12 @@
  */
 
 import crypto from "node:crypto";
+import { EventEmitter } from "node:events";
 import dotenv from "dotenv";
 import express from "express";
 
-import { AgentPipeline, AIAgent, ExcelStore, normalizePhone } from "./agent.js";
+import { AgentPipeline, AIAgent, ExcelStore, normalizePhone, SettingsStore } from "./agent.js";
+import { mountDashboard } from "./dashboard.js";
 
 dotenv.config({ quiet: true });
 
@@ -77,6 +89,11 @@ const config = {
   businessContext: process.env.BUSINESS_CONTEXT || "",
   excelFilePath: process.env.EXCEL_FILE_PATH || "./whatsapp_leads.xlsx",
   batchWindowMs: Number(process.env.MESSAGE_BATCH_WINDOW_MS) || 3000,
+  settingsFilePath: process.env.SETTINGS_FILE_PATH || "./agent-settings.json",
+
+  // Control panel login
+  dashboardUser: process.env.DASHBOARD_USER || "admin",
+  dashboardPassword: process.env.DASHBOARD_PASSWORD || "",
 
   // Cloud API
   whatsappToken: process.env.WHATSAPP_TOKEN,
@@ -108,7 +125,36 @@ function validateConfig() {
     }
   }
   if (missing.length) throw new Error(`Missing required environment variables: ${missing.join(", ")}`);
+  if (!config.dashboardPassword) {
+    config.dashboardPassword = crypto.randomBytes(9).toString("base64url");
+    console.warn(
+      `[DASHBOARD] DASHBOARD_PASSWORD is not set. Generated one for this run:\n` +
+        `            user: ${config.dashboardUser}   password: ${config.dashboardPassword}\n` +
+        `            Set DASHBOARD_PASSWORD in .env to keep it fixed.`,
+    );
+  }
 }
+
+/* ---------------------------------------------------------------------------
+ * Connection state (shown live in the dashboard)
+ * ------------------------------------------------------------------------- */
+
+class ConnectionState extends EventEmitter {
+  constructor() {
+    super();
+    this.state = { status: "starting", detail: "", qr: null, since: new Date().toISOString() };
+  }
+  /** status: starting | waiting | qr | connected | disconnected | error */
+  set(status, detail = "", extra = {}) {
+    this.state = { status, detail, qr: null, since: new Date().toISOString(), ...extra };
+    this.emit("change", this.snapshot());
+  }
+  snapshot() {
+    return { ...this.state };
+  }
+}
+
+const connection = new ConnectionState();
 
 /* ---------------------------------------------------------------------------
  * Transport A: WhatsApp Cloud API (webhook in, Graph API out)
@@ -125,6 +171,7 @@ function createCloudTransport(app) {
     const challenge = req.query["hub.challenge"];
     if (mode === "subscribe" && typeof token === "string" && safeEqual(token, config.verifyToken)) {
       console.log("[WEBHOOK] Verified by Meta.");
+      if (connection.state.status !== "connected") connection.set("waiting", "Webhook verified by Meta, waiting for messages");
       return res.status(200).type("text/plain").send(String(challenge ?? ""));
     }
     console.warn("[WEBHOOK] Verification failed (wrong verify token).");
@@ -146,6 +193,9 @@ function createCloudTransport(app) {
           if (value.metadata?.display_phone_number && !businessNumber) {
             businessNumber = normalizePhone(value.metadata.display_phone_number);
             pipeline.addSelfNumber(businessNumber);
+          }
+          if (connection.state.status !== "connected") {
+            connection.set("connected", `Webhook receiving events${businessNumber ? ` for +${businessNumber}` : ""}`);
           }
           const names = new Map((value.contacts ?? []).map((c) => [c.wa_id, c.profile?.name]));
 
@@ -187,8 +237,10 @@ function createCloudTransport(app) {
   return {
     name: "WhatsApp Cloud API",
     send,
+    chatIdForPhone: (digits) => digits,
     async start() {
       console.log(`[WHATSAPP] Cloud API mode. Webhook endpoint: POST/GET /webhook (port ${config.port}).`);
+      connection.set("waiting", "Waiting for the first webhook event from Meta");
     },
     async stop() {},
   };
@@ -234,6 +286,8 @@ async function createWebJsTransport() {
   } catch {
     throw new Error("WHATSAPP_MODE=webjs needs the optional packages: npm install whatsapp-web.js qrcode-terminal");
   }
+  // Optional: render the QR as an image for the dashboard too.
+  const qrImage = await import("qrcode").then((m) => m.default ?? m).catch(() => null);
   const { Client, LocalAuth } = wweb.default ?? wweb;
 
   const client = new Client({
@@ -241,19 +295,29 @@ async function createWebJsTransport() {
     puppeteer: { headless: true, args: ["--no-sandbox", "--disable-setuid-sandbox"] },
   });
 
-  client.on("qr", (qr) => {
+  client.on("qr", async (qr) => {
     console.log("\n[WHATSAPP] Scan this QR code: WhatsApp -> Settings -> Linked devices -> Link a device\n");
     qrcode.generate(qr, { small: true });
+    const image = qrImage ? await qrImage.toDataURL(qr, { margin: 1, width: 280 }).catch(() => null) : null;
+    connection.set("qr", "Scan the QR code with WhatsApp -> Linked devices", { qr: image });
   });
-  client.on("authenticated", () => console.log(`[WHATSAPP] Authenticated. Session saved in ${config.sessionDir}.`));
-  client.on("auth_failure", (msg) =>
-    console.error(`[WHATSAPP] Authentication failed: ${msg}. Delete ${config.sessionDir} and scan again.`),
-  );
-  client.on("disconnected", (reason) => console.warn(`[WHATSAPP] Disconnected: ${reason}`));
+  client.on("authenticated", () => {
+    console.log(`[WHATSAPP] Authenticated. Session saved in ${config.sessionDir}.`);
+    connection.set("starting", "Authenticated, loading chats…");
+  });
+  client.on("auth_failure", (msg) => {
+    console.error(`[WHATSAPP] Authentication failed: ${msg}. Delete ${config.sessionDir} and scan again.`);
+    connection.set("error", `Authentication failed: ${msg}`);
+  });
+  client.on("disconnected", (reason) => {
+    console.warn(`[WHATSAPP] Disconnected: ${reason}`);
+    connection.set("disconnected", String(reason));
+  });
   client.on("ready", () => {
     const own = client.info?.wid?.user;
     if (own) pipeline.addSelfNumber(own);
     console.log(`[WHATSAPP] Client ready as +${own ?? "unknown"}.`);
+    connection.set("connected", `Logged in as +${own ?? "unknown"}`);
   });
 
   // `message` only fires for messages we RECEIVE (unlike `message_create`),
@@ -288,6 +352,7 @@ async function createWebJsTransport() {
     send: async (chatId, text) => {
       await client.sendMessage(chatId, text);
     },
+    chatIdForPhone: (digits) => `${digits}@c.us`,
     async start() {
       console.log("[WHATSAPP] Starting whatsapp-web.js client (first run downloads/launches Chromium)…");
       await client.initialize();
@@ -317,23 +382,34 @@ async function main() {
 
   const transport = config.mode === "cloud" ? createCloudTransport(app) : await createWebJsTransport();
 
-  const ai = new AIAgent({
-    apiKey: config.openaiApiKey,
-    model: config.openaiModel,
-    businessContext: config.businessContext,
+  // .env values are the defaults; anything saved from the dashboard overrides them.
+  const settings = new SettingsStore({
+    filePath: config.settingsFilePath,
+    defaults: {
+      model: config.openaiModel,
+      businessContext: config.businessContext,
+      batchWindowMs: config.batchWindowMs,
+    },
   });
+  await settings.load();
+  const getSettings = () => settings.get();
+
+  const ai = new AIAgent({ apiKey: config.openaiApiKey, getSettings });
 
   pipeline = new AgentPipeline({
     ai,
     excel,
     send: transport.send,
+    getSettings,
     selfNumbers: config.agentPhoneNumbers,
-    batchWindowMs: config.batchWindowMs,
   });
 
   app.get("/health", (_req, res) => {
-    res.json({ status: "ok", mode: config.mode, model: config.openaiModel, excel: excel.filePath, uptime: process.uptime() });
+    res.json({ status: "ok", mode: config.mode, model: settings.get().model, excel: excel.filePath, uptime: process.uptime() });
   });
+
+  // Control panel (Basic auth). Mounted after /webhook and /health so those stay public.
+  const dashboard = mountDashboard(app, { config, settings, pipeline, excel, ai, transport, connection });
 
   // Malformed JSON and other request errors: log and answer without crashing.
   app.use((err, _req, res, _next) => {
@@ -342,7 +418,8 @@ async function main() {
   });
 
   const server = app.listen(config.port, () => {
-    console.log(`[SERVER] Listening on http://localhost:${config.port} (mode: ${config.mode}, model: ${config.openaiModel})`);
+    console.log(`[SERVER] Listening on http://localhost:${config.port} (mode: ${config.mode}, model: ${settings.get().model})`);
+    console.log(`[DASHBOARD] Control panel: http://localhost:${config.port}  (user: ${config.dashboardUser})`);
   });
 
   await transport.start();
@@ -353,6 +430,7 @@ async function main() {
     if (stopping) return;
     stopping = true;
     console.log(`\n[SERVER] ${signal} received — finishing in-flight messages…`);
+    dashboard.closeStreams();
     server.close();
     const force = setTimeout(() => process.exit(1), 30_000);
     force.unref();

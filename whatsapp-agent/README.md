@@ -7,6 +7,9 @@ WhatsApp ──► server.js (Cloud API webhook  or  whatsapp-web.js client)
                  │
                  ▼
              agent.js  dedup → 3s burst batching → OpenAI (JSON) → send reply → Excel row → console
+                 │
+                 ▼
+          dashboard.js + public/index.html   web control panel (live feed, conversations, settings, test chat)
 ```
 
 ## Setup
@@ -21,6 +24,21 @@ Full setup steps for both connection modes are in the comment block at the top o
 
 - **`WHATSAPP_MODE=cloud`**: the official Meta WhatsApp Cloud API. Expose `/webhook` over HTTPS and register it in the Meta App Dashboard. Recommended for production.
 - **`WHATSAPP_MODE=webjs`**: whatsapp-web.js. Scan the QR code printed in the terminal once; the session is saved in `.wwebjs_auth/`.
+
+## Control panel
+
+Open **http://localhost:3000** and log in with `DASHBOARD_USER` / `DASHBOARD_PASSWORD`. The interface is in Russian.
+
+| Tab | What you can do |
+|---|---|
+| **Обзор** (Overview) | Connection status, today's numbers, the message pipeline with its current settings, intent breakdown, a 7-day chart, a live activity feed, and Excel download. In webjs mode the login QR code also appears here. |
+| **Диалоги** (Conversations) | Every customer and their full thread with intents and summaries. Reply manually as the operator; the reply goes to WhatsApp and is logged as `Manual`. |
+| **Настройки** (Settings) | Edit business info, extra rules and tone, model, creativity (temperature), batch wait time, fallback reply, and the auto-reply switch. Changes apply instantly without a restart and are saved to `agent-settings.json`. Shows the exact system prompt the model receives. |
+| **Тест-чат** (Test chat) | Chat with the agent as if you were a customer, using the current (even unsaved) settings. Nothing is sent to WhatsApp or written to Excel. |
+
+The header switch pauses auto-replies. While paused, incoming messages are still logged, and you answer them from **Диалоги**.
+
+Security: every dashboard route requires the password, and changes additionally need a custom header, which blocks cross-site (CSRF) requests. `/webhook` and `/health` stay public, as Meta requires. If you expose the server publicly (e.g. via ngrok for the webhook), set a strong `DASHBOARD_PASSWORD` and use HTTPS.
 
 ## Excel output
 
