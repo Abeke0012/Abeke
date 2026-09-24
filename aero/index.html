@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aero® — Electric Hypercar</title>
+  <meta name="description" content="Aero. Pure electrical performance sculpted by the wind." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       GLOBAL
+       ============================================================ */
+    :root {
+      --gap: 24px;
+      --margin: 32px;
+      --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      overscroll-behavior: none;
+      background: #000;
+      color: #fff;
+    }
+
+    body {
+      font-family: "Inter Tight", sans-serif;
+      font-weight: 500;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--gap);
+      padding-inline: var(--margin);
+    }
+
+    /* Dev grid overlay — toggle with "G" */
+    .dev-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      pointer-events: none;
+      display: none;
+    }
+    .dev-grid.is-visible { display: grid; }
+    .dev-grid > div { background: rgba(255, 0, 0, 0.1); }
+
+    /* ============================================================
+       HEADER
+       ============================================================ */
+    .header {
+      position: fixed;
+      top: 24px;
+      left: 0;
+      width: 100%;
+      height: 58px;
+      padding-inline: var(--margin);
+      z-index: 100;
+      display: flex;
+      mix-blend-mode: difference;
+    }
+
+    .header__col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14px;
+      line-height: 14px;
+      letter-spacing: -0.03em;
+    }
+
+    .header__col--nav {
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0 24px;
+    }
+
+    .header__col--end {
+      align-items: flex-end;
+      text-align: right;
+    }
+
+    .header__logo {
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .header a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ============================================================
+       HERO
+       ============================================================ */
+    .hero {
+      position: relative;
+      height: 1200vh; /* (SCRUB1 + FADE + SCRUB2 + 1) * 100vh — kept in sync by JS */
+    }
+
+    .hero__sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .hero__backdrop {
+      position: absolute;
+      inset: 0;
+      background: #000;
+    }
+
+    .hero__video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero__video--2 { opacity: 0; }
+    .hero__video--1 { opacity: 1; }
+
+    /* Hero UI overlay */
+    .hero-ui {
+      position: fixed;
+      inset: 0;
+      height: 100vh;
+      z-index: 50;
+      align-content: end;
+      align-items: end;
+      padding-bottom: 33px;
+      pointer-events: none;
+      mix-blend-mode: difference;
+    }
+    .hero-ui > * { pointer-events: auto; }
+
+    .hero-ui__main { grid-column: 1 / 7; }
+
+    .hero-ui__title {
+      font-size: 160px;
+      font-weight: 500;
+      line-height: 100%;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-ui__caption {
+      font-size: 18px;
+      line-height: 120%;
+      letter-spacing: -0.04em;
+      text-indent: 120px;
+    }
+
+    .hero-ui__side {
+      grid-column: 9 / 13;
+      min-height: 176px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hero-ui__row {
+      display: flex;
+    }
+
+    .hero-ui__label {
+      width: 120px;
+      flex-shrink: 0;
+      font-size: 18px;
+      line-height: 120%;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-ui__text {
+      flex: 1;
+      font-size: 18px;
+      line-height: 120%;
+      letter-spacing: -0.04em;
+      text-indent: 120px;
+    }
+
+    .hero-ui__meta {
+      display: flex;
+      gap: 25px;
+      font-size: 18px;
+      letter-spacing: -0.04em;
+    }
+
+    /* ============================================================
+       FEATURE PANELS
+       ============================================================ */
+    .features {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      padding-top: 82px;
+      pointer-events: none;
+      mix-blend-mode: difference;
+      align-items: start;
+    }
+
+    .panel {
+      grid-row: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      /* Moved with `top`, not transform, so no GPU layer breaks the blend. */
+      position: relative;
+      top: 0;
+    }
+
+    .panel--right { grid-column: 9 / 12; }
+    .panel--left { grid-column: 2 / 5; }
+
+    .panel__bar {
+      align-self: flex-end;
+      width: 95px;
+      height: 2px;
+      background: linear-gradient(90deg, #888DCC 0%, #02B5B8 25.96%, #868D0A 55.77%, #B2A2B6 95.19%);
+    }
+
+    .panel__body {
+      display: flex;
+      flex-direction: column;
+      gap: 80px;
+    }
+
+    .panel__text {
+      font-size: 32px;
+      font-weight: 400;
+      line-height: 120%;
+      letter-spacing: -0.04em;
+      text-indent: 120px;
+    }
+
+    .specs {
+      list-style: none;
+      padding: 12px 0 0;
+      border-top: 1px solid #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .specs__row {
+      display: grid;
+      grid-template-columns: 6px 1fr auto;
+      align-items: center;
+      column-gap: 12px;
+      font-size: 14px;
+      line-height: 14px;
+      text-transform: uppercase;
+      letter-spacing: -0.03em;
+      white-space: nowrap;
+    }
+
+    .specs__mark {
+      width: 6px;
+      height: 14px;
+      background: #fff;
+    }
+
+    .specs__value {
+      text-align: right;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* ============================================================
+       NEXT
+       ============================================================ */
+    .next {
+      position: relative;
+      min-height: 100vh;
+      background: #000;
+    }
+
+    /* ============================================================
+       REVEAL SYSTEM
+       ============================================================ */
+    .reveal-word {
+      display: inline-block;
+      text-indent: 0; /* text-indent inherits into inline-blocks — reset per word */
+      opacity: 0;
+      filter: blur(10px);
+      transform: translateY(20px);
+      transition:
+        opacity 0.4s var(--ease-expo),
+        filter 0.4s var(--ease-expo),
+        transform 0.4s var(--ease-expo);
+      transition-delay: calc(var(--i) * var(--stagger));
+      will-change: opacity, filter, transform;
+    }
+
+    .reveal-active .reveal-word {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+    }
+
+    .reveal-exit .reveal-word {
+      opacity: 0;
+      filter: blur(9px);
+      transform: translateY(-28px);
+      transition-duration: 0.3s;
+    }
+
+    /* ============================================================
+       RESPONSIVE (mobile only)
+       ============================================================ */
+    @media (max-width: 768px) {
+      :root {
+        --gap: 12px;
+        --margin: 16px;
+      }
+
+      .header {
+        top: 16px;
+        padding-inline: 16px;
+      }
+      .header__col--nav { display: none; }
+
+      .hero-ui { padding-bottom: 24px; }
+
+      .hero-ui__title { font-size: 56px; }
+
+      .hero-ui__main { grid-column: 1 / -1; }
+      .hero-ui__caption {
+        font-size: 14px;
+        text-indent: 0;
+      }
+
+      .hero-ui__side {
+        grid-column: 1 / -1;
+        min-height: auto;
+        margin-top: 24px;
+        gap: 16px;
+      }
+      .hero-ui__row {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .hero-ui__label {
+        width: auto;
+        font-size: 14px;
+      }
+      .hero-ui__text {
+        font-size: 14px;
+        text-indent: 0;
+      }
+      .hero-ui__meta { font-size: 14px; }
+
+      .panel--right,
+      .panel--left { grid-column: 1 / -1; }
+      .panel__text {
+        font-size: 20px;
+        text-indent: 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-ui__title { font-size: 40px; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ============ DEV GRID OVERLAY (press G) ============ -->
+  <div class="dev-grid grid" aria-hidden="true">
+    <div></div><div></div><div></div><div></div><div></div><div></div>
+    <div></div><div></div><div></div><div></div><div></div><div></div>
+  </div>
+
+  <!-- ============ HEADER ============ -->
+  <header class="header">
+    <div class="header__col">
+      <a class="header__logo" href="#">Aero®</a>
+    </div>
+    <nav class="header__col header__col--nav" aria-label="Brand">
+      <span>Aerodynamic mastery</span>
+      <span>Sustainable</span>
+      <span>Untamed</span>
+    </nav>
+    <nav class="header__col header__col--nav" aria-label="Company">
+      <a href="#">Engineering Tomorrow</a>
+      <a href="#">The Manifesto</a>
+    </nav>
+    <div class="header__col header__col--nav header__col--end">
+      <a href="#">+ Reserve</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="hero">
+      <div class="hero__sticky">
+        <div class="hero__backdrop"></div>
+
+        <video class="hero__video hero__video--2" id="video2" muted playsinline preload="auto">
+          <source src="[ЗАМЕНИТЕ_НА_ВАШУ_ССЫЛКУ_НА_ВИДЕО_2]" type="video/mp4" />
+        </video>
+
+        <video class="hero__video hero__video--1" id="video1" muted playsinline preload="auto">
+          <source src="[ЗАМЕНИТЕ_НА_ВАШУ_ССЫЛКУ_НА_ВИДЕО_1]" type="video/mp4" />
+        </video>
+      </div>
+    </section>
+
+    <!-- Hero UI overlay -->
+    <div class="hero-ui grid" id="heroUI">
+      <div class="hero-ui__main">
+        <h1 class="hero-ui__title" data-reveal="char">Aero®</h1>
+        <p class="hero-ui__caption" data-reveal="word">
+          Pure electrical performance sculpted by the wind. Carbon-weave monocoque built for extreme track velocity. Zero emission. Maximum adrenaline.
+        </p>
+      </div>
+
+      <div class="hero-ui__side">
+        <div class="hero-ui__row">
+          <span class="hero-ui__label" data-reveal="word">Status</span>
+          <p class="hero-ui__text" data-reveal="word">
+            Advanced solid-state battery architecture meets active aero logic. Every chassis stress-tested under extreme G-force. Precision intelligence drives motorsport forward.
+          </p>
+        </div>
+        <div class="hero-ui__meta">
+          <span data-reveal="word">(Launch)</span>
+          <span data-reveal="word">(2027)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ FEATURE PANELS ============ -->
+    <div class="features grid" aria-label="Specifications">
+      <article class="panel panel--right" id="panelRight">
+        <div class="panel__bar"></div>
+        <div class="panel__body">
+          <p class="panel__text" data-reveal="word">
+            Dual-motor vectoring system monitors traction millisecond by millisecond. Tuned to maximize downforce, eliminate body roll, and cut through atmosphere flawlessly.
+          </p>
+          <ul class="specs">
+            <li class="specs__row">
+              <span class="specs__mark"></span>
+              <span data-reveal="word">0-100 KM/H</span>
+              <span class="specs__value" data-reveal="word">1.85s</span>
+            </li>
+            <li class="specs__row">
+              <span class="specs__mark"></span>
+              <span data-reveal="word">Top Speed</span>
+              <span class="specs__value" data-reveal="word">415km/h</span>
+            </li>
+            <li class="specs__row">
+              <span class="specs__mark"></span>
+              <span data-reveal="word">Peak Power</span>
+              <span class="specs__value" data-reveal="word">1400kW</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="panel panel--left" id="panelLeft">
+        <div class="panel__bar"></div>
+        <div class="panel__body">
+          <p class="panel__text" data-reveal="word">
+            Next-gen titanium matrix alloys withstand relentless compression while saving unsprung mass. Built to absorb track imperfection and keep tires glued to the apex.
+          </p>
+          <ul class="specs">
+            <li class="specs__row">
+              <span class="specs__mark"></span>
+              <span data-reveal="word">Dry Weight</span>
+              <span class="specs__value" data-reveal="word">1640kg</span>
+            </li>
+            <li class="specs__row">
+              <span class="specs__mark"></span>
+              <span data-reveal="word">Drag Coeff</span>
+              <span class="specs__value" data-reveal="word">0.21 Cd</span>
+            </li>
+            <li class="specs__row">
+              <span class="specs__mark"></span>
+              <span data-reveal="word">Range</span>
+              <span class="specs__value"><span data-reveal="word">720 km</span><span data-reveal="word">WLTP</span></span>
+            </li>
+          </ul>
+        </div>
+      </article>
+    </div>
+
+    <!-- ============ NEXT ============ -->
+    <section class="next" id="next"></section>
+  </main>
+
+  <script>
+    (() => {
+      /* ==========================================================
+         CONSTANTS
+         ========================================================== */
+      const SCRUB1_VH = 3;
+      const FADE_VH = 3;
+      const SCRUB2_VH = 5;
+      const HERO_VH = SCRUB1_VH + FADE_VH + SCRUB2_VH + 1;
+
+      const LERP = 0.09;
+      const SEEK_DRIFT = 0.02; // seconds
+      const SEEK_INTERVAL = 30; // ms
+      const PANEL_ENTER_OFFSET = 60; // px past viewport bottom
+
+      let rafId = 0; // scrub RAF loop handle (0 = stopped)
+
+      const clamp01 = (v) => Math.min(1, Math.max(0, v));
+      const lerp = (a, b, t) => a + (b - a) * t;
+
+      /* ==========================================================
+         DOM
+         ========================================================== */
+      const hero = document.getElementById("hero");
+      const heroUI = document.getElementById("heroUI");
+      const video1 = document.getElementById("video1");
+      const video2 = document.getElementById("video2");
+      const panelRight = document.getElementById("panelRight");
+      const panelLeft = document.getElementById("panelLeft");
+      const devGrid = document.querySelector(".dev-grid");
+
+      hero.style.height = HERO_VH * 100 + "vh";
+
+      /* ==========================================================
+         REVEAL SYSTEM
+         ========================================================== */
+      /**
+       * Splits an element's text into .reveal-word spans, each carrying its
+       * index (--i) and the stagger step (--stagger). mode: "word" | "char".
+       */
+      function splitReveal(el, mode = "word", stagger = 0.05) {
+        const text = el.textContent.trim().replace(/\s+/g, " ");
+        const tokens = mode === "char" ? Array.from(text) : text.split(" ");
+        const frag = document.createDocumentFragment();
+        let i = 0;
+
+        el.setAttribute("aria-label", text);
+        tokens.forEach((token, n) => {
+          const span = document.createElement("span");
+          span.className = "reveal-word";
+          span.setAttribute("aria-hidden", "true");
+          span.style.setProperty("--i", i++);
+          span.style.setProperty("--stagger", stagger + "s");
+          span.textContent = token === " " ? " " : token;
+          frag.appendChild(span);
+          if (mode === "word" && n < tokens.length - 1) frag.appendChild(document.createTextNode(" "));
+        });
+
+        el.textContent = "";
+        el.appendChild(frag);
+      }
+
+      // Title: char-level, 0.025s. Everything else: word-level, 0.05s.
+      function splitGroup(root) {
+        root.querySelectorAll("[data-reveal]").forEach((el) => {
+          const mode = el.dataset.reveal;
+          splitReveal(el, mode, mode === "char" ? 0.025 : 0.05);
+        });
+      }
+
+      /** state: "active" | "exit" | "hidden" */
+      function setReveal(root, state) {
+        if (root.dataset.revealState === state) return;
+        root.dataset.revealState = state;
+        root.classList.toggle("reveal-active", state === "active");
+        root.classList.toggle("reveal-exit", state === "exit");
+      }
+
+      splitGroup(heroUI);
+      splitGroup(panelRight);
+      splitGroup(panelLeft);
+
+      /* ==========================================================
+         VIDEO SCRUB ENGINE (RAF-lerp)
+         ========================================================== */
+      class Scrubber {
+        constructor(video) {
+          this.video = video;
+          this.target = 0;
+          this.current = 0;
+          this.lastSeek = 0;
+          this.ready = false;
+          this.progress = 0;
+
+          const prime = () => {
+            this.ready = true;
+            // iOS Safari only renders seeked frames after a play() gesture.
+            const p = video.play();
+            if (p && p.then) p.then(() => video.pause()).catch(() => {});
+            else video.pause();
+            this.setProgress(this.progress);
+            startLoop();
+          };
+
+          if (video.readyState >= 1) prime();
+          else video.addEventListener("loadedmetadata", prime, { once: true });
+        }
+
+        get duration() {
+          const d = this.video.duration;
+          return this.ready && isFinite(d) ? d : 0;
+        }
+
+        setProgress(p) {
+          this.progress = p;
+          // Stop a hair before the end: seeking exactly to `duration` shows black on some browsers.
+          this.target = p * Math.max(0, this.duration - 0.05);
+        }
+
+        /** Returns true when settled. */
+        tick(now) {
+          if (!this.ready) return true;
+
+          const diff = this.target - this.current;
+          this.current = Math.abs(diff) < 0.001 ? this.target : this.current + diff * LERP;
+
+          const drift = Math.abs(this.video.currentTime - this.current);
+          if (drift > SEEK_DRIFT && now - this.lastSeek >= SEEK_INTERVAL) {
+            this.video.currentTime = this.current;
+            this.lastSeek = now;
+          }
+
+          return this.current === this.target && drift <= SEEK_DRIFT;
+        }
+      }
+
+      const scrub1 = new Scrubber(video1);
+      const scrub2 = new Scrubber(video2);
+
+      function loop(now) {
+        const settled1 = scrub1.tick(now);
+        const settled2 = scrub2.tick(now);
+        rafId = settled1 && settled2 ? 0 : requestAnimationFrame(loop);
+      }
+      function startLoop() {
+        if (!rafId) rafId = requestAnimationFrame(loop);
+      }
+
+      /* ==========================================================
+         FEATURE PANEL GEOMETRY
+         ========================================================== */
+      const panels = [
+        { el: panelRight, range: [0, 0.4], naturalTop: 0, height: 0 },
+        { el: panelLeft, range: [0.45, 0.85], naturalTop: 0, height: 0 },
+      ];
+
+      function measurePanels() {
+        panels.forEach((p) => {
+          const prev = p.el.style.top;
+          p.el.style.top = "0px";
+          p.naturalTop = p.el.getBoundingClientRect().top;
+          p.height = p.el.offsetHeight;
+          p.el.style.top = prev;
+        });
+      }
+
+      /* ==========================================================
+         SCROLL TIMELINE
+         ========================================================== */
+      let vh = window.innerHeight;
+      let heroTop = 0;
+
+      function measure() {
+        vh = window.innerHeight;
+        heroTop = hero.getBoundingClientRect().top + window.scrollY;
+        measurePanels();
+      }
+
+      function update() {
+        const scrolled = window.scrollY - heroTop;
+
+        // ---- Phase 1: video 1 scrub + hero UI exit
+        const p1 = clamp01(scrolled / (SCRUB1_VH * vh));
+        scrub1.setProgress(p1);
+
+        const uiFade = clamp01((p1 - 0.8) / 0.2);
+        heroUI.style.opacity = (1 - uiFade).toFixed(3);
+        heroUI.style.transform = uiFade ? `translateY(${-120 * uiFade}px)` : "";
+        setReveal(heroUI, uiFade > 0.15 ? "exit" : "active");
+
+        // ---- Phase 2: crossfade
+        const fade = clamp01((scrolled - SCRUB1_VH * vh) / (FADE_VH * vh));
+        video1.style.opacity = String(1 - fade);
+        video1.style.filter = fade ? `blur(${fade * 80}px)` : "";
+        video2.style.opacity = String(fade);
+
+        // ---- Phase 3: video 2 scrub (last frame at 80%) + panels
+        const p3 = clamp01((scrolled - (SCRUB1_VH + FADE_VH) * vh) / (SCRUB2_VH * vh));
+        scrub2.setProgress(clamp01(p3 / 0.8));
+
+        panels.forEach((p) => {
+          const [start, end] = p.range;
+          const sub = clamp01((p3 - start) / (end - start));
+          // sub 0: top edge 60px below the fold. sub 1: bottom edge above the top.
+          const from = vh + PANEL_ENTER_OFFSET - p.naturalTop;
+          const to = -(p.naturalTop + p.height);
+          p.el.style.top = lerp(from, to, sub).toFixed(1) + "px";
+
+          if (sub > 0.12 && sub < 0.88) setReveal(p.el, "active");
+          else setReveal(p.el, sub >= 0.88 ? "exit" : "hidden");
+        });
+
+        startLoop();
+      }
+
+      /* ==========================================================
+         EVENTS
+         ========================================================== */
+      window.addEventListener("scroll", update, { passive: true });
+      window.addEventListener("resize", () => {
+        measure();
+        update();
+      });
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key.toLowerCase() !== "g" || e.metaKey || e.ctrlKey || e.altKey) return;
+        const tag = document.activeElement && document.activeElement.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA") return;
+        devGrid.classList.toggle("is-visible");
+      });
+
+      // Re-measure once fonts load (panel heights depend on them).
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          measure();
+          update();
+        });
+      }
+
+      measure();
+      update();
+
+      // Hero title cluster reveals immediately on load.
+      heroUI.dataset.revealState = "";
+      heroUI.classList.remove("reveal-active", "reveal-exit");
+      requestAnimationFrame(() => requestAnimationFrame(update));
+    })();
+  </script>
+</body>
+</html>
