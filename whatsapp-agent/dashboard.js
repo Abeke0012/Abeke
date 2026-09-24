@@ -23,7 +23,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
 
-import { buildSystemPrompt, INTENTS, normalizePhone, SETTINGS_LIMITS, validateSettings } from "./agent.js";
+import { buildSystemPrompt, INTENTS, LANGUAGES, normalizePhone, SETTINGS_LIMITS, validateSettings } from "./agent.js";
 
 const PUBLIC_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), "public");
 const RECENT_EVENTS = 200;
@@ -102,6 +102,7 @@ export function mountDashboard(app, { config, settings, pipeline, excel, ai, tra
     updatedAt: settings.updatedAt,
     limits: SETTINGS_LIMITS,
     suggestedModels: SUGGESTED_MODELS,
+    languages: Object.keys(LANGUAGES),
     systemPrompt: buildSystemPrompt(settings.get()),
   });
 
@@ -186,7 +187,7 @@ export function mountDashboard(app, { config, settings, pipeline, excel, ai, tra
       incoming: "",
       response: text,
       intent: "Manual",
-      summary: "Manual reply by operator",
+      summary: "Ответ оператора",
     };
     await excel.appendRow(row);
     pipeline.emit("activity", { at: row.timestamp, type: "manual", phone: row.phone, name: row.name, reply: text });

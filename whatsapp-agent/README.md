@@ -58,5 +58,6 @@ Sheet **Leads & Conversations** in `EXCEL_FILE_PATH`:
 - **Loop guard**: the agent never answers its own number (from `AGENT_PHONE_NUMBER`, the webhook metadata, or the logged-in whatsapp-web.js account). In webjs mode it also skips `fromMe`, group, and status messages.
 - **AI failure**: if OpenAI fails, the customer gets a polite holding reply, and the row is flagged `[AI ERROR]` for manual follow-up.
 - **Send failure**: the row is still logged, with the response prefixed `[NOT SENT]`.
+- **Language**: the agent replies in Russian by default, even when a customer writes in another language. Change this in Настройки → Язык ответов: another language, or «Как пишет клиент» to answer in the customer's language. The Excel summary uses the same language.
 - **Memory**: the last 10 turns per customer are kept in memory for context and forgotten after 30 minutes idle.
 - **Shutdown**: Ctrl+C / SIGTERM answers any buffered messages and finishes Excel writes before exiting.

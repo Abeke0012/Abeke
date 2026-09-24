@@ -175,6 +175,8 @@
     .field label { display: block; font-weight: 600; margin-bottom: 4px; }
     .field .help { color: var(--muted); font-size: 12.5px; margin: 0 0 8px; }
     .field textarea { resize: vertical; min-height: 110px; line-height: 1.5; }
+    .select { width: 100%; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; outline: none; }
+    .select:focus { border-color: var(--accent); }
     .field .count { text-align: right; font-size: 11.5px; color: var(--muted); margin-top: 4px; }
     .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .range { display: flex; align-items: center; gap: 12px; }
@@ -346,6 +348,12 @@
             <p class="help">Как агент должен общаться. Например: «Обращайся на „вы“», «Всегда предлагай оформить заказ по ссылке», «При жалобе извинись и попроси номер заказа».</p>
             <textarea id="instructions" name="instructions" rows="5" placeholder="Например: Отвечай тепло и коротко, используй не больше одного эмодзи."></textarea>
             <div class="count" data-count="instructions"></div>
+          </div>
+
+          <div class="field">
+            <label for="language">Язык ответов</label>
+            <p class="help">На каком языке агент отвечает клиентам. На этом же языке пишется краткая суть обращения в Excel.</p>
+            <select id="language" name="language" class="select"></select>
           </div>
 
           <div class="row2">
@@ -611,7 +619,7 @@
         const [, connLabel] = CONN[state.conn.status] || ["", state.conn.status];
         $("fConn").textContent = `${o.agent.transport} · ${connLabel}`;
         $("fBatch").textContent = s.batchWindowMs ? `Ждёт ${s.batchWindowMs / 1000} с, если клиент пишет несколько сообщений подряд` : "Отвечает сразу на каждое сообщение";
-        $("fModel").textContent = `${s.model} · креативность ${s.temperature}`;
+        $("fModel").textContent = `${s.model} · креативность ${s.temperature} · язык: ${langLabel(s.language).replace(" — всегда", "")}`;
         $("fSend").textContent = s.autoReply ? "Автоматически" : "Пауза: отвечаете вы";
         $("fSendStep").classList.toggle("off", !s.autoReply);
         $("fExcel").textContent = o.agent.excelFile.split(/[\\/]/).pop();
@@ -661,6 +669,7 @@
           ["Канал", o.agent.transport],
           ["Статус", (CONN[state.conn.status] || [, state.conn.status])[1] + (state.conn.detail ? ` — ${state.conn.detail}` : "")],
           ["Модель", s.model],
+          ["Язык ответов", langLabel(s.language)],
           ["Работает", upText],
           ["Excel-файл", o.agent.excelFile],
           ["Файл настроек", o.agent.settingsFile],
@@ -756,13 +765,16 @@
          settings
          ============================================================ */
       const form = $("settingsForm");
-      const FIELDS = ["businessContext", "instructions", "model", "temperature", "batchWindowMs", "fallbackReply"];
+      const FIELDS = ["businessContext", "instructions", "language", "model", "temperature", "batchWindowMs", "fallbackReply"];
+      const LANG_RU = { ru: "Русский — всегда", auto: "Как пишет клиент", en: "Английский", uk: "Украинский", kk: "Казахский", uz: "Узбекский", ky: "Киргизский", tr: "Турецкий" };
+      const langLabel = (code) => LANG_RU[code] || code;
       let draftAuto = true;
 
       function readForm() {
         return {
           businessContext: form.businessContext.value,
           instructions: form.instructions.value,
+          language: form.language.value,
           model: form.model.value.trim(),
           temperature: Number(form.temperature.value),
           batchWindowMs: Math.round(Number(form.batchWindowMs.value) * 1000),
@@ -773,6 +785,7 @@
       function fillForm(s) {
         form.businessContext.value = s.businessContext;
         form.instructions.value = s.instructions;
+        form.language.value = s.language;
         form.model.value = s.model;
         form.temperature.value = s.temperature;
         $("tempOut").textContent = s.temperature;
@@ -810,7 +823,7 @@
       const previewPrompt = debounce(async () => {
         try {
           const d = readForm();
-          const { systemPrompt } = await api("api/prompt-preview", { method: "POST", body: { businessContext: d.businessContext, instructions: d.instructions } });
+          const { systemPrompt } = await api("api/prompt-preview", { method: "POST", body: { businessContext: d.businessContext, instructions: d.instructions, language: d.language } });
           $("promptPreview").textContent = systemPrompt;
         } catch {}
       }, 400);
@@ -819,7 +832,7 @@
         if (e.target === form.temperature) $("tempOut").textContent = form.temperature.value;
         updateCounts();
         renderDirty();
-        if (e.target === form.businessContext || e.target === form.instructions) previewPrompt();
+        if (e.target === form.businessContext || e.target === form.instructions || e.target === form.language) previewPrompt();
         if (state.tab === "test") renderTestInfo();
       });
       $("autoReplyField").addEventListener("click", () => { draftAuto = !draftAuto; renderDraftAuto(); renderDirty(); });
@@ -839,6 +852,9 @@
         const wasDirty = isDirty();
         state.settings = data.settings;
         if (data.limits) state.limits = data.limits;
+        if (data.languages && !form.language.options.length) {
+          form.language.innerHTML = data.languages.map((c) => `<option value="${esc(c)}">${esc(langLabel(c))}</option>`).join("");
+        }
         if (data.suggestedModels) {
           state.suggestedModels = data.suggestedModels;
           $("modelList").innerHTML = data.suggestedModels.map((m) => `<option value="${esc(m)}"></option>`).join("");
@@ -865,6 +881,7 @@
         if (!state.settings) return;
         const d = readForm();
         const rows = [
+          ["Язык ответов", langLabel(d.language)],
           ["Модель", d.model],
           ["Креативность", d.temperature],
           ["Информация о бизнесе", d.businessContext ? `${d.businessContext.length} символов` : "не заполнена"],
@@ -906,7 +923,7 @@
               text,
               name: $("testName").value,
               history: state.testHistory,
-              settings: { businessContext: d.businessContext, instructions: d.instructions, model: d.model, temperature: d.temperature },
+              settings: { businessContext: d.businessContext, instructions: d.instructions, language: d.language, model: d.model, temperature: d.temperature },
             },
           });
           typing.remove();
