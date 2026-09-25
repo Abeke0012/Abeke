@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AVENGERS // LAB — Stark · Odinson · Parker</title>
+<meta name="description" content="A fan-made cinematic showcase of Iron Man, Thor and Spider-Man: scroll through three stages of armour, storm and web.">
+<meta name="theme-color" content="#050505">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Hero colours are registered so they can cross-fade between stages. */
+@property --hero-glow { syntax: "<color>"; inherits: true; initial-value: #ff2a2a; }
+@property --hero-accent { syntax: "<color>"; inherits: true; initial-value: #ffd700; }
+:root {
+  --gap: 24px;
+  --margin: 40px;
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --hero-glow: #ff2a2a;
+  --hero-accent: #ffd700;
+  --bg: #050505;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --orb: "Orbitron", "Arial Black", sans-serif;
+  transition: --hero-glow 0.9s var(--ease-expo), --hero-accent 0.9s var(--ease-expo);
+}
+:root[data-hero="thor"] { --hero-glow: #00d2ff; --hero-accent: #e0e0e0; }
+:root[data-hero="spider"] { --hero-glow: #ff0055; --hero-accent: #1a73e8; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { overscroll-behavior: none; background: #050505; color: #fff; }
+body { font-family: "Inter", system-ui, sans-serif; font-weight: 400; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); padding-inline: var(--margin); }
+
+/* ─── Section 1: navigation ─── */
+.nav { position: fixed; top: 0; left: 0; width: 100%; height: 70px; padding-inline: 40px; z-index: 1000; mix-blend-mode: difference;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; color: #fff; }
+.nav-logo { font-family: var(--orb); font-size: 18px; font-weight: 900; letter-spacing: 0.1em; white-space: nowrap; }
+.nav-links { display: flex; gap: 36px; font-family: var(--orb); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; }
+.nav-links a { position: relative; padding: 6px 0; opacity: .7; transition: opacity .3s; }
+.nav-links a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--hero-accent); transform: scaleX(0); transform-origin: right; transition: transform .5s var(--ease-expo); }
+.nav-links a:hover, .nav-links a.is-active { opacity: 1; }
+.nav-links a:hover::after, .nav-links a.is-active::after { transform: scaleX(1); transform-origin: left; }
+.nav-status { justify-self: end; font-family: var(--mono); font-size: 12px; letter-spacing: .12em; color: #39ff14; animation: breathe 2.4s ease-in-out infinite; white-space: nowrap; }
+@keyframes breathe { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+
+/* ─── Section 2: stage ─── */
+.stage { position: relative; height: 900vh; background: #050505; }
+.viewport { position: sticky; top: 0; height: 100vh; overflow: hidden; perspective: 1000px; }
+.world { position: absolute; inset: 0; transform-style: preserve-3d; will-change: transform; }
+.ambient { position: absolute; inset: -10%; pointer-events: none;
+  background: radial-gradient(45% 40% at 50% 55%, color-mix(in srgb, var(--hero-glow) 22%, transparent), transparent 70%); transform: translate3d(0, 0, -600px) scale(1.7); }
+
+.layer { position: absolute; inset: 0; transform-style: preserve-3d; visibility: hidden; opacity: 0; will-change: transform, opacity, filter; }
+.layer canvas.fx { position: absolute; inset: 0; width: 100%; height: 100%; transform: translate3d(0, 0, -200px) scale(1.2); pointer-events: none; }
+
+/* Center focus: the silhouette */
+.figure { position: absolute; left: 50%; top: 52%; width: min(46vh, 42vw); aspect-ratio: 2 / 3; transform: translate3d(-50%, -50%, 60px); pointer-events: none; transform-style: preserve-3d; }
+.figure-tilt { position: absolute; inset: 0; will-change: transform; }
+.figure-float { position: absolute; inset: 0; animation: float 6s ease-in-out infinite; }
+.figure svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 24px color-mix(in srgb, var(--glow) 55%, transparent)) drop-shadow(0 30px 40px rgba(0,0,0,.6)); }
+@keyframes float { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -14px, 0); } }
+.layer[data-hero="iron"] { --glow: #ff2a2a; --accent: #ffd700; }
+.layer[data-hero="thor"] { --glow: #00d2ff; --accent: #e0e0e0; }
+.layer[data-hero="spider"] { --glow: #ff0055; --accent: #1a73e8; }
+
+/* Foreground UI */
+.ui { position: absolute; inset: 0; pointer-events: none; transform: translate3d(0, 0, 140px) scale(0.86); /* scale undoes the perspective growth at z=140 */ align-content: space-between; padding-top: 110px; padding-bottom: 48px; }
+.hero-name { grid-column: 1 / -1; font-family: var(--orb); font-weight: 900; font-size: 180px; line-height: .9; letter-spacing: .02em; text-align: center; color: transparent;
+  -webkit-text-stroke: 1.5px color-mix(in srgb, var(--glow) 80%, #fff); text-shadow: 0 0 40px color-mix(in srgb, var(--glow) 35%, transparent); white-space: nowrap; }
+.hero-meta { grid-column: 1 / 6; align-self: end; }
+.hero-index { font-family: var(--mono); font-size: 12px; letter-spacing: .2em; color: var(--accent); }
+.hero-line { margin-top: 14px; font-family: var(--orb); font-weight: 900; font-size: 34px; line-height: 1.05; letter-spacing: .02em; }
+.hero-copy { margin-top: 14px; max-width: 26rem; font-size: 15px; line-height: 1.55; color: rgba(255,255,255,.7); }
+.specs { grid-column: 9 / 13; align-self: end; font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+  border: 1px solid color-mix(in srgb, var(--glow) 45%, transparent); background: rgba(5,5,5,.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 18px 20px; }
+.specs h3 { font-family: var(--orb); font-weight: 500; font-size: 11px; letter-spacing: .2em; color: var(--glow); margin-bottom: 12px; display: flex; justify-content: space-between; }
+.specs h3 span { color: rgba(255,255,255,.45); }
+.spec { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 8px 0; border-top: 1px solid rgba(255,255,255,.08); }
+.spec b { font-weight: 500; color: #fff; }
+.spec i { grid-column: 1 / -1; height: 3px; background: rgba(255,255,255,.08); position: relative; overflow: hidden; font-style: normal; }
+.spec i::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--glow), var(--accent)); transform-origin: left; transform: scaleX(0); transition: transform 1.2s var(--ease-expo); transition-delay: calc(var(--d, 0) * 90ms + 300ms); }
+.layer.is-live .spec i::after { transform: scaleX(var(--v)); }
+.specs, .hero-index, .hero-copy { opacity: 0; transform: translate3d(0, 24px, 0); transition: opacity .8s var(--ease-expo), transform .8s var(--ease-expo); }
+.layer.is-live .specs, .layer.is-live .hero-index, .layer.is-live .hero-copy { opacity: 1; transform: none; }
+.layer.is-live .hero-copy { transition-delay: .25s; }
+.layer.is-live .specs { transition-delay: .35s; }
+
+/* Glitch split text */
+.gw { display: inline-block; opacity: 0; filter: blur(15px); transform: translate3d(0, 40px, -100px); white-space: pre;
+  transition: opacity .9s var(--ease-expo), filter .9s var(--ease-expo), transform .9s var(--ease-expo); transition-delay: calc(var(--i) * 0.04s); will-change: opacity, filter, transform; }
+.is-live .gw { opacity: 1; filter: blur(0); transform: translate3d(0, 0, 0); }
+.is-live .electric .gw { animation: zap .5s steps(2) calc(var(--i) * 0.04s + .15s) 2; }
+@keyframes zap { 0% { transform: translate3d(-3px, 1px, 0); text-shadow: 3px 0 #00d2ff, -3px 0 #fff; } 25% { transform: translate3d(3px, -2px, 0); } 50% { transform: translate3d(-2px, 2px, 0); text-shadow: -3px 0 #00d2ff, 3px 0 #fff; } 75% { transform: translate3d(2px, 0, 0); } 100% { transform: none; text-shadow: none; } }
+
+/* Iron Man: holographic HUD rings */
+.hud { position: absolute; left: 50%; top: 50%; width: min(90vh, 80vw); aspect-ratio: 1; transform: translate3d(-50%, -46%, -80px) rotateX(64deg); transform-style: preserve-3d; pointer-events: none; }
+.hud svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; will-change: transform; }
+.hud-readout { position: absolute; font-family: var(--mono); font-size: 11px; letter-spacing: .12em; color: #ffd700; opacity: .75; pointer-events: none; transform: translate3d(0, 0, 40px); }
+/* Thor: storm */
+.clouds { position: absolute; inset: -20%; transform: translate3d(0, 0, -400px) scale(1.5); pointer-events: none;
+  background:
+    radial-gradient(40% 30% at 20% 30%, rgba(60,80,110,.55), transparent 70%),
+    radial-gradient(35% 28% at 75% 25%, rgba(50,70,100,.5), transparent 70%),
+    radial-gradient(50% 35% at 50% 70%, rgba(20,30,50,.8), transparent 75%),
+    radial-gradient(30% 25% at 85% 70%, rgba(70,90,120,.35), transparent 70%),
+    #07090d;
+  background-size: 140% 140%; animation: drift 24s ease-in-out infinite alternate; }
+@keyframes drift { from { background-position: 0% 0%, 100% 0%, 50% 100%, 100% 100%; } to { background-position: 30% 20%, 60% 30%, 40% 70%, 70% 80%; } }
+.flash { position: absolute; inset: 0; background: radial-gradient(70% 60% at 50% 30%, rgba(200,240,255,.9), rgba(0,210,255,.25) 60%, transparent); opacity: 0; pointer-events: none; mix-blend-mode: screen; transform: translate3d(0,0,100px); }
+/* Spider-Man: glitch copies of the silhouette */
+.glitch-copy { position: absolute; inset: 0; opacity: 0; mix-blend-mode: screen; }
+.figure.is-glitching .glitch-copy { opacity: .85; }
+.figure.is-glitching .glitch-copy.c1 { transform: translate3d(-8px, 0, 0); clip-path: inset(20% 0 55% 0); filter: hue-rotate(-60deg); }
+.figure.is-glitching .glitch-copy.c2 { transform: translate3d(9px, 0, 0); clip-path: inset(58% 0 18% 0); filter: hue-rotate(160deg); }
+.scan { position: absolute; inset: 0; pointer-events: none; transform: translate3d(0,0,120px); opacity: .08;
+  background: repeating-linear-gradient(0deg, #fff 0 1px, transparent 1px 4px); }
+canvas.webs { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; transform: translate3d(0, 0, 160px); }
+
+/* Progress */
+.progress { position: absolute; left: 40px; right: 40px; bottom: 20px; height: 1px; background: rgba(255,255,255,.1); z-index: 5; transform: translate3d(0,0,200px); }
+.progress span { position: absolute; inset: 0; background: linear-gradient(90deg, var(--hero-glow), var(--hero-accent)); transform-origin: left; transform: scaleX(0); }
+.progress em { position: absolute; top: 0; height: 9px; width: 1px; background: rgba(255,255,255,.35); transform: translateY(-4px); }
+
+/* After the stage */
+.outro { position: relative; z-index: 2; min-height: 70vh; display: grid; place-items: center; text-align: center; padding: 120px var(--margin); background: #050505; }
+.outro h2 { font-family: var(--orb); font-weight: 900; font-size: clamp(30px, 9vw, 140px); letter-spacing: .04em; line-height: .95;
+  background: linear-gradient(90deg, #ff2a2a, #ffd700 30%, #00d2ff 55%, #ff0055 80%, #1a73e8); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.outro p { margin-top: 24px; color: rgba(255,255,255,.55); font-size: 15px; }
+.outro .again { display: inline-block; margin-top: 32px; padding: 14px 26px; border: 1px solid rgba(255,255,255,.3); font-family: var(--orb); font-size: 12px; letter-spacing: .2em; transition: border-color .3s, color .3s; }
+.outro .again:hover { border-color: var(--hero-accent); color: var(--hero-accent); }
+.fineprint { margin-top: 48px; font-size: 11px; color: rgba(255,255,255,.35); letter-spacing: .04em; }
+
+/* ─── Responsive ─── */
+@media (max-width: 1100px) { .hero-name { font-size: 130px; } }
+@media (max-width: 768px) {
+  :root { --gap: 12px; --margin: 20px; }
+  .viewport { perspective: 600px; }
+  .ui { transform: translate3d(0, 0, 140px) scale(0.767); }
+  .nav { padding-inline: 20px; grid-template-columns: auto 1fr; }
+  .nav-logo { font-size: 14px; }
+  .nav-links { display: none; }
+  .nav-status { font-size: 10px; }
+  .hero-name { font-size: 54px; }
+  .ui { padding-top: 96px; padding-bottom: 36px; grid-template-rows: 1fr auto auto; align-content: stretch; }
+  .hero-name { align-self: start; }
+  .figure { width: min(56vw, 34vh); top: 38%; }
+  .hero-meta { grid-column: 1 / -1; }
+  .hero-line { font-size: 22px; }
+  .hero-copy { display: none; }
+  .specs { grid-column: 1 / -1; margin-top: 14px; padding: 12px 14px; background: rgba(5,5,5,.7); }
+  .spec { grid-template-columns: 1fr auto; padding: 5px 0; }
+  .hud { width: 110vw; }
+  .progress { left: 20px; right: 20px; bottom: 14px; }
+}
+@media (max-width: 420px) {
+  .nav-logo { font-size: 12px; letter-spacing: .06em; }
+  .nav-status { font-size: 9px; letter-spacing: .06em; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .figure-float, .clouds, .nav-status { animation: none; }
+  .gw, .specs, .hero-index, .hero-copy, .spec i::after { transition-duration: .01s; transition-delay: 0s; }
+  .is-live .electric .gw { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Section 1: navigation -->
+<header class="nav">
+  <a href="#" class="nav-logo" data-go="0">AVENGERS // LAB</a>
+  <nav class="nav-links" aria-label="Heroes">
+    <a href="#" data-go="0">Iron Man</a>
+    <a href="#" data-go="1">Thor</a>
+    <a href="#" data-go="2">Spider-Man</a>
+  </nav>
+  <span class="nav-status">+ SYSTEM ONLINE</span>
+</header>
+
+<main>
+  <!-- Section 2: 3D stage -->
+  <section class="stage" data-stage aria-label="Hero showcase">
+    <div class="viewport" data-viewport>
+      <div class="world" data-world>
+        <div class="ambient" aria-hidden="true"></div>
+
+        <!-- ═══ IRON MAN ═══ -->
+        <article class="layer" data-hero="iron" aria-label="Iron Man">
+          <canvas class="fx" data-fx="iron" aria-hidden="true"></canvas>
+          <div class="hud" aria-hidden="true" data-hud>
+            <svg viewBox="-100 -100 200 200" data-ring="0"><circle r="96" fill="none" stroke="#ff2a2a" stroke-opacity=".35" stroke-width=".4"/><circle r="92" fill="none" stroke="#ffd700" stroke-width="1.2" stroke-dasharray="2 5" stroke-opacity=".7"/></svg>
+            <svg viewBox="-100 -100 200 200" data-ring="1"><circle r="78" fill="none" stroke="#ffd700" stroke-width=".6" stroke-dasharray="40 12 4 12" stroke-opacity=".8"/><path d="M0 -84 L3 -78 L-3 -78Z M84 0 L78 3 L78 -3Z M0 84 L-3 78 L3 78Z M-84 0 L-78 -3 L-78 3Z" fill="#ffd700"/></svg>
+            <svg viewBox="-100 -100 200 200" data-ring="2"><circle r="60" fill="none" stroke="#ff2a2a" stroke-width="2.5" stroke-dasharray="70 24" stroke-opacity=".55"/><circle r="54" fill="none" stroke="#fff" stroke-width=".3" stroke-opacity=".4"/></svg>
+            <svg viewBox="-100 -100 200 200" data-ring="3"><g stroke="#ffd700" stroke-opacity=".6" stroke-width=".5"><line x1="-100" y1="0" x2="-40" y2="0"/><line x1="40" y1="0" x2="100" y2="0"/><line x1="0" y1="-100" x2="0" y2="-40"/><line x1="0" y1="40" x2="0" y2="100"/></g><circle r="36" fill="none" stroke="#ffd700" stroke-width=".8" stroke-dasharray="1 3"/></svg>
+            <p class="hud-readout" style="left:4%;top:30%">TGT LOCK · 0x7F2A</p>
+            <p class="hud-readout" style="right:4%;top:36%" data-alt>ALT 00412 M</p>
+            <p class="hud-readout" style="left:12%;bottom:26%" data-pwr>PWR 100%</p>
+          </div>
+          <div class="figure" data-figure>
+            <div class="figure-tilt"><div class="figure-float">
+              <svg viewBox="0 0 400 600" aria-hidden="true">
+                <defs>
+                  <linearGradient id="im-red" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8242a"/><stop offset=".6" stop-color="#8e1016"/><stop offset="1" stop-color="#4a070a"/></linearGradient>
+                  <linearGradient id="im-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset=".5" stop-color="#d4a017"/><stop offset="1" stop-color="#7a5a08"/></linearGradient>
+                  <radialGradient id="im-core"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#bff6ff"/><stop offset="1" stop-color="#00d2ff" stop-opacity="0"/></radialGradient>
+                </defs>
+                <g stroke="#2a0406" stroke-width="2" stroke-linejoin="round">
+                  <!-- legs -->
+                  <path d="M140 380 L192 380 L188 480 L182 572 L148 572 L144 480 Z" fill="url(#im-red)"/>
+                  <path d="M208 380 L260 380 L256 480 L252 572 L218 572 L212 480 Z" fill="url(#im-red)"/>
+                  <path d="M150 440 L186 440 L184 478 L152 478 Z M214 440 L250 440 L248 478 L216 478 Z" fill="url(#im-gold)"/>
+                  <!-- arms -->
+                  <path d="M98 188 L84 292 L96 362 L124 362 L130 292 L144 204 Z" fill="url(#im-red)"/>
+                  <path d="M302 188 L316 292 L304 362 L276 362 L270 292 L256 204 Z" fill="url(#im-red)"/>
+                  <path d="M88 292 L128 292 L126 318 L92 318 Z M312 292 L272 292 L274 318 L308 318 Z" fill="url(#im-gold)"/>
+                  <!-- torso + hips -->
+                  <path d="M128 160 Q200 138 272 160 L288 232 Q278 302 252 332 L148 332 Q122 302 112 232 Z" fill="url(#im-red)"/>
+                  <path d="M150 332 L250 332 L264 384 L136 384 Z" fill="url(#im-gold)"/>
+                  <path d="M160 250 L240 250 L232 322 L168 322 Z" fill="url(#im-gold)" opacity=".85"/>
+                  <!-- shoulders -->
+                  <ellipse cx="118" cy="178" rx="34" ry="28" fill="url(#im-red)"/>
+                  <ellipse cx="282" cy="178" rx="34" ry="28" fill="url(#im-red)"/>
+                  <!-- neck + helmet -->
+                  <rect x="184" y="134" width="32" height="18" fill="#3a0608"/>
+                  <path d="M168 58 Q200 36 232 58 L240 108 Q238 132 222 140 L178 140 Q162 132 160 108 Z" fill="url(#im-red)"/>
+                  <path d="M176 76 Q200 64 224 76 L228 106 Q226 126 214 132 L186 132 Q174 126 172 106 Z" fill="url(#im-gold)"/>
+                </g>
+                <!-- glow: eyes, core, repulsors -->
+                <g class="im-glow">
+                  <path d="M180 92 L196 96 L194 101 L181 98 Z M220 92 L204 96 L206 101 L219 98 Z" fill="#eaffff"/>
+                  <circle cx="200" cy="208" r="30" fill="url(#im-core)"/><circle cx="200" cy="208" r="12" fill="#fff" stroke="#bff6ff" stroke-width="3"/>
+                  <circle cx="110" cy="372" r="12" fill="url(#im-core)"/><circle cx="290" cy="372" r="12" fill="url(#im-core)"/>
+                </g>
+                <g fill="none" stroke="#ffd700" stroke-opacity=".5" stroke-width="1.2"><path d="M150 190 Q200 176 250 190"/><path d="M200 238 L200 250"/><path d="M130 232 L160 250 M270 232 L240 250"/></g>
+              </svg>
+            </div></div>
+          </div>
+          <div class="ui grid">
+            <h2 class="hero-name" data-split="chars">STARK</h2>
+            <div class="hero-meta">
+              <p class="hero-index">01 / 03 · ARMOUR</p>
+              <p class="hero-line" data-split="words">GENIUS, ENGINEERED.</p>
+              <p class="hero-copy">A suit printed from nano-alloy, a reactor the size of a coin, and a pilot who never reads the manual.</p>
+            </div>
+            <div class="specs">
+              <h3>TECH SPECS <span>MK-LXXXV</span></h3>
+              <div class="spec" style="--v:.97;--d:0">Power core<b>3.2 GJ</b><i></i></div>
+              <div class="spec" style="--v:1;--d:1">Armour status<b>100%</b><i></i></div>
+              <div class="spec" style="--v:.86;--d:2">Repulsors<b>Armed</b><i></i></div>
+              <div class="spec" style="--v:.74;--d:3">Flight ceiling<b>Mach 3.1</b><i></i></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- ═══ THOR ═══ -->
+        <article class="layer" data-hero="thor" aria-label="Thor">
+          <div class="clouds" aria-hidden="true" data-clouds></div>
+          <canvas class="fx" data-fx="thor" aria-hidden="true"></canvas>
+          <div class="figure" data-figure>
+            <div class="figure-tilt"><div class="figure-float">
+              <svg viewBox="0 0 400 600" aria-hidden="true">
+                <defs>
+                  <linearGradient id="th-cape" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a0e12"/><stop offset="1" stop-color="#2a0406"/></linearGradient>
+                  <linearGradient id="th-armor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a6470"/><stop offset=".5" stop-color="#2c333c"/><stop offset="1" stop-color="#15191e"/></linearGradient>
+                  <linearGradient id="th-steel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e8eef4"/><stop offset=".5" stop-color="#9aa6b2"/><stop offset="1" stop-color="#4b5560"/></linearGradient>
+                  <linearGradient id="th-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9b25c"/><stop offset="1" stop-color="#7a5a22"/></linearGradient>
+                </defs>
+                <!-- cape -->
+                <path d="M126 168 Q70 360 36 590 L364 590 Q338 380 276 168 Z" fill="url(#th-cape)"/>
+                <path d="M126 168 Q96 300 80 420" stroke="#a0161c" stroke-width="3" fill="none" opacity=".6"/>
+                <g stroke="#0b0d10" stroke-width="2" stroke-linejoin="round">
+                  <!-- legs -->
+                  <path d="M150 360 L196 360 L190 470 L186 575 L152 575 L148 470 Z" fill="url(#th-armor)"/>
+                  <path d="M204 360 L252 360 L250 470 L248 575 L214 575 L210 470 Z" fill="url(#th-armor)"/>
+                  <!-- lowered left arm -->
+                  <path d="M140 172 L114 184 L102 300 L128 306 Z" fill="url(#th-armor)"/>
+                  <!-- raised right arm to the hammer -->
+                  <path d="M250 168 L278 160 L318 72 L296 62 Z" fill="url(#th-armor)"/>
+                  <!-- torso -->
+                  <path d="M136 160 Q200 142 264 160 L274 300 L256 362 L146 362 L128 300 Z" fill="url(#th-armor)"/>
+                  <path d="M146 300 L256 300 L252 322 L150 322 Z" fill="#6b5320"/>
+                </g>
+                <g fill="url(#th-steel)" stroke="#0b0d10" stroke-width="1.5">
+                  <circle cx="176" cy="200" r="11"/><circle cx="224" cy="200" r="11"/><circle cx="176" cy="236" r="11"/><circle cx="224" cy="236" r="11"/><circle cx="176" cy="272" r="11"/><circle cx="224" cy="272" r="11"/>
+                </g>
+                <!-- head + hair -->
+                <path d="M160 96 Q158 50 200 46 Q242 50 240 96 L246 150 Q226 138 222 120 L178 120 Q174 138 154 150 Z" fill="url(#th-hair)"/>
+                <ellipse cx="200" cy="100" rx="30" ry="36" fill="#caa183"/>
+                <path d="M172 118 Q200 146 228 118 L226 130 Q200 156 174 130 Z" fill="url(#th-hair)"/>
+                <path d="M184 96 L194 98 M216 96 L206 98" stroke="#eaffff" stroke-width="4" stroke-linecap="round"/>
+                <!-- hammer -->
+                <g transform="rotate(-18 306 44)">
+                  <rect x="300" y="44" width="12" height="48" rx="3" fill="#5a3a22" stroke="#0b0d10" stroke-width="1.5"/>
+                  <rect x="266" y="4" width="80" height="44" rx="6" fill="url(#th-steel)" stroke="#0b0d10" stroke-width="2"/>
+                  <path d="M272 26 L340 26" stroke="#7a8794" stroke-width="2"/>
+                  <rect x="266" y="4" width="80" height="44" rx="6" fill="none" stroke="#00d2ff" stroke-width="2" stroke-opacity=".9"/>
+                </g>
+              </svg>
+            </div></div>
+          </div>
+          <div class="flash" data-flash aria-hidden="true"></div>
+          <div class="ui grid">
+            <h2 class="hero-name" data-split="chars">ODINSON</h2>
+            <div class="hero-meta">
+              <p class="hero-index">02 / 03 · STORM</p>
+              <p class="hero-line electric" data-split="words">THE STORM ANSWERS.</p>
+              <p class="hero-copy">Hover the sky and it answers back. One arm raised, a hammer that only lifts for the worthy.</p>
+            </div>
+            <div class="specs">
+              <h3>TECH SPECS <span>ASGARD-01</span></h3>
+              <div class="spec" style="--v:1;--d:0">Weapon bond<b>Worthy</b><i></i></div>
+              <div class="spec" style="--v:.92;--d:1">Discharge<b>1.21 TV</b><i></i></div>
+              <div class="spec" style="--v:.8;--d:2">Storm cells<b>Active · 12</b><i></i></div>
+              <div class="spec" style="--v:.66;--d:3">Bifrost link<b>Standby</b><i></i></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- ═══ SPIDER-MAN ═══ -->
+        <article class="layer" data-hero="spider" aria-label="Spider-Man">
+          <canvas class="fx" data-fx="spider" aria-hidden="true"></canvas>
+          <div class="figure" data-figure data-glitch-figure>
+            <div class="figure-tilt"><div class="figure-float">
+              <svg viewBox="0 0 400 600" aria-hidden="true" data-spider-svg>
+                <defs>
+                  <linearGradient id="sp-red" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff2a4e"/><stop offset="1" stop-color="#8a0a22"/></linearGradient>
+                  <linearGradient id="sp-blue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f7df0"/><stop offset="1" stop-color="#0c2c6b"/></linearGradient>
+                  <pattern id="sp-web" width="18" height="18" patternUnits="userSpaceOnUse"><path d="M0 0 L18 18 M18 0 L0 18 M9 0 V18 M0 9 H18" stroke="#2a0008" stroke-width=".8" opacity=".55"/></pattern>
+                </defs>
+                <g stroke="#10030a" stroke-width="2" stroke-linejoin="round">
+                  <!-- legs, crouched -->
+                  <path d="M150 300 L98 366 L118 470 L148 468 L138 380 L186 322 Z" fill="url(#sp-blue)"/>
+                  <path d="M250 300 L302 366 L282 470 L252 468 L262 380 L214 322 Z" fill="url(#sp-blue)"/>
+                  <path d="M112 452 L150 452 L156 486 L104 486 Z M250 452 L288 452 L296 486 L244 486 Z" fill="url(#sp-red)"/>
+                  <!-- arm down to the ground -->
+                  <path d="M154 214 L92 262 L70 370 L94 376 L114 282 L162 246 Z" fill="url(#sp-red)"/>
+                  <!-- arm raised, shooting -->
+                  <path d="M246 214 L312 188 L364 146 L374 164 L320 214 L254 250 Z" fill="url(#sp-red)"/>
+                  <!-- torso -->
+                  <path d="M150 204 Q200 188 250 204 L262 300 Q200 320 138 300 Z" fill="url(#sp-red)"/>
+                  <path d="M138 260 Q200 276 262 260 L262 300 Q200 320 138 300 Z" fill="url(#sp-blue)"/>
+                  <!-- head -->
+                  <ellipse cx="200" cy="150" rx="44" ry="54" fill="url(#sp-red)"/>
+                </g>
+                <g fill="url(#sp-web)"><path d="M150 204 Q200 188 250 204 L262 262 Q200 276 138 262 Z"/><ellipse cx="200" cy="150" rx="44" ry="54"/><path d="M154 214 L92 262 L70 370 L94 376 L114 282 L162 246 Z"/><path d="M246 214 L312 188 L364 146 L374 164 L320 214 L254 250 Z"/></g>
+                <!-- lenses -->
+                <path d="M170 130 Q182 112 196 140 Q186 160 170 150 Q162 142 170 130 Z" fill="#f4fbff" stroke="#10030a" stroke-width="4"/>
+                <path d="M230 130 Q218 112 204 140 Q214 160 230 150 Q238 142 230 130 Z" fill="#f4fbff" stroke="#10030a" stroke-width="4"/>
+                <!-- chest mark: an abstract eight-legged glyph -->
+                <g stroke="#10030a" stroke-width="3" stroke-linecap="round" fill="#10030a"><ellipse cx="200" cy="226" rx="5" ry="9"/><path d="M196 222 L182 210 M204 222 L218 210 M196 228 L180 232 M204 228 L220 232 M196 232 L184 246 M204 232 L216 246" fill="none"/></g>
+                <path d="M370 156 L400 120" stroke="#e8f4ff" stroke-width="2" opacity=".9"/>
+              </svg>
+            </div></div>
+          </div>
+          <div class="scan" aria-hidden="true"></div>
+          <canvas class="webs" data-webs aria-hidden="true"></canvas>
+          <div class="ui grid">
+            <h2 class="hero-name" data-split="chars">PARKER</h2>
+            <div class="hero-meta">
+              <p class="hero-index">03 / 03 · WEB</p>
+              <p class="hero-line" data-split="words">THE WEB REMEMBERS.</p>
+              <p class="hero-copy">Move and the lines follow. Click to snap them loose and let them swing back.</p>
+            </div>
+            <div class="specs">
+              <h3>TECH SPECS <span>QNS-616</span></h3>
+              <div class="spec" style="--v:.87;--d:0">Web fluid<b>87%</b><i></i></div>
+              <div class="spec" style="--v:.95;--d:1">Spider-sense<b>Tingling</b><i></i></div>
+              <div class="spec" style="--v:.98;--d:2">Agility index<b>98</b><i></i></div>
+              <div class="spec" style="--v:.7;--d:3">Swing speed<b>70 mph</b><i></i></div>
+            </div>
+          </div>
+        </article>
+      </div>
+      <div class="progress" aria-hidden="true"><span data-bar></span><em style="left:33.33%"></em><em style="left:66.66%"></em></div>
+    </div>
+  </section>
+
+  <section class="outro" aria-label="End">
+    <div>
+      <h2>ASSEMBLED.</h2>
+      <p>Three stages. Armour, storm and web.</p>
+      <a href="#" class="again" data-go="0">↺ RUN IT AGAIN</a>
+      <p class="fineprint">Fan concept for demonstration only. Not affiliated with or endorsed by Marvel or Disney. Character names belong to their owners; all artwork here is original.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  "use strict";
+  const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const clamp01 = (v) => Math.min(1, Math.max(0, v));
+  const range = (p, a, b) => clamp01((p - a) / (b - a));
+  const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+  const easeIn = (t) => t * t * t;
+  const backOut = (t) => { const c = 2.2; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+  const LERP = 0.08;
+
+  /* ═══ Input (passive listeners) ═══ */
+  const input = { p: 0, mx: 0, my: 0, px: innerWidth / 2, py: innerHeight / 2, inside: false };
+  const stage = $("[data-stage]");
+  const readScroll = () => { input.p = clamp01((scrollY - stage.offsetTop) / Math.max(1, stage.offsetHeight - innerHeight)); };
+  addEventListener("scroll", readScroll, { passive: true });
+  addEventListener("pointermove", (e) => {
+    input.px = e.clientX; input.py = e.clientY; input.inside = true;
+    input.mx = (e.clientX / innerWidth) * 2 - 1; input.my = (e.clientY / innerHeight) * 2 - 1;
+  }, { passive: true });
+  document.addEventListener("pointerleave", () => { input.inside = false; }, { passive: true });
+  readScroll();
+
+  /* ═══ glitchSplitText(): headers → word (or char) spans with a stagger index ═══ */
+  function glitchSplitText(el, mode = "words") {
+    const text = el.textContent.trim();
+    el.setAttribute("aria-label", text);
+    el.textContent = "";
+    const parts = mode === "chars" ? [...text] : text.split(/(\s+)/).filter(Boolean);
+    let i = 0;
+    for (const part of parts) {
+      if (/^\s+$/.test(part)) { el.append(" "); continue; }
+      const s = document.createElement("span");
+      s.className = "gw"; s.textContent = part; s.setAttribute("aria-hidden", "true");
+      s.style.setProperty("--i", i++);
+      el.append(s);
+    }
+    return el;
+  }
+  $$("[data-split]").forEach((el) => glitchSplitText(el, el.dataset.split));
+
+  /* ═══ Layers ═══ */
+  const HEROES = ["iron", "thor", "spider"];
+  const layers = HEROES.map((key) => {
+    const el = $(`.layer[data-hero="${key}"]`);
+    return { key, el, fig: $(".figure-tilt", el), canvas: $("canvas.fx", el), visible: false, live: false, alpha: 0 };
+  });
+  const byKey = Object.fromEntries(layers.map((l) => [l.key, l]));
+  const world = $("[data-world]");
+
+  /* Where each layer sits for a local phase t (0…1 within its third of the scroll). */
+  function pose(key, t) {
+    if (key === "iron") {
+      if (t > 1) return null;
+      const out = range(t, 0.8, 1);
+      return { z: 500 * easeIn(out), y: 0, o: 1 - out, blur: 0, live: t < 0.8 };
+    }
+    if (key === "thor") {
+      if (t < 0 || t > 1) return null;
+      const inn = easeOut(range(t, 0, 0.2)), out = range(t, 0.8, 1);
+      return { z: lerp(-500, 0, inn) - 1000 * easeIn(out), y: 0, o: Math.min(inn, 1 - out), blur: 18 * out, live: t >= 0.2 && t < 0.8 };
+    }
+    // spider: drops in from above, then stays.
+    if (t < 0) return null;
+    const d = range(t, 0, 0.2);
+    return { z: 0, y: (1 - backOut(d)) * -110, o: Math.min(1, d * 2.5), blur: 0, live: t >= 0.2 };
+  }
+
+  /* ═══ Canvas plumbing: debounced resize, DPR cap, quality switch ═══ */
+  let quality = matchMedia("(max-width: 768px)").matches ? 0.6 : 1;
+  const canvases = [...layers.map((l) => l.canvas), $("[data-webs]")];
+  let W = innerWidth, H = innerHeight, DPR = Math.min(devicePixelRatio || 1, 1.5);
+  const sizeAll = () => {
+    W = innerWidth; H = innerHeight; DPR = Math.min(devicePixelRatio || 1, quality < 1 ? 1 : 1.5);
+    for (const c of canvases) { c.width = Math.round(W * DPR); c.height = Math.round(H * DPR); c.getContext("2d").setTransform(DPR, 0, 0, DPR, 0, 0); }
+  };
+  let resizeTimer = 0;
+  addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { sizeAll(); readScroll(); }, 150); }, { passive: true });
+  sizeAll();
+  // The figure's on-screen box (for sparks, bolts and webs to aim at).
+  const figBox = (l) => l.fig.getBoundingClientRect();
+
+  /* ═══ Iron Man: arc-reactor sparks + HUD rotation ═══ */
+  const iron = (() => {
+    const ctx = byKey.iron.canvas.getContext("2d");
+    const sparks = [];
+    const rings = $$("[data-ring]");
+    const alt = $("[data-alt]"), pwr = $("[data-pwr]");
+    return {
+      draw(t, time, dt) {
+        const b = figBox(byKey.iron);
+        const cx = b.left + b.width / 2, cy = b.top + b.height * 0.35;
+        const rate = (REDUCED ? 1 : 5) * quality;
+        for (let i = 0; i < rate; i++) {
+          const a = Math.random() * Math.PI * 2, s = 1.2 + Math.random() * 4.2;
+          sparks.push({ x: cx, y: cy, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 1, life: 1, hue: Math.random() < 0.7 ? 48 : 0 });
+        }
+        ctx.clearRect(0, 0, W, H);
+        // Faint blueprint grid behind.
+        ctx.strokeStyle = "rgba(255,215,0,.05)"; ctx.lineWidth = 1; ctx.beginPath();
+        for (let x = (time * 0.02) % 60; x < W; x += 60) { ctx.moveTo(x, 0); ctx.lineTo(x, H); }
+        for (let y = 0; y < H; y += 60) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
+        ctx.stroke();
+        ctx.globalCompositeOperation = "lighter";
+        for (let i = sparks.length - 1; i >= 0; i--) {
+          const s = sparks[i];
+          s.x += s.vx * dt; s.y += s.vy * dt; s.vy += 0.05 * dt; s.vx *= 0.99; s.life -= 0.012 * dt;
+          if (s.life <= 0) { sparks.splice(i, 1); continue; }
+          ctx.strokeStyle = s.hue ? `hsla(${s.hue},100%,62%,${s.life})` : `rgba(255,70,50,${s.life})`;
+          ctx.lineWidth = 1.6 * s.life;
+          ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(s.x - s.vx * 3, s.y - s.vy * 3); ctx.stroke();
+        }
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 120);
+        g.addColorStop(0, "rgba(190,246,255,.35)"); g.addColorStop(1, "rgba(0,210,255,0)");
+        ctx.fillStyle = g; ctx.fillRect(cx - 120, cy - 120, 240, 240);
+        ctx.globalCompositeOperation = "source-over";
+        if (sparks.length > 600) sparks.splice(0, sparks.length - 600);
+        // HUD: spin with scroll plus a slow idle drift.
+        const spin = t * 540 + (REDUCED ? 0 : time * 0.01);
+        rings.forEach((r, i) => { r.style.transform = `translate3d(0,0,${i * 22}px) rotate(${(i % 2 ? -1 : 1) * spin * (1 + i * 0.35)}deg)`; });
+        alt.textContent = `ALT ${String(Math.round(412 + t * 8200)).padStart(5, "0")} M`;
+        pwr.textContent = `PWR ${Math.round(100 - t * 6)}%`;
+      },
+    };
+  })();
+
+  /* ═══ Thor: random lightning, more (and aimed) when the cursor is on the sky ═══ */
+  const thor = (() => {
+    const ctx = byKey.thor.canvas.getContext("2d");
+    const flash = $("[data-flash]"), clouds = $("[data-clouds]");
+    let bolts = [], next = 0, flashV = 0;
+    const bolt = (x0, y0, x1, y1, spread, depth) => {
+      // Midpoint displacement, with side branches.
+      let pts = [[x0, y0], [x1, y1]];
+      for (let d = 0; d < depth; d++) {
+        const out = [pts[0]];
+        for (let i = 0; i < pts.length - 1; i++) {
+          const [ax, ay] = pts[i], [bx, by] = pts[i + 1];
+          out.push([(ax + bx) / 2 + (Math.random() - 0.5) * spread, (ay + by) / 2 + (Math.random() - 0.5) * spread * 0.3], pts[i + 1]);
+        }
+        pts = out; spread *= 0.55;
+      }
+      return pts;
+    };
+    const strike = (tx, ty, strong) => {
+      const x0 = tx + (Math.random() - 0.5) * W * 0.4;
+      const main = bolt(x0, -20, tx, ty, W * 0.18, quality < 1 ? 5 : 7);
+      const branches = [];
+      for (let k = 0; k < (strong ? 3 : 1); k++) {
+        const from = main[(Math.random() * main.length * 0.7) | 0];
+        branches.push(bolt(from[0], from[1], from[0] + (Math.random() - 0.5) * 260, from[1] + 120 + Math.random() * 200, 90, 5));
+      }
+      bolts.push({ main, branches, life: 1 });
+      flashV = Math.max(flashV, strong ? 0.75 : 0.45);
+    };
+    const path = (pts) => { ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]); };
+    return {
+      enterFlash(v) { flashV = Math.max(flashV, v); },
+      draw(t, time, dt) {
+        const hover = input.inside;
+        if (time > next && !REDUCED) {
+          const b = figBox(byKey.thor);
+          // Aim at the hammer by default; at the cursor when hovering.
+          const tx = hover ? input.px : b.left + b.width * 0.78, ty = hover ? input.py : b.top + b.height * 0.06;
+          strike(tx, ty, hover && Math.random() < 0.5);
+          next = time + (hover ? 350 + Math.random() * 700 : 1400 + Math.random() * 2600) / Math.max(0.5, quality);
+        }
+        ctx.clearRect(0, 0, W, H);
+        ctx.globalCompositeOperation = "lighter";
+        ctx.lineCap = "round"; ctx.lineJoin = "round";
+        for (let i = bolts.length - 1; i >= 0; i--) {
+          const B = bolts[i];
+          B.life -= 0.045 * dt;
+          if (B.life <= 0) { bolts.splice(i, 1); continue; }
+          const a = B.life * (0.7 + Math.random() * 0.3);
+          ctx.strokeStyle = `rgba(0,210,255,${0.35 * a})`; ctx.lineWidth = 10; path(B.main); ctx.stroke();
+          ctx.strokeStyle = `rgba(190,245,255,${0.9 * a})`; ctx.lineWidth = 2.4; path(B.main); ctx.stroke();
+          ctx.lineWidth = 1.2; ctx.strokeStyle = `rgba(150,230,255,${0.6 * a})`;
+          for (const br of B.branches) { path(br); ctx.stroke(); }
+        }
+        ctx.globalCompositeOperation = "source-over";
+        flashV *= Math.pow(0.86, dt);
+        flash.style.opacity = flashV.toFixed(3);
+        clouds.style.filter = `brightness(${1 + flashV * 1.6})`;
+      },
+    };
+  })();
+
+  /* ═══ Spider-Man: neon web backdrop, glitches, elastic strings from the cursor ═══ */
+  const spider = (() => {
+    const ctx = byKey.spider.canvas.getContext("2d");
+    const wctx = $("[data-webs]").getContext("2d");
+    const figure = $("[data-glitch-figure]");
+    // Two glitch copies of the silhouette for RGB-split slices.
+    const svg = $("[data-spider-svg]");
+    ["c1", "c2"].forEach((c) => { const copy = svg.cloneNode(true); copy.removeAttribute("data-spider-svg"); copy.classList.add("glitch-copy", c); svg.parentNode.appendChild(copy); });
+    let glitchUntil = 0, nextGlitch = 0;
+    // Elastic strings: from the cursor to the four corners.
+    const strings = [0, 1, 2, 3].map(() => ({ ox: 0, oy: 0, vx: 0, vy: 0, reach: 1, rv: 0 }));
+    let lastX = input.px, lastY = input.py, snapAt = -1e9;
+    addEventListener("pointerdown", () => {
+      if (!byKey.spider.live) return;
+      snapAt = performance.now();
+      for (const s of strings) { s.reach = 0.15; s.rv = 0; s.vx += (Math.random() - 0.5) * 60; s.vy += (Math.random() - 0.5) * 60; }
+    }, { passive: true });
+    return {
+      draw(t, time, dt, live) {
+        // Backdrop web: radial spokes from off-screen anchors, swaying threads.
+        ctx.clearRect(0, 0, W, H);
+        ctx.globalCompositeOperation = "lighter";
+        const anchors = [[-W * 0.05, -H * 0.05], [W * 1.05, H * 0.1], [W * 0.5, H * 1.1]];
+        const spokes = Math.round(16 * quality), rings = Math.round(9 * quality);
+        anchors.forEach(([ax, ay], k) => {
+          const R = Math.hypot(W, H) * 0.75;
+          ctx.strokeStyle = k === 1 ? "rgba(26,115,232,.28)" : "rgba(255,0,85,.26)"; ctx.lineWidth = 1;
+          const base = Math.atan2(H / 2 - ay, W / 2 - ax);
+          for (let s = 0; s < spokes; s++) {
+            const a = base + (s / spokes - 0.5) * 1.6;
+            ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ax + Math.cos(a) * R, ay + Math.sin(a) * R); ctx.stroke();
+          }
+          for (let r = 1; r <= rings; r++) {
+            const rr = (r / rings) * R * 0.9 + Math.sin(time * 0.001 + r + k) * 6;
+            ctx.beginPath();
+            for (let s = 0; s <= spokes; s++) {
+              const a = base + (s / spokes - 0.5) * 1.6;
+              const sag = s > 0 && s < spokes ? 0.985 : 1;
+              const x = ax + Math.cos(a) * rr * sag, y = ay + Math.sin(a) * rr * sag;
+              s ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+            }
+            ctx.stroke();
+          }
+        });
+        // A single web line holds him on the way down.
+        if (t < 0.3) {
+          const b = figBox(byKey.spider);
+          ctx.strokeStyle = `rgba(240,248,255,${0.8 * (1 - range(t, 0.2, 0.3))})`; ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.moveTo(b.left + b.width / 2, -10); ctx.lineTo(b.left + b.width / 2, b.top + b.height * 0.12); ctx.stroke();
+        }
+        ctx.globalCompositeOperation = "source-over";
+        // Glitch bursts.
+        if (!REDUCED && time > nextGlitch) { glitchUntil = time + 120 + Math.random() * 200; nextGlitch = time + 1500 + Math.random() * 3000; }
+        figure.classList.toggle("is-glitching", time < glitchUntil);
+
+        // Elastic strings (only once he has landed).
+        wctx.clearRect(0, 0, W, H);
+        if (!live) return;
+        const mvx = input.px - lastX, mvy = input.py - lastY;
+        lastX = input.px; lastY = input.py;
+        const corners = [[0, 0], [W, 0], [W, H], [0, H]];
+        wctx.lineCap = "round";
+        strings.forEach((s, i) => {
+          // Springs: the mid-point bow follows gravity and is kicked by cursor motion.
+          s.vx += (-s.ox * 0.08 - mvx * 0.35) * dt; s.vy += ((22 - s.oy) * 0.08 - mvy * 0.35) * dt;
+          s.vx *= Math.pow(0.88, dt); s.vy *= Math.pow(0.88, dt);
+          s.ox += s.vx * dt * 0.5; s.oy += s.vy * dt * 0.5;
+          // Reach: after a snap the string recoils toward its corner, then springs back out.
+          s.rv += (1 - s.reach) * 0.05 * dt; s.rv *= Math.pow(0.82, dt); s.reach += s.rv * dt;
+          const [cx, cy] = corners[i];
+          const ex = lerp(cx, input.px, s.reach), ey = lerp(cy, input.py, s.reach);
+          const mx = (cx + ex) / 2 + s.ox, my = (cy + ey) / 2 + s.oy;
+          const snapGlow = clamp01(1 - (time - snapAt) / 500);
+          wctx.strokeStyle = `rgba(255,0,85,${0.25 + snapGlow * 0.3})`; wctx.lineWidth = 5;
+          wctx.beginPath(); wctx.moveTo(cx, cy); wctx.quadraticCurveTo(mx, my, ex, ey); wctx.stroke();
+          wctx.strokeStyle = "rgba(245,250,255,.9)"; wctx.lineWidth = 1.2;
+          wctx.beginPath(); wctx.moveTo(cx, cy); wctx.quadraticCurveTo(mx, my, ex, ey); wctx.stroke();
+        });
+        wctx.fillStyle = "#fff";
+        wctx.beginPath(); wctx.arc(input.px, input.py, 3, 0, Math.PI * 2); wctx.fill();
+      },
+    };
+  })();
+
+  /* ═══ Nav: jump to a hero, mark the active one ═══ */
+  const links = $$(".nav-links a");
+  $$("[data-go]").forEach((a) => a.addEventListener("click", (e) => {
+    e.preventDefault();
+    const i = +a.dataset.go;
+    const span = stage.offsetHeight - innerHeight;
+    const target = stage.offsetTop + span * (i / 3 + (i === 0 ? 0 : 0.1));
+    scrollTo({ top: target, behavior: REDUCED ? "auto" : "smooth" });
+  }));
+
+  /* ═══ The RAF loop ═══ */
+  const bar = $("[data-bar]");
+  const tilt = { x: 0, y: 0 };
+  let eased = input.p, last = performance.now(), activeHero = "", thorFlashed = false;
+  // Frame-rate watch: drop to lighter rendering if we sit under ~50 fps.
+  let fpsAcc = 0, fpsN = 0, lowStreak = 0;
+
+  function frame(now) {
+    requestAnimationFrame(frame);
+    const dtMs = Math.min(64, now - last); last = now;
+    const dt = dtMs / 16.667;
+    fpsAcc += dtMs; fpsN++;
+    if (fpsN === 60) {
+      const fps = 1000 / (fpsAcc / 60);
+      lowStreak = fps < 50 ? lowStreak + 1 : 0;
+      if (lowStreak >= 2 && quality > 0.5) { quality = 0.5; sizeAll(); }
+      fpsAcc = 0; fpsN = 0;
+    }
+
+    eased = lerp(eased, input.p, 1 - Math.pow(1 - LERP, dt));
+    if (Math.abs(eased - input.p) < 0.00005) eased = input.p;
+    const P = eased * 3; // 0…3 across the three stages
+
+    // Mouse parallax: the whole world tilts ±10°.
+    tilt.x = lerp(tilt.x, input.my, LERP); tilt.y = lerp(tilt.y, input.mx, LERP);
+    world.style.transform = REDUCED ? "none" : `rotateX(${(-tilt.x * 10).toFixed(2)}deg) rotateY(${(tilt.y * 10).toFixed(2)}deg)`;
+
+    let best = null;
+    layers.forEach((l, i) => {
+      const t = P - i;
+      const ps = pose(l.key, t);
+      const visible = !!ps && ps.o > 0.005;
+      if (visible !== l.visible) { l.visible = visible; l.el.style.visibility = visible ? "visible" : "hidden"; }
+      l.alpha = visible ? ps.o : 0;
+      if (visible) {
+        l.el.style.transform = `translate3d(0, ${ps.y.toFixed(2)}vh, ${ps.z.toFixed(1)}px)`;
+        l.el.style.opacity = ps.o.toFixed(3);
+        l.el.style.filter = ps.blur > 0.2 ? `blur(${ps.blur.toFixed(1)}px)` : "none";
+        // The silhouette leans a little further than the world.
+        l.fig.style.transform = REDUCED ? "none" : `rotateY(${(tilt.y * 12).toFixed(2)}deg) rotateX(${(-tilt.x * 8).toFixed(2)}deg)`;
+        if (l.key === "iron") iron.draw(clamp01(t), now, dt);
+        if (l.key === "thor") thor.draw(clamp01(t), now, dt);
+        if (l.key === "spider") spider.draw(clamp01(t), now, dt, !!ps.live);
+      }
+      const live = !!ps && ps.live && visible;
+      if (live !== l.live) { l.live = live; l.el.classList.toggle("is-live", live); }
+      if (!best || l.alpha > best.alpha) best = l;
+    });
+    // Thor's entrance flash, once per pass.
+    const tThor = P - 1;
+    if (tThor > 0.02 && tThor < 0.2 && !thorFlashed) { thor.enterFlash(0.9); thorFlashed = true; }
+    if (tThor < 0 || tThor > 0.3) thorFlashed = false;
+
+    if (best && best.key !== activeHero) {
+      activeHero = best.key;
+      document.documentElement.dataset.hero = activeHero;
+      links.forEach((a, i) => a.classList.toggle("is-active", HEROES[i] === activeHero));
+    }
+    bar.style.transform = `scaleX(${eased.toFixed(4)})`;
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
