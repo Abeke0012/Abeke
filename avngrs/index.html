@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A.V.N.G.R.S // Tactical Database</title>
+<meta name="description" content="A.V.N.G.R.S Tactical Database — a holo-terminal fan concept. Project Tachyon, core telemetry, tactical archive 2026.">
+<meta name="theme-color" content="#060606">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&family=Space+Mono:wght@400;700&family=Allura&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
+    "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.mjs"
+  }
+}
+</script>
+<style>
+:root {
+  --bg: #060606;
+  --fg: #ffffff;
+  --dim: rgba(255, 255, 255, .5);
+  --line: rgba(255, 255, 255, .14);
+  --core: #7ff3ff;
+  --gap: 24px;
+  --margin: 32px;
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --geist: "Geist", "Helvetica Neue", Arial, sans-serif;
+  --mono: "Space Mono", ui-monospace, Menlo, monospace;
+  --script: "Allura", "Brush Script MT", cursive;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--fg); overscroll-behavior: none; }
+body { font-family: var(--geist); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-stopped { overflow: hidden; }
+:focus-visible { outline: 1px solid var(--fg); outline-offset: 4px; }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); padding-inline: var(--margin); }
+.mono { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+.dim { color: var(--dim); }
+
+/* Dev grid (G) */
+.grid-overlay { position: fixed; inset: 0; z-index: 9999; pointer-events: none; display: none; }
+.grid-overlay.on { display: grid; }
+.grid-overlay span { background: rgba(255, 0, 0, .08); height: 100%; }
+
+/* TextEngine masks */
+.te-mask { display: block; overflow: hidden; padding-bottom: .06em; margin-bottom: -.06em; }
+.te-mask.word { display: inline-block; vertical-align: top; }
+.te-inner { display: inline-block; will-change: transform; transform: translate3d(0, 110%, 0); }
+.te-mask:not(.word) > .te-inner { display: block; white-space: nowrap; }
+
+/* DigitRoll */
+.dr { display: inline-flex; align-items: flex-end; font-variant-numeric: tabular-nums; }
+.dr-col { display: inline-block; height: 1em; line-height: 1; overflow: hidden; }
+.dr-col > span { display: block; will-change: transform; }
+.dr-col > span > span { display: block; height: 1em; line-height: 1; }
+.dr-lit { display: inline-block; line-height: 1; }
+
+/* ─── Preloader ─── */
+.pre { position: fixed; inset: 0; z-index: 500; background: var(--bg); display: grid; place-items: center; align-content: center; gap: 16px; will-change: clip-path; }
+.pre-count { font-family: var(--mono); font-size: 56px; letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+.pre-bar { width: min(280px, 60vw); height: 1px; background: var(--line); overflow: hidden; }
+.pre-bar i { display: block; height: 100%; background: var(--fg); transform-origin: left; transform: scaleX(0); }
+.pre-log { height: 1.2em; }
+
+/* ─── Header: four flex columns, difference blend ─── */
+.header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; gap: var(--gap); padding: 22px var(--margin); mix-blend-mode: difference; color: #fff; }
+.hcol { flex: 1 1 0; display: flex; flex-direction: column; gap: 4px; }
+.hcol + .hcol { border-left: 1px solid rgba(255,255,255,.2); padding-left: 16px; }
+.hcol.logo { font-family: var(--geist); font-weight: 700; font-size: 20px; letter-spacing: -.02em; justify-content: center; }
+.hcol.logo sup { font-size: 10px; font-weight: 400; margin-left: 2px; }
+.hcol.status { align-items: flex-end; text-align: right; }
+.blink { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #fff; margin-right: 8px; vertical-align: 1px; animation: blink 1.4s ease-in-out infinite; }
+@keyframes blink { 50% { opacity: .15; } }
+
+/* ─── WebGL ─── */
+#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; display: block; transition: opacity .6s var(--ease-out); }
+#gl.off { opacity: 0; }
+main { position: relative; z-index: 1; }
+
+/* ─── Hero ─── */
+.hero { position: relative; min-height: 100vh; align-content: end; padding-top: 140px; padding-bottom: 56px; pointer-events: none; }
+.hero-copy { grid-column: 1 / 9; position: relative; mix-blend-mode: difference; }
+.hero .kicker { margin-bottom: 26px; }
+.hero h1 { font-weight: 700; font-size: clamp(56px, 10.4vw, 176px); line-height: .86; letter-spacing: -.05em; text-transform: uppercase; }
+.legacy { position: absolute; right: -2%; bottom: 18%; font-family: var(--script); font-weight: 400; font-size: clamp(80px, 12vw, 210px); line-height: 1; color: #fff; transform: rotate(-8deg); pointer-events: none; mix-blend-mode: difference; }
+.legacy .te-mask { overflow: visible; }
+.legacy .te-inner { clip-path: inset(0 100% 0 0); transform: none; }
+.hero-sub { grid-column: 1 / 5; margin-top: 30px; font-size: 16px; line-height: 1.55; color: var(--dim); }
+.hud-corner { position: absolute; z-index: 2; display: grid; gap: 5px; pointer-events: none; mix-blend-mode: difference; }
+.hud-corner b { font-weight: 400; color: #fff; }
+.hud-corner.tr { top: 110px; right: var(--margin); text-align: right; color: var(--dim); }
+.hud-corner.br { bottom: 56px; right: var(--margin); text-align: right; color: var(--dim); }
+
+/* ─── Specs (sticky, scrubbed) ─── */
+.specs { position: relative; height: 340vh; }
+.specs-stage { position: sticky; top: 0; height: 100vh; pointer-events: none; }
+.specs-ui { position: absolute; inset: 0; align-content: space-between; padding-top: 120px; padding-bottom: 40px; mix-blend-mode: difference; }
+.specs h2 { grid-column: 1 / 7; font-weight: 700; font-size: clamp(40px, 5.4vw, 88px); line-height: .9; letter-spacing: -.04em; }
+.specs .lede { grid-column: 9 / 13; align-self: start; font-size: 15px; line-height: 1.55; color: var(--dim); }
+.readouts { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: end; }
+.group { display: grid; gap: 22px; opacity: 0; transform: translate3d(0, 24px, 0); will-change: transform, opacity; }
+.group.a { grid-column: 1 / 4; } .group.b { grid-column: 10 / 13; text-align: right; } .group.c { grid-column: 5 / 9; text-align: center; }
+.readout { border-top: 1px solid var(--line); padding-top: 12px; }
+.readout .val { display: flex; align-items: flex-end; gap: 6px; margin-top: 10px; font-weight: 700; font-size: clamp(34px, 3.6vw, 60px); letter-spacing: -.03em; line-height: 1; }
+.group.b .val { justify-content: flex-end; } .group.c .val { justify-content: center; }
+.readout .val small { font-family: var(--mono); font-weight: 400; font-size: 12px; letter-spacing: .04em; padding-bottom: .4em; }
+.scrub { grid-column: 1 / -1; margin-top: 34px; position: relative; height: 1px; background: var(--line); }
+.scrub i { position: absolute; inset: 0; background: #fff; transform-origin: left; transform: scaleX(0); will-change: transform; }
+.scrub em { position: absolute; top: 10px; transform: translateX(-50%); font-style: normal; color: var(--dim); transition: color .3s; }
+.scrub em.on { color: #fff; }
+.scrub em::before { content: ""; position: absolute; left: 50%; top: -14px; width: 1px; height: 7px; background: currentColor; }
+
+/* ─── Archive (normal flow) ─── */
+.archive { position: relative; padding-block: 170px 120px; background: var(--bg); }
+.archive h2 { grid-column: 1 / 9; font-weight: 700; font-size: clamp(48px, 7vw, 120px); line-height: .88; letter-spacing: -.05em; text-transform: uppercase; }
+.archive .note { grid-column: 9 / 13; align-self: end; font-size: 15px; line-height: 1.55; color: var(--dim); }
+.table { grid-column: 1 / -1; margin-top: 90px; border-top: 1px solid #fff; }
+.row { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); align-items: baseline; padding: 20px 0; border-bottom: 1px solid var(--line); }
+.row .c1 { grid-column: 1 / 2; color: var(--dim); } .row .c2 { grid-column: 2 / 6; font-weight: 600; font-size: 22px; letter-spacing: -.02em; }
+.row .c3 { grid-column: 6 / 9; color: var(--dim); } .row .c4 { grid-column: 9 / 11; color: var(--dim); }
+.row .c5 { grid-column: 11 / 13; justify-self: end; font-weight: 700; font-size: 30px; letter-spacing: -.03em; display: flex; align-items: flex-end; gap: 5px; }
+.row .c5 small { font-family: var(--mono); font-weight: 400; font-size: 11px; padding-bottom: .4em; }
+.footer { grid-column: 1 / -1; margin-top: 120px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; color: var(--dim); }
+.footer p { max-width: 44rem; text-transform: none; letter-spacing: .02em; }
+
+/* ─── Phones: simple flow, static canvas, stacked readouts ─── */
+@media (max-width: 768px) {
+  :root { --gap: 12px; --margin: 16px; }
+  .header { padding-block: 16px; align-items: center; }
+  .hcol.logo { flex: 1 1 auto; font-size: 18px; }
+  .hcol.mid { display: none; }
+  .hcol.status { flex: 1 1 auto; border-left: 0; padding-left: 0; }
+  .hcol.status [data-clock] { display: none; }
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  #gl { position: relative; inset: auto; width: 100%; height: 58vh; margin-top: 96px; }
+  #gl.off { opacity: 1; }
+  .hero { min-height: auto; padding-top: 0; }
+  .hero-copy, .hero-sub { grid-column: 1; }
+  .hero h1 { font-size: 15vw; }
+  .legacy { right: 0; bottom: 30%; font-size: 26vw; }
+  .hud-corner { display: none; }
+  .specs { height: auto; }
+  .specs-stage { position: relative; height: auto; }
+  .specs-ui { position: relative; padding: 90px var(--margin) 40px; row-gap: 24px; }
+  .specs h2, .specs .lede { grid-column: 1; }
+  .readouts { display: flex; flex-direction: column; align-items: stretch; gap: 22px; }
+  .group, .group.b, .group.c { text-align: left; }
+  .group.b .val, .group.c .val { justify-content: flex-start; }
+  .scrub { display: none; }
+  .archive { padding-block: 90px; }
+  .archive h2, .archive .note { grid-column: 1; }
+  .archive .note { margin-top: 18px; }
+  .row { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .row .c1 { grid-column: 1 / 2; } .row .c2 { grid-column: 2 / 7; font-size: 18px; }
+  .row .c3 { grid-column: 2 / 5; margin-top: 6px; } .row .c4 { display: none; } .row .c5 { grid-column: 5 / 7; font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) { .blink { animation: none; } }
+</style>
+</head>
+<body>
+<div class="pre" data-pre aria-hidden="true">
+  <p class="mono dim">A.V.N.G.R.S // Secure handshake</p>
+  <p class="pre-count" data-pre-count>000</p>
+  <div class="pre-bar"><i data-pre-bar></i></div>
+  <p class="mono dim pre-log" data-pre-log>Resolving</p>
+</div>
+<div class="grid-overlay grid" data-grid-overlay aria-hidden="true"></div>
+
+<header class="header">
+  <a href="#top" class="hcol logo" data-jump>A.V.N.G.R.S<sup>®</sup></a>
+  <div class="hcol mid mono"><span>Project Tachyon</span><span class="dim">Tactical Archive 2026</span></div>
+  <div class="hcol mid mono"><span>Core Telemetry</span><span class="dim">Sync <span data-sync>99.98</span>%</span></div>
+  <div class="hcol status mono"><span><span class="blink"></span>Status: Nominal</span><span class="dim" data-clock>00:00:00 UTC</span></div>
+</header>
+
+<main id="top">
+  <div data-gl-range>
+    <!-- 01 — Hero -->
+    <section class="hero grid" aria-label="Earth's mightiest data">
+      <canvas id="gl" aria-label="A 3D reactor core that tilts toward your cursor"></canvas>
+      <div class="hero-copy">
+        <p class="kicker mono dim">01 / Tactical Database — Core Asset 07</p>
+        <h1 data-te="lines">Earth's mightiest data</h1>
+        <p class="legacy" data-legacy aria-label="Legacy"><span class="te-mask"><span class="te-inner">Legacy</span></span></p>
+      </div>
+      <p class="hero-sub" data-te="words">A holo-terminal archive of the gear that held the line. Move your cursor — the core answers on its own springs.</p>
+      <div class="hud-corner tr mono"><span>ROT-Y <b data-yaw>+00.00°</b></span><span>ROT-X <b data-pitch>+00.00°</b></span><span>FRAMES <b data-frames>0</b></span></div>
+      <div class="hud-corner br mono"><span>LAT 40.7484° N</span><span>LON 73.9857° W</span></div>
+    </section>
+
+    <!-- 02 — Specs: scrubbed into wireframe -->
+    <section class="specs" data-specs aria-label="Technical specifications">
+      <div class="specs-stage">
+        <div class="specs-ui grid">
+          <h2 data-te="lines">Anatomy of a core.</h2>
+          <p class="lede" data-te="words">Scroll to strip the housing away. The render drops to wireframe as the scan passes through each layer.</p>
+          <div class="readouts">
+            <div class="group a" data-group="0">
+              <div class="readout mono"><span class="dim">Power output</span><div class="val"><span data-roll="3.00"></span><small>GJ/S</small></div></div>
+              <div class="readout mono"><span class="dim">Arc reactor cycles</span><div class="val"><span data-roll="8,640,000"></span></div></div>
+            </div>
+            <div class="group c" data-group="2">
+              <div class="readout mono"><span class="dim">Power level</span><div class="val"><span data-roll="9,001"></span><small>PL</small></div></div>
+            </div>
+            <div class="group b" data-group="1">
+              <div class="readout mono"><span class="dim">Vibranium frequency</span><div class="val"><span data-roll="97.4"></span><small>%</small></div></div>
+              <div class="readout mono"><span class="dim">Core temperature</span><div class="val"><span data-roll="1,280"></span><small>K</small></div></div>
+            </div>
+            <div class="scrub mono" aria-hidden="true"><i data-scrub></i><em style="left:12%">Solid</em><em style="left:45%">Scan</em><em style="left:78%">Wireframe</em></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 03 — Archive -->
+  <section class="archive grid" aria-label="Tactical archive">
+    <h2 data-te="lines">Tactical archive.</h2>
+    <p class="note" data-te="words">Every core logged since the first prototype. Values sampled at last contact.</p>
+    <div class="table">
+      <div class="row mono-row"><span class="c1 mono">01</span><span class="c2">Prototype cell</span><span class="c3 mono">Palladium · 2008</span><span class="c4 mono">Retired</span><span class="c5"><span data-roll="1.0"></span><small>GJ/S</small></span></div>
+      <div class="row"><span class="c1 mono">02</span><span class="c2">Chest unit II</span><span class="c3 mono">Palladium · 2010</span><span class="c4 mono">Retired</span><span class="c5"><span data-roll="1.6"></span><small>GJ/S</small></span></div>
+      <div class="row"><span class="c1 mono">03</span><span class="c2">New-element core</span><span class="c3 mono">Synthetic · 2012</span><span class="c4 mono">Archived</span><span class="c5"><span data-roll="2.4"></span><small>GJ/S</small></span></div>
+      <div class="row"><span class="c1 mono">04</span><span class="c2">Nano housing</span><span class="c3 mono">Nanite · 2018</span><span class="c4 mono">Archived</span><span class="c5"><span data-roll="2.9"></span><small>GJ/S</small></span></div>
+      <div class="row"><span class="c1 mono">05</span><span class="c2">Core asset 07</span><span class="c3 mono">Tachyon · 2026</span><span class="c4 mono">Active</span><span class="c5"><span data-roll="3.00"></span><small>GJ/S</small></span></div>
+    </div>
+    <footer class="footer mono">
+      <p>Fan concept for demonstration only. Not affiliated with or endorsed by Marvel or Disney. All 3D assets, data and artwork are original.</p>
+      <span>Press G for grid</span>
+    </footer>
+  </section>
+</main>
+
+<script type="module">
+/* ═════════════ Config ═════════════ */
+const CONFIG = {
+  model: { url: null, scale: 1 },   // optional Draco-compressed glTF to replace the procedural core
+  dracoDecoder: "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/libs/draco/gltf/",
+  exposure: 1.18,
+  leanDeg: { y: 15, x: 14 },
+  preloadMax: 4000,
+};
+
+/* ═════════════ Basics ═════════════ */
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const PHONE = () => innerWidth <= 768;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const clamp01 = (v) => Math.min(1, Math.max(0, v));
+const range = (p, a, b) => clamp01((p - a) / (b - a));
+const lerp = (a, b, t) => a + (b - a) * t;
+const DEG = Math.PI / 180;
+
+/* ═════════════ Shared ticker: Lenis first ═════════════ */
+let lenis = null;
+const subs = new Set();
+const onTick = (fn) => subs.add(fn);
+function tick(now) { requestAnimationFrame(tick); lenis?.raf(now); for (const fn of subs) fn(now); }
+
+/* ═════════════ Spring solver (mass · tension · friction · velocity) ═════════════ */
+const EASE = { linear: (t) => t, easeOutCubic: (t) => 1 - Math.pow(1 - t, 3), easeInOutCubic: (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2) };
+const moving = new Set();
+class Spring {
+  constructor(value = 0, config = {}) {
+    this.x = value; this.v = 0; this.to = value; this.from = value;
+    this.c = { tension: 170, friction: 26, mass: 1, precision: 0.001, ...config };
+    this.onChange = null; this.onRest = null; this.t0 = 0; this.last = 0;
+  }
+  get active() { return moving.has(this); }
+  start(to, { delay = 0, config } = {}) {
+    if (config) this.c = { ...this.c, ...config };
+    this.from = this.x; this.to = to; this.t0 = performance.now() + delay; this.last = 0;
+    moving.add(this); return this;
+  }
+  jump(x) { this.x = this.to = x; this.v = 0; moving.delete(this); this.onChange?.(x); }
+  step(now) {
+    if (now < this.t0) return;
+    const c = this.c;
+    if (c.duration !== undefined) {
+      const k = c.duration <= 0 ? 1 : clamp01((now - this.t0) / c.duration);
+      this.x = lerp(this.from, this.to, (c.easing || EASE.linear)(k)); this.onChange?.(this.x);
+      if (k >= 1) this.rest(); return;
+    }
+    const prev = this.last || now - 16.667; this.last = now;
+    const steps = Math.max(1, Math.ceil(Math.min(64, now - prev)));   // 1 ms explicit substeps
+    for (let i = 0; i < steps; i++) {
+      const a = (-c.tension * 1e-6 * (this.x - this.to) - c.friction * 1e-3 * this.v) / c.mass;
+      this.v += a; this.x += this.v;
+    }
+    const settled = Math.abs(this.v) < c.precision / 10 && Math.abs(this.x - this.to) < c.precision;
+    if (settled) { this.x = this.to; this.v = 0; }
+    this.onChange?.(this.x);
+    if (settled) this.rest();
+  }
+  rest() { moving.delete(this); this.onRest?.(this.x); }
+}
+onTick((now) => { for (const s of [...moving]) s.step(now); });
+const dur = (ms, e = "easeOutCubic") => ({ duration: ms, easing: EASE[e] });
+
+/* ═════════════ Inview (strict rootMargin) ═════════════ */
+const inview = (el, fn, rootMargin = "0px 0px -25% 0px") => {
+  const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); fn(); } }, { rootMargin });
+  io.observe(el);
+};
+
+/* ═════════════ TextEngine: lines or words, 110% → 0, 900ms easeOutCubic ═════════════ */
+const lineEngines = [];
+function textEngine(el, mode = "words") {
+  const text = el.textContent.replace(/\s+/g, " ").trim();
+  el.setAttribute("aria-label", text);
+  let springs = [], played = false;
+  const make = (inner) => { const s = new Spring(0, dur(900)); s.onChange = (v) => { inner.style.transform = `translate3d(0, ${lerp(110, 0, v).toFixed(2)}%, 0)`; }; return s; };
+  const build = () => {
+    el.textContent = "";
+    const words = text.split(" ");
+    if (mode === "words") {
+      springs = words.map((w, i) => {
+        if (i) el.append(" ");
+        const m = document.createElement("span"); m.className = "te-mask word"; m.setAttribute("aria-hidden", "true");
+        const inner = document.createElement("span"); inner.className = "te-inner"; inner.textContent = w;
+        m.append(inner); el.append(m); return make(inner);
+      });
+    } else {
+      // Measure where the browser breaks the line, then wrap each line in its own mask.
+      const probes = words.map((w, i) => { const s = document.createElement("span"); s.textContent = w + (i < words.length - 1 ? " " : ""); el.append(s); return s; });
+      const lines = [];
+      let top = null;
+      for (const p of probes) { if (top === null || Math.abs(p.offsetTop - top) > 4) { lines.push([]); top = p.offsetTop; } lines[lines.length - 1].push(p.textContent); }
+      el.textContent = "";
+      springs = lines.map((l) => {
+        const m = document.createElement("span"); m.className = "te-mask"; m.setAttribute("aria-hidden", "true");
+        const inner = document.createElement("span"); inner.className = "te-inner"; inner.textContent = l.join("").trim();
+        m.append(inner); el.append(m); return make(inner);
+      });
+    }
+    if (played) springs.forEach((s) => s.jump(1));
+  };
+  build();
+  const api = {
+    relayout: () => { if (mode === "lines") build(); },
+    play() { played = true; springs.forEach((s, i) => s.start(1, { delay: REDUCED ? 0 : i * (mode === "lines" ? 90 : 28), config: REDUCED ? dur(1) : undefined })); },
+  };
+  if (mode === "lines") lineEngines.push(api);
+  return api;
+}
+let rt0 = 0, lastW = innerWidth;
+addEventListener("resize", () => { if (innerWidth === lastW) return; lastW = innerWidth; clearTimeout(rt0); rt0 = setTimeout(() => lineEngines.forEach((e) => e.relayout()), 150); });
+document.fonts?.ready.then(() => lineEngines.forEach((e) => e.relayout()));
+const heroEngines = [];
+for (const el of $$("[data-te]")) {
+  const te = textEngine(el, el.dataset.te);
+  if (el.closest(".hero")) heroEngines.push(te); // hero plays after the preloader
+  else inview(el, te.play);
+}
+
+/* ═════════════ DigitRoll ═════════════ */
+function digitRoll(host, value) {
+  host.classList.add("dr"); host.setAttribute("aria-label", value);
+  const cols = [];
+  for (const ch of value) {
+    if (!/\d/.test(ch)) { const s = document.createElement("span"); s.className = "dr-lit"; s.textContent = ch; s.setAttribute("aria-hidden", "true"); host.append(s); continue; }
+    const col = document.createElement("span"); col.className = "dr-col"; col.setAttribute("aria-hidden", "true");
+    const stack = document.createElement("span");
+    for (let r = 0; r < 2; r++) for (let d = 0; d <= 9; d++) { const c = document.createElement("span"); c.textContent = d; stack.append(c); }
+    col.append(stack); host.append(col);
+    const s = new Spring(0, { tension: 95, friction: 24, precision: 0.002 });
+    s.onChange = (v) => { stack.style.transform = `translate3d(0, ${(-v / 20) * 100}%, 0)`; };
+    s.onChange(0);
+    cols.push({ s, target: 10 + +ch });
+  }
+  return { play: (extra = 0) => cols.forEach((c, i) => c.s.start(c.target, { delay: extra + i * 70 })), jump: () => cols.forEach((c) => c.s.jump(c.target)) };
+}
+const rolls = new Map();
+for (const el of $$("[data-roll]")) rolls.set(el, digitRoll(el, el.dataset.roll));
+// Archive numbers roll on entry; spec readouts roll when their progress trigger fires.
+for (const [el, r] of rolls) if (!el.closest("[data-group]")) (REDUCED ? r.jump() : inview(el, () => r.play()));
+
+/* ═════════════ Legacy script: a pen-stroke wipe ═════════════ */
+const legacyInner = $("[data-legacy] .te-inner");
+const legacy = new Spring(0, dur(1400, "easeInOutCubic"));
+legacy.onChange = (v) => { legacyInner.style.clipPath = `inset(-20% ${((1 - v) * 100).toFixed(2)}% -20% -5%)`; };
+legacy.onChange(0);
+
+/* ═════════════ Header clock + sync ═════════════ */
+{
+  const clock = $("[data-clock]"), sync = $("[data-sync]");
+  const upd = () => { const d = new Date(); clock.textContent = `${d.toISOString().slice(11, 19)} UTC`; sync.textContent = (99.9 + Math.random() * 0.09).toFixed(2); };
+  upd(); setInterval(upd, 1000);
+}
+
+/* ═════════════ Grid overlay (G) ═════════════ */
+{
+  const g = $("[data-grid-overlay]");
+  for (let i = 0; i < 12; i++) g.append(document.createElement("span"));
+  addEventListener("keydown", (e) => { if (e.key.toLowerCase() === "g" && !e.metaKey && !e.ctrlKey && !e.altKey) g.classList.toggle("on"); });
+}
+
+/* ═════════════ Pointer + lean springs (chassis, coils lag, core leads) ═════════════ */
+const pointer = { x: 0, y: 0 };
+const leanOn = () => !PHONE() && !REDUCED;
+const mk = (cfg) => ({ x: new Spring(0, { ...cfg, precision: 0.002 }), y: new Spring(0, { ...cfg, precision: 0.002 }) });
+const LEAN = { chassis: mk({ tension: 120, friction: 24, mass: 1.6 }), coils: mk({ tension: 60, friction: 12, mass: 2 }), core: mk({ tension: 230, friction: 20, mass: 0.8 }), bezel: mk({ tension: 90, friction: 18, mass: 1.8 }) };
+const leanSprings = Object.values(LEAN).flatMap((p) => [p.x, p.y]);
+addEventListener("pointermove", (e) => {
+  if (e.pointerType === "touch" || !leanOn()) return;
+  pointer.x = (e.clientX / innerWidth) * 2 - 1; pointer.y = (e.clientY / innerHeight) * 2 - 1;
+  for (const p of Object.values(LEAN)) { p.x.start(pointer.x); p.y.start(pointer.y); }
+}, { passive: true });
+
+/* ═════════════ Specs progress triggers ═════════════ */
+const specs = $("[data-specs]");
+const groups = $$("[data-group]").map((el) => {
+  const s = new Spring(0, { tension: 140, friction: 24 });
+  s.onChange = (v) => { el.style.opacity = v.toFixed(3); el.style.transform = `translate3d(0, ${((1 - v) * 24).toFixed(1)}px, 0)`; };
+  return { el, s, fired: false, rolls: $$("[data-roll]", el).map((r) => rolls.get(r)) };
+});
+const TRIGGERS = [0.12, 0.38, 0.62];
+const scrubBar = $("[data-scrub]"), scrubMarks = $$(".scrub em");
+let specsP = 0;
+const readSpecs = () => {
+  if (PHONE()) {
+    // Phones: no scrubbing — every group simply appears when it scrolls in.
+    groups.forEach((g) => { if (!g.fired && g.el.getBoundingClientRect().top < innerHeight * 0.85) { g.fired = true; g.s.start(1); g.rolls.forEach((r) => r.play(200)); } });
+    return;
+  }
+  const r = specs.getBoundingClientRect();
+  specsP = clamp01(-r.top / Math.max(1, r.height - innerHeight));
+  scrubBar.style.transform = `scaleX(${specsP.toFixed(4)})`;
+  scrubMarks.forEach((m, i) => m.classList.toggle("on", specsP >= [0.1, 0.45, 0.78][i]));
+  groups.forEach((g, i) => {
+    const on = specsP >= TRIGGERS[i];
+    if (on && !g.fired) { g.fired = true; g.s.start(1); g.rolls.forEach((r) => r.play(150)); }
+    if (!on && g.fired && specsP < TRIGGERS[i] - 0.06) { g.fired = false; g.s.start(0); }
+  });
+};
+addEventListener("scroll", readSpecs, { passive: true });
+
+/* ═════════════ The 3D stage ═════════════ */
+const stage = { ready: false, firstFrame: null };
+async function stage3D() {
+  const canvas = $("#gl");
+  const SPEC = { three: "three", draco: "three/addons/loaders/DRACOLoader.js", gltf: "three/addons/loaders/GLTFLoader.js" };
+  const THREE = await import(/* @vite-ignore */ SPEC.three);
+  const { DRACOLoader } = await import(/* @vite-ignore */ SPEC.draco);
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.NeutralToneMapping;
+  renderer.toneMappingExposure = CONFIG.exposure;
+  renderer.setClearColor(0x060606, 1);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+
+  // Environment baked from plain emissive planes (studio softboxes), black everywhere else.
+  {
+    const room = new THREE.Scene(); room.background = new THREE.Color(0);
+    const panel = (w, h, k, pos, color = 0xffffff) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(k), side: THREE.DoubleSide })); m.position.set(...pos); m.lookAt(0, 0, 0); room.add(m); };
+    panel(8, 3, 5, [0, 6, 3]); panel(1.2, 7, 6, [-6, 0, 3]); panel(1.2, 7, 6, [6, 0, 3]); panel(5, 2, 1.2, [0, -2, 7]); panel(3, 3, 1.5, [0, 0, -7], 0x9ff6ff);
+    const pm = new THREE.PMREMGenerator(renderer);
+    scene.environment = pm.fromScene(room, 0.03).texture; scene.environmentIntensity = 0.9; pm.dispose();
+  }
+  // Two rim lights, 60° off-axis behind the asset.
+  const rimA = new THREE.DirectionalLight(0xffffff, 3.4); rimA.position.set(-Math.sin(60 * DEG) * 6, 2.5, -Math.cos(60 * DEG) * 6);
+  const rimB = new THREE.DirectionalLight(0xe6fbff, 2.8); rimB.position.set(Math.sin(60 * DEG) * 6, -1.5, -Math.cos(60 * DEG) * 6);
+  scene.add(rimA, rimB);
+
+  let rig = buildCore(THREE);
+  scene.add(rig.root);
+  if (CONFIG.model.url) {
+    try {
+      const { GLTFLoader } = await import(/* @vite-ignore */ SPEC.gltf);
+      const gltf = await new GLTFLoader().setDRACOLoader(new DRACOLoader().setDecoderPath(CONFIG.dracoDecoder)).loadAsync(CONFIG.model.url);
+      scene.remove(rig.root);
+      const root = new THREE.Group(); gltf.scene.scale.setScalar(CONFIG.model.scale); root.add(gltf.scene);
+      const g = () => new THREE.Group();
+      rig = { root, parts: { coils: g(), core: g(), bezel: g() }, solids: [], wires: [] };
+      scene.add(root);
+    } catch (err) { console.warn("Model failed; keeping the procedural core.", err); }
+  }
+
+  // Draw on demand: only when a spring moves, the scroll changes, or the size changes.
+  let dirty = true, visible = true, frames = 0, heroP = 0, lastWire = -1;
+  const range_ = $("[data-gl-range]");
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting || PHONE(); canvas.classList.toggle("off", !visible); if (visible) dirty = true; }).observe(range_);
+  const resize = () => {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); dirty = true;
+  };
+  let rt = 0; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(resize, 120); }); resize();
+  addEventListener("scroll", () => {
+    if (PHONE()) return;
+    const r = $(".hero").getBoundingClientRect();
+    heroP = clamp01(-r.top / Math.max(1, r.height));
+    dirty = true;
+  }, { passive: true });
+
+  const yawEl = $("[data-yaw]"), pitchEl = $("[data-pitch]"), framesEl = $("[data-frames]");
+  const P = rig.parts;
+  const draw = () => {
+    const L = LEAN, Y = CONFIG.leanDeg.y * DEG, X = CONFIG.leanDeg.x * DEG;
+    const wire = PHONE() ? 0 : range(specsP, 0.18, 0.72);
+    // Chassis: rotateY(dx·15°) rotateX(−dy·14°); the scan turns it to three-quarter view.
+    rig.root.rotation.y = L.chassis.x.x * Y - wire * 0.7;
+    rig.root.rotation.x = L.chassis.y.x * X + wire * 0.25;
+    // Sub-assemblies lag or lead the chassis, and separate along z during the scan.
+    P.bezel.rotation.y = (L.bezel.x.x - L.chassis.x.x) * Y * 0.6;
+    P.bezel.rotation.x = (L.bezel.y.x - L.chassis.y.x) * X * 0.6;
+    P.coils.rotation.y = (L.coils.x.x - L.chassis.x.x) * Y * 0.9;
+    P.coils.rotation.x = (L.coils.y.x - L.chassis.y.x) * X * 0.9;
+    P.coils.rotation.z = (L.coils.x.x - L.chassis.x.x) * 0.5;
+    P.core.position.x = (L.core.x.x - L.chassis.x.x) * 0.06;
+    P.core.position.y = -(L.core.y.x - L.chassis.y.x) * 0.06;
+    P.coils.position.z = wire * 0.45; P.core.position.z = 0.1 + wire * 0.95; P.bezel.position.z = -wire * 0.35;
+    if (Math.abs(wire - lastWire) > 1e-4) { lastWire = wire; rig.setWire(wire); }
+    // Hero: asset sits right of the headline; specs: centred.
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    const shift = PHONE() ? 0 : -0.2 * w * (1 - heroP);
+    camera.setViewOffset(w, h, shift, 0, w, h);
+    camera.position.set(0, 0, PHONE() ? 8.8 : lerp(7.4, 8.4, heroP));
+    camera.lookAt(0, 0, 0);
+    renderer.render(scene, camera);
+    frames++;
+    const sg = (v) => (v >= 0 ? "+" : "") + v.toFixed(2).padStart(5, "0") + "°";
+    yawEl.textContent = sg(rig.root.rotation.y / DEG); pitchEl.textContent = sg(rig.root.rotation.x / DEG); framesEl.textContent = frames;
+  };
+  onTick(() => {
+    if (!visible) return;                                       // scrolled away: frozen
+    if (!dirty && !leanSprings.some((s) => s.active)) return;   // settled: frozen
+    dirty = false; draw();
+  });
+  draw();
+  stage.ready = true;
+  window.__stage = { get frames() { return frames; } };
+}
+
+/* ═════════════ Procedural reactor core (original design) ═════════════ */
+function buildCore(THREE) {
+  const titanium = new THREE.MeshPhysicalMaterial({ color: 0xa3abb0, metalness: 1, roughness: 0.22, clearcoat: 0.4, clearcoatRoughness: 0.25 });
+  const graphite = new THREE.MeshPhysicalMaterial({ color: 0x16181a, metalness: 0.85, roughness: 0.35, clearcoat: 0.5 });
+  const copper = new THREE.MeshPhysicalMaterial({ color: 0xb8733f, metalness: 1, roughness: 0.3 });
+  const glass = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0, roughness: 0.04, transmission: 1, thickness: 0.3, ior: 1.45, clearcoat: 1, transparent: true });
+  const glow = new THREE.MeshBasicMaterial({ color: 0x7ff3ff, toneMapped: false, transparent: true });
+  const glowSoft = new THREE.MeshBasicMaterial({ color: 0x2fd8ee, toneMapped: false, transparent: true, opacity: 0.6 });
+  const solids = [];
+  const add = (parent, geo, mat, pos = [0, 0, 0], rot = [0, 0, 0]) => { const m = new THREE.Mesh(geo, mat); m.position.set(...pos); m.rotation.set(...rot); parent.add(m); solids.push(m); return m; };
+  const root = new THREE.Group();
+  const bezel = new THREE.Group(), coils = new THREE.Group(), core = new THREE.Group();
+  root.add(bezel, coils, core);
+  // Housing: a lathe profile around z.
+  const prof = [[1.18, -0.2], [1.74, -0.2], [1.84, -0.06], [1.84, 0.12], [1.66, 0.22], [1.52, 0.12], [1.22, 0.1], [1.18, -0.2]].map(([r, z]) => new THREE.Vector2(r, z));
+  add(bezel, new THREE.LatheGeometry(prof, 160), graphite, [0, 0, 0], [Math.PI / 2, 0, 0]);
+  add(bezel, new THREE.TorusGeometry(1.6, 0.05, 16, 160), titanium, [0, 0, 0.2]);
+  add(bezel, new THREE.TorusGeometry(1.82, 0.03, 12, 160), titanium, [0, 0, 0.1]);
+  for (let i = 0; i < 20; i++) { const a = (i / 20) * Math.PI * 2; add(bezel, new THREE.CylinderGeometry(0.035, 0.035, 0.06, 12), titanium, [Math.cos(a) * 1.72, Math.sin(a) * 1.72, 0.19], [Math.PI / 2, 0, 0]); }
+  add(bezel, new THREE.CircleGeometry(1.2, 96), graphite, [0, 0, -0.18]);
+  // Coil ring: ten copper-wound pods.
+  for (let i = 0; i < 10; i++) {
+    const a = (i / 10) * Math.PI * 2;
+    const pod = new THREE.Group(); pod.position.set(Math.cos(a) * 1.0, Math.sin(a) * 1.0, 0); pod.rotation.z = a; coils.add(pod);
+    add(pod, new THREE.BoxGeometry(0.32, 0.24, 0.16), graphite);
+    for (let k = 0; k < 6; k++) add(pod, new THREE.TorusGeometry(0.13, 0.018, 8, 20), copper, [-0.12 + k * 0.048, 0, 0], [0, Math.PI / 2, 0]);
+  }
+  add(coils, new THREE.TorusGeometry(1.0, 0.012, 8, 160), glowSoft, [0, 0, 0.1]);
+  // Inner ring, spokes and the socket.
+  add(core, new THREE.TorusGeometry(0.66, 0.06, 16, 120), titanium);
+  add(core, new THREE.TorusGeometry(0.58, 0.014, 8, 120), glow, [0, 0, 0.04]);
+  for (let i = 0; i < 10; i++) { const a = (i / 10) * Math.PI * 2 + Math.PI / 10; add(core, new THREE.BoxGeometry(0.34, 0.03, 0.03), titanium, [Math.cos(a) * 0.82, Math.sin(a) * 0.82, 0], [0, 0, a]); }
+  add(core, new THREE.CylinderGeometry(0.5, 0.5, 0.1, 6), graphite, [0, 0, -0.08], [Math.PI / 2, 0, Math.PI / 6]);
+  // The light itself, under a glass lens.
+  add(core, new THREE.CylinderGeometry(0.4, 0.4, 0.08, 64), glow, [0, 0, 0], [Math.PI / 2, 0, 0]);
+  add(core, new THREE.TorusGeometry(0.44, 0.03, 12, 64), titanium, [0, 0, 0.04]);
+  add(core, new THREE.SphereGeometry(0.44, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2.6), glass, [0, 0, 0.02], [Math.PI / 2, 0, 0]);
+  // Wireframe twins for the scan.
+  const wireMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 });
+  const wires = solids.map((m) => { const l = new THREE.LineSegments(new THREE.WireframeGeometry(m.geometry), wireMat); m.add(l); l.visible = false; return l; });
+  solids.forEach((m) => { m.material.transparent = true; });
+  const setWire = (w) => {
+    wireMat.opacity = w * 0.55;
+    wires.forEach((l) => { l.visible = w > 0.001; });
+    // Fade the materials, never the meshes: the wireframe twins are children and must stay visible.
+    for (const m of solids) { const mat = m.material; const base = mat.userData.base ?? (mat.userData.base = mat.opacity); mat.opacity = base * (1 - w); mat.visible = w < 0.999; mat.depthWrite = w < 0.5; }
+  };
+  root.rotation.set(0, 0, 0);
+  return { root, parts: { bezel, coils, core }, setWire };
+}
+
+/* ═════════════ Anchors ═════════════ */
+$$("[data-jump]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); lenis ? lenis.scrollTo(0, { duration: 1.4 }) : scrollTo({ top: 0, behavior: "smooth" }); }));
+
+/* ═════════════ Boot: preloader holds Lenis until fonts + 3D are ready ═════════════ */
+(async () => {
+  try { const L = "lenis"; const { default: Lenis } = await import(/* @vite-ignore */ L); lenis = new Lenis({ lerp: 0.085, smoothWheel: true }); window.lenis = lenis; } catch { lenis = null; }
+  lenis?.stop();
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  scrollTo(0, 0);
+  requestAnimationFrame(tick);
+  const pre = $("[data-pre]"), count = $("[data-pre-count]"), bar = $("[data-pre-bar]"), log = $("[data-pre-log]");
+  let done = 0; const total = 2;
+  const mark = (label) => { done++; log.textContent = label; };
+  const fonts = (document.fonts?.ready ?? Promise.resolve()).then(() => mark("Fonts linked"));
+  const gl = stage3D().then(() => mark("Core asset online")).catch((err) => { console.warn("3D unavailable:", err); mark("Core asset offline"); $("#gl").style.background = "radial-gradient(40% 40% at 70% 50%, rgba(127,243,255,.15), transparent 70%), #060606"; });
+  const shown = new Spring(0, { tension: 120, friction: 26 });
+  shown.onChange = (v) => { count.textContent = String(Math.round(v * 100)).padStart(3, "0"); bar.style.transform = `scaleX(${v.toFixed(4)})`; };
+  const t0 = performance.now();
+  await new Promise((res) => {
+    const poll = () => {
+      const target = Math.max(done / total, Math.min(1, (performance.now() - t0) / CONFIG.preloadMax));
+      if (Math.abs(shown.to - target) > 0.001) shown.start(target);
+      if (target >= 1 && shown.x > 0.995) return res();
+      setTimeout(poll, 50);
+    };
+    poll();
+  });
+  void fonts; void gl;
+  // Reveal: the panel wipes upward.
+  const wipe = new Spring(0, dur(1000, "easeInOutCubic"));
+  wipe.onChange = (v) => { pre.style.clipPath = `inset(0 0 ${(v * 100).toFixed(2)}% 0)`; };
+  wipe.onRest = () => pre.remove();
+  wipe.start(1);
+  lenis?.start();
+  setTimeout(() => { heroEngines.forEach((e, i) => e.play(i * 120)); legacy.start(1, { delay: REDUCED ? 0 : 700 }); }, 350);
+  readSpecs();
+})();
+</script>
+</body>
+</html>
