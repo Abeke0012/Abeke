@@ -397,7 +397,9 @@ const lerp = (a, b, t) => a + (b - a) * t;
 const bell = (t) => Math.sin(Math.PI * clamp01(t));
 const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const asset = (f) => CONFIG.assets + f;
+// A standalone build carries the media inline (window.__INLINE_ASSETS__, data URIs), so one file works anywhere.
+const INLINE = window.__INLINE_ASSETS__ || {};
+const asset = (f) => INLINE[f] || CONFIG.assets + f;
 document.title = CONFIG.title;
 
 /* Missing assets: one accent banner, and the page falls back to gradients. */
@@ -550,14 +552,17 @@ const byId = Object.fromEntries(chapters.map((c) => [c.ch.id, c]));
 
 const allVideos = [];
 function attachVideo(v, file) {
-  if (v.el.getAttribute("src")) return;
+  if (v.attached) return;
+  v.attached = true;
   v.el.addEventListener("loadedmetadata", () => {
     v.ready = true;
     // iOS paints seeks only after one play(); pause straight away.
     const p = v.el.play(); if (p?.then) p.then(() => v.el.pause()).catch(() => {});
   }, { once: true });
   v.el.addEventListener("error", () => { v.failed = true; reportMissing(file); }, { once: true });
-  v.el.src = asset(file);
+  // Inline clips play from blob URLs: seeking a blob is instant, seeking a data URI is not.
+  if (INLINE[file]) fetch(INLINE[file]).then((r) => r.blob()).then((b) => { v.el.src = URL.createObjectURL(b); });
+  else v.el.src = asset(file);
   allVideos.push(v);
 }
 function enableCinematic() {
