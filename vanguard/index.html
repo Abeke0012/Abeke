@@ -1,0 +1,974 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VANGUARD — Build the impossible.</title>
+<meta name="description" content="VANGUARD Initiative. Three operatives — Halcyon, Stratos, Wraith. Build the impossible.">
+<meta name="theme-color" content="#050505">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,600;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": { "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.mjs" } }
+</script>
+<style>
+@property --accent { syntax: "<color>"; inherits: true; initial-value: #2EF2E0; }
+@property --draw { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+:root {
+  --bg: #050505;
+  --fg: #F2F2F2;
+  --muted: #8A8A8A;
+  --line: rgba(255, 255, 255, .12);
+  --accent: #2EF2E0;
+  --gutter: 40px;
+  --ease: cubic-bezier(.16, 1, .3, 1);
+  --head: "Inter Tight", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  transition: --accent .8s var(--ease);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--fg); }
+body { font-family: var(--head); font-weight: 600; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+img, video { display: block; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.mono { font-family: var(--mono); font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: .16em; }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); padding-inline: var(--gutter); }
+:focus-visible { outline: 1px solid var(--accent); outline-offset: 4px; }
+
+/* ─── Global overlays ─── */
+.grain { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 60; pointer-events: none; opacity: .06; mix-blend-mode: overlay; }
+.vignette { position: fixed; inset: 0; z-index: 59; pointer-events: none; background: radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(0,0,0,.65) 100%); }
+.banner { position: fixed; left: 0; right: 0; bottom: 0; z-index: 200; display: none; padding: 6px var(--gutter); background: var(--accent); color: #050505; font-family: var(--mono); font-size: 11px; letter-spacing: .12em; line-height: 1.6; }
+.banner.on { display: block; }
+
+/* ─── Header ─── */
+.header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 64px; padding-inline: var(--gutter); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; mix-blend-mode: difference; color: #fff; }
+.brand { white-space: nowrap; }
+.nav { display: flex; gap: 40px; }
+.roll { position: relative; display: inline-block; overflow: hidden; height: 1.3em; line-height: 1.3em; }
+.roll span { display: block; transition: transform .5s var(--ease); }
+.roll span + span { position: absolute; left: 0; top: 100%; }
+.roll:hover span, .roll:focus-visible span { transform: translateY(-100%); }
+.pill { justify-self: end; display: inline-flex; align-items: center; height: 36px; padding: 0 18px; border: 1px solid var(--accent); border-radius: 999px; transition: background-color .3s, color .3s; }
+.pill:hover { background: var(--accent); color: #050505; }
+.hudrow { position: fixed; top: 64px; left: 0; right: 0; z-index: 100; height: 30px; padding-inline: var(--gutter); display: flex; align-items: center; justify-content: space-between; gap: 16px; border-top: 1px solid var(--line); color: #fff; mix-blend-mode: difference; }
+.live { display: inline-flex; align-items: center; gap: 10px; }
+.pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 0 var(--accent); animation: pulse 1.6s ease-out infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 70%, transparent); } 100% { box-shadow: 0 0 0 10px transparent; } }
+.hud-right { display: flex; align-items: center; gap: 18px; }
+.hudrow .short { display: none; }
+.hudrow, .hudrow button { white-space: nowrap; }
+.sound { display: inline-flex; align-items: center; gap: 10px; }
+.eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 10px; width: 14px; opacity: .35; }
+.eq i { width: 2px; height: 30%; background: currentColor; }
+.sound.on .eq { opacity: 1; }
+.sound.on .eq i { animation: eq .9s ease-in-out infinite alternate; }
+.sound.on .eq i:nth-child(2) { animation-delay: -.3s; } .sound.on .eq i:nth-child(3) { animation-delay: -.6s; } .sound.on .eq i:nth-child(4) { animation-delay: -.15s; } .sound.on .eq i:nth-child(5) { animation-delay: -.45s; }
+@keyframes eq { from { height: 20%; } to { height: 100%; } }
+.cine { display: none; padding: 2px 8px; border: 1px solid var(--accent); border-radius: 999px; }
+
+/* ─── Preloader ─── */
+.pre { position: fixed; inset: 0; z-index: 300; pointer-events: auto; }
+.pre-half { position: absolute; left: 0; right: 0; height: 50.2%; background: #050505; transition: transform 1.1s var(--ease); }
+.pre-half.top { top: 0; } .pre-half.bot { bottom: 0; }
+.pre.open .pre-half.top { transform: translateY(-100%); }
+.pre.open .pre-half.bot { transform: translateY(100%); }
+.pre-core { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 18px; transition: opacity .3s; }
+.pre.open .pre-core { opacity: 0; }
+.pre-count { font-family: var(--mono); font-size: 44px; font-weight: 500; letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+.pre-line { width: min(320px, 60vw); height: 1px; background: var(--line); overflow: hidden; }
+.pre-line i { display: block; height: 100%; background: var(--accent); transform-origin: left; transform: scaleX(0); }
+
+/* ─── Chapters ─── */
+.chapter { position: relative; height: 400vh; }
+.stage { position: sticky; top: 0; height: 100vh; overflow: hidden; background: #050505; }
+.stage .fallback { position: absolute; inset: 0; background: radial-gradient(60% 55% at 70% 45%, color-mix(in srgb, var(--c) 30%, transparent), transparent 70%), radial-gradient(80% 70% at 20% 90%, color-mix(in srgb, var(--c) 12%, transparent), transparent 70%), #050505; }
+.media { position: absolute; inset: 0; }
+.media img, .media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.media .poster { transform-origin: 60% 45%; will-change: transform; }
+.media video { opacity: 0; }
+.shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(0deg, rgba(5,5,5,.9) 0%, rgba(5,5,5,.35) 35%, transparent 60%), linear-gradient(90deg, rgba(5,5,5,.55), transparent 45%); }
+.flash { position: absolute; inset: 0; opacity: 0; pointer-events: none; z-index: 2; }
+.flash.bolt { background: #fff; mix-blend-mode: screen; }
+.flash.bolt.on { animation: bolt .18s linear 1; }
+@keyframes bolt { 0% { opacity: 0; } 35% { opacity: .85; } 100% { opacity: 0; } }
+
+.hud { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.corner { position: absolute; width: 16px; height: 16px; border: 0 solid var(--c); }
+.corner.tl { top: 108px; left: var(--gutter); border-top-width: 1px; border-left-width: 1px; }
+.corner.tr { top: 108px; right: var(--gutter); border-top-width: 1px; border-right-width: 1px; }
+.corner.bl { bottom: 24px; left: var(--gutter); border-bottom-width: 1px; border-left-width: 1px; }
+.corner.br { bottom: 24px; right: var(--gutter); border-bottom-width: 1px; border-right-width: 1px; }
+.dossier { position: absolute; top: 136px; left: calc(var(--gutter) + 28px); display: grid; gap: 6px; }
+.dossier b { font-weight: 500; color: var(--c); }
+.dossier span { color: var(--muted); }
+.rail { position: absolute; right: calc(var(--gutter) + 6px); top: 30%; height: 40%; width: 1px; background: var(--line); }
+.rail i { position: absolute; inset: 0; background: var(--c); transform-origin: top; transform: scaleY(0); box-shadow: 0 0 10px var(--c); }
+.rail small { position: absolute; top: -26px; right: -4px; color: var(--muted); }
+.rail em { position: absolute; bottom: -26px; right: -4px; font-style: normal; color: var(--c); }
+.coords { position: absolute; left: calc(var(--gutter) + 28px); bottom: 30px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.copy { position: absolute; left: var(--gutter); bottom: 70px; z-index: 5; width: min(75vw, 1100px); pointer-events: none; }
+.headline { position: absolute; left: 0; bottom: 0; font-size: min(9vw, 150px); font-weight: 800; letter-spacing: -0.04em; line-height: .9; white-space: nowrap; }
+.headline .line { display: block; overflow: hidden; padding-bottom: .06em; margin-bottom: -.06em; }
+.headline .line > span { display: inline-block; transform: translateY(110%); transition: transform .9s var(--ease), filter .9s var(--ease), opacity .9s var(--ease); transition-delay: calc(var(--i) * 90ms); }
+.headline .line .acc { color: var(--c); }
+.headline.in .line > span { transform: translateY(0); }
+.headline.out .line > span { transform: translateY(-110%); filter: blur(8px); opacity: 0; transition-duration: .6s; }
+.headline.zap { animation: zap .18s steps(2) 1; }
+@keyframes zap { 0% { transform: translate(2px, 0); text-shadow: -2px 0 var(--c), 2px 0 #fff; } 50% { transform: translate(-2px, 0); text-shadow: 2px 0 var(--c), -2px 0 #fff; } 100% { transform: none; text-shadow: none; } }
+
+.cards { position: absolute; right: calc(var(--gutter) + 56px); top: 18vh; width: min(360px, 30vw); z-index: 4; perspective: 900px; }
+.qcard { position: relative; margin-bottom: 26px; padding: 22px 24px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.06); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  opacity: 0; will-change: transform, opacity; transform-style: preserve-3d; }
+.qcard:nth-child(2) { margin-left: -60px; }
+.qcard .idx { color: var(--c); }
+.qcard q { display: block; margin-top: 12px; font-style: italic; font-weight: 400; font-size: 20px; line-height: 1.35; letter-spacing: -0.01em; quotes: "“" "”"; }
+.qcard .sig { display: block; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); }
+
+.stats { position: absolute; right: calc(var(--gutter) + 56px); bottom: 40px; z-index: 4; display: flex; gap: 36px; opacity: 0; transform: translateY(16px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+.stats.on { opacity: 1; transform: none; }
+.stat b { display: block; font-size: 38px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+.stat b small { font-size: 14px; font-weight: 600; margin-left: 4px; color: var(--c); letter-spacing: 0; }
+.stat > span { display: block; margin-top: 8px; color: var(--muted); }
+/* Digit roll */
+.dr { display: inline-flex; overflow: hidden; height: 1em; line-height: 1; vertical-align: bottom; }
+.dr-col { display: inline-block; height: 1em; overflow: hidden; }
+.dr-col > span { display: flex; flex-direction: column; transition: transform 1.1s var(--ease); transition-delay: calc(var(--d) * 80ms); }
+.dr-col > span > span { height: 1em; }
+
+/* Crosshair */
+.xhair { position: fixed; left: 0; top: 0; z-index: 50; width: 44px; height: 44px; margin: -22px 0 0 -22px; pointer-events: none; opacity: 0; transition: opacity .3s; }
+.xhair.on { opacity: 1; }
+.xhair::before, .xhair::after { content: ""; position: absolute; background: var(--accent); }
+.xhair::before { left: 50%; top: 0; bottom: 0; width: 1px; }
+.xhair::after { top: 50%; left: 0; right: 0; height: 1px; }
+.xhair i { position: absolute; inset: 12px; border: 1px solid var(--accent); border-radius: 50%; }
+.xhair small { position: absolute; left: 52px; top: 14px; white-space: nowrap; color: var(--accent); }
+
+/* Transitions */
+.smoke { position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: 0; visibility: hidden; mix-blend-mode: screen; }
+.smoke video { width: 100%; height: 100%; object-fit: cover; }
+.smoke .fog { position: absolute; inset: -20%; background: radial-gradient(30% 30% at 30% 40%, #fff, transparent 70%), radial-gradient(35% 35% at 70% 55%, #eee, transparent 70%), radial-gradient(40% 30% at 50% 80%, #ddd, transparent 70%); filter: blur(30px); display: none; }
+.smoke.fallback .fog { display: block; }
+.smoke.fallback video { display: none; }
+.glitch { position: fixed; inset: 0; z-index: 45; width: 100%; height: 100%; pointer-events: none; opacity: 0; }
+
+/* ─── Persona ─── */
+.persona { position: relative; height: 260vh; --c: #FFB020; }
+.persona-stage { position: sticky; top: 0; height: 100vh; display: grid; align-items: center; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); padding: 110px var(--gutter) 40px; }
+.pcard { grid-column: 2 / 6; position: relative; height: min(72vh, 680px); border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: #0b0b0b; }
+.pcard .locked { position: absolute; inset: 0; display: grid; place-items: center; background: repeating-linear-gradient(0deg, rgba(255,176,32,.07) 0 1px, transparent 1px 4px), radial-gradient(60% 50% at 70% 45%, rgba(255,176,32,.14), transparent 70%), #0a0806; }
+.pcard .locked span { color: var(--c); opacity: .7; transform: translateX(25%); }
+/* The portrait is shown colour-true; the scanner only moves the clip edge. */
+.pcard img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0); will-change: clip-path; }
+.pcard .scanner { position: absolute; top: 0; bottom: 0; left: 0; width: 2px; background: var(--c); box-shadow: 0 0 18px var(--c), 0 0 40px var(--c); will-change: transform; }
+.pcard .tag { position: absolute; top: 16px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 4px; background: rgba(5,5,5,.55); }
+.pcard .tag.l { left: 16px; } .pcard .tag.r { right: 16px; color: var(--c); opacity: 0; transition: opacity .5s; }
+.pcard.unmasked .tag.r { opacity: 1; }
+.ptext { grid-column: 7 / 12; }
+.ptext .mono { color: var(--c); }
+.ptext h2 { margin-top: 18px; font-size: min(6vw, 96px); font-weight: 800; letter-spacing: -0.04em; line-height: .9; }
+.ptext p { margin-top: 24px; max-width: 30rem; color: #cfcfcf; font-weight: 400; font-size: 18px; line-height: 1.5; }
+.spec { margin-top: 34px; display: grid; gap: 16px; max-width: 30rem; }
+.spec-row { display: grid; grid-template-columns: 110px 1fr 40px; align-items: center; gap: 16px; }
+.spec-row span:first-child { color: var(--muted); }
+.spec-row b { font-family: var(--mono); font-weight: 500; font-size: 13px; text-align: right; color: var(--c); }
+.bar { height: 2px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--c); transform-origin: left; transform: scaleX(0); transition: transform 1.4s var(--ease); transition-delay: calc(var(--d) * 120ms); }
+.spec.on .bar i { transform: scaleX(var(--v)); }
+
+/* ─── Roster ─── */
+.roster { position: relative; padding: 160px var(--gutter) 140px; }
+.roster h2 { font-size: min(15vw, 240px); font-weight: 800; letter-spacing: -0.05em; line-height: .85; }
+.roster h2 .ch { display: inline-block; opacity: 0; transform: translateY(40%); filter: blur(10px); transition: opacity .8s var(--ease), transform .8s var(--ease), filter .8s var(--ease); transition-delay: calc(var(--i) * 45ms); }
+.roster h2.on .ch { opacity: 1; transform: none; filter: none; }
+.roster-sub { margin-top: 20px; color: var(--muted); }
+.rcards { margin-top: 70px; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gutter); }
+.rcard { position: relative; height: min(68vh, 620px); border-radius: 12px; perspective: 900px; cursor: pointer; }
+.rcard-in { position: absolute; inset: 0; border-radius: 12px; overflow: hidden; background: radial-gradient(60% 50% at 50% 40%, color-mix(in srgb, var(--c) 25%, transparent), #0a0a0a 70%); transform-style: preserve-3d; transition: transform .6s var(--ease); will-change: transform; }
+.rcard img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(.75); transition: filter .6s var(--ease), transform .8s var(--ease); }
+.rcard:hover img { filter: none; transform: scale(1.04); }
+.rcard-in::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(5,5,5,.85), transparent 55%); }
+/* Accent border that draws itself clockwise */
+.rcard-in::before { content: ""; position: absolute; inset: 0; z-index: 2; border-radius: 12px; padding: 1px; pointer-events: none;
+  background: conic-gradient(from 0deg, var(--c) var(--draw), transparent var(--draw));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  transition: --draw .9s var(--ease); box-shadow: 0 0 30px color-mix(in srgb, var(--c) 30%, transparent); }
+.rcard:hover .rcard-in::before, .rcard:focus-visible .rcard-in::before { --draw: 360deg; }
+.rmeta { position: absolute; left: 24px; right: 24px; bottom: 24px; z-index: 3; }
+.rmeta .mono { color: var(--c); }
+.rmeta h3 { margin-top: 10px; font-size: 44px; font-weight: 800; letter-spacing: -0.04em; line-height: .9; }
+.rmeta .open { display: block; margin-top: 14px; opacity: 0; transform: translateY(8px); transition: opacity .4s var(--ease), transform .4s var(--ease); }
+.rcard:hover .open, .rcard:focus-visible .open { opacity: 1; transform: none; }
+.rcard .rnum { position: absolute; top: 20px; left: 24px; z-index: 3; color: var(--muted); }
+
+/* ─── Finale & footer ─── */
+.finale { min-height: 100vh; display: grid; place-items: center; text-align: center; padding: 120px var(--gutter); background: #050505; }
+.finale h2 { font-size: min(11vw, 180px); font-weight: 800; letter-spacing: -0.05em; line-height: .9; }
+.finale h2 span { display: block; animation: cycle 6s linear infinite; }
+.finale h2 span:nth-child(2) { animation-delay: -2s; }
+@keyframes cycle { 0%, 100% { color: #2EF2E0; } 33% { color: #9B6BFF; } 66% { color: #FFB020; } }
+.magnet { display: inline-flex; align-items: center; justify-content: center; margin-top: 56px; height: 64px; padding: 0 34px; border-radius: 999px; background: var(--fg); color: #050505; font-family: var(--mono); font-size: 13px; font-weight: 500; letter-spacing: .14em; will-change: transform; transition: background-color .3s; }
+.magnet:hover { background: var(--accent); }
+.footer { padding: 60px var(--gutter) 28px; border-top: 1px solid var(--line); overflow: hidden; }
+.wordmark { font-size: 18.4vw; font-weight: 800; letter-spacing: -0.05em; line-height: .8; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.35); white-space: nowrap; }
+.foot-row { margin-top: 36px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; color: var(--muted); }
+.foot-row nav { display: flex; gap: 24px; }
+.foot-row a:hover { color: var(--fg); }
+
+/* ─── Mobile ─── */
+@media (max-width: 767.98px) {
+  :root { --gutter: 16px; }
+  .header { grid-template-columns: 1fr auto; }
+  .nav { display: none; }
+  .brand { font-size: 10px; letter-spacing: .12em; }
+  .hudrow { font-size: 10px; }
+  .track-label { display: none; }
+  .hudrow { font-size: 10px; letter-spacing: .1em; gap: 10px; }
+  .hudrow .long { display: none; }
+  .hudrow .short { display: inline; }
+  .hud-right { gap: 10px; }
+  .cine { display: inline-block; }
+  .headline { font-size: 13vw; }
+  .copy { bottom: auto; top: 30vh; width: calc(100vw - 32px); }
+  .headline { bottom: auto; top: 0; }
+  .cards { left: var(--gutter); right: var(--gutter); top: auto; bottom: 96px; width: auto; }
+  .qcard { margin: 0 0 10px; padding: 14px 16px; }
+  .qcard:nth-child(2) { margin-left: 0; }
+  .qcard q { font-size: 15px; margin-top: 8px; }
+  .qcard .sig { margin-top: 10px; padding-top: 8px; }
+  .stats { left: var(--gutter); right: var(--gutter); bottom: 44px; gap: 18px; justify-content: space-between; }
+  .stat b { font-size: 22px; }
+  .stat > span { font-size: 9px; letter-spacing: .1em; }
+  .rail, .coords { display: none; }
+  .dossier { top: 124px; }
+  .persona { height: 220vh; }
+  .persona-stage { grid-template-columns: 1fr; align-content: center; gap: 22px; padding-top: 104px; }
+  .pcard { grid-column: 1; height: 42vh; }
+  .ptext { grid-column: 1; }
+  .ptext h2 { font-size: 11vw; margin-top: 10px; }
+  .ptext p { font-size: 15px; margin-top: 12px; }
+  .spec { margin-top: 18px; gap: 10px; }
+  .rcards { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 14px; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); scrollbar-width: none; }
+  .rcards::-webkit-scrollbar { display: none; }
+  .rcard { flex: 0 0 78vw; height: 60vh; scroll-snap-align: center; }
+  .rcard .open { opacity: 1; transform: none; }
+  .xhair { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .headline .line > span { transform: none; opacity: 0; transition: opacity .6s; }
+  .headline.in .line > span { opacity: 1; }
+  .headline.out .line > span { transform: none; filter: none; opacity: 0; }
+  .roster h2 .ch { transform: none; filter: none; }
+  .finale h2 span, .pulse, .eq i { animation: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="banner" data-banner role="alert"></div>
+<canvas class="grain" data-grain aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+
+<div class="pre" data-pre aria-hidden="true">
+  <div class="pre-half top"></div><div class="pre-half bot"></div>
+  <div class="pre-core"><p class="mono" data-pre-label></p><p class="pre-count" data-pre-count>000</p><div class="pre-line"><i data-pre-line></i></div></div>
+</div>
+
+<header class="header" data-header></header>
+<div class="hudrow" data-hudrow></div>
+
+<main id="top" data-main></main>
+
+<div class="smoke" data-smoke aria-hidden="true"><video muted playsinline preload="auto"></video><div class="fog"></div></div>
+<canvas class="glitch" data-glitch aria-hidden="true"></canvas>
+<div class="xhair" data-xhair aria-hidden="true"><i></i><small class="mono" data-xhair-label></small></div>
+
+<script type="module">
+/* ═════════════════════════════════════════════════════════════════
+   CONFIG — every string and asset on the page lives here.
+   ═════════════════════════════════════════════════════════════════ */
+const CONFIG = {
+  assets: "./assets/",
+  title: "VANGUARD — Build the impossible.",
+  brand: "◆ VANGUARD / INITIATIVE",
+  nav: [
+    { label: "SYSTEMS", href: "#halcyon" },
+    { label: "ARCHIVE", href: "#persona" },
+    { label: "ROSTER", href: "#roster" },
+  ],
+  enlist: { label: "ENLIST ↗", href: "#finale" },
+  hud: {
+    link: "┌ TELEMETRY LINK · LIVE",
+    linkShort: "┌ LIVE",
+    track: "♪ VANGUARD THEME — ORIGINAL SCORE",
+    soundOff: "SOUND: OFF",
+    soundOn: "SOUND: ON",
+    cinematic: "▶ PLAY CINEMATIC",
+    cinematicOn: "■ CINEMATIC ON",
+  },
+  preloader: "// INITIALISING VANGUARD",
+  missing: "// ASSET MISSING — assets/",
+  progressLabel: "PROGRESS",
+  audio: { file: "theme.mp3", volume: 0.35, fade: 1500 },
+  smoke: "smoke-wipe.mp4",
+  chapters: [
+    {
+      id: "halcyon", name: "HALCYON", accent: "#2EF2E0",
+      dossier: ["HALCYON / INDUSTRIES", "UNIT 01 · CLEARANCE Ω"],
+      poster: "hero-halcyon.jpg",
+      videos: [{ src: "halcyon.mp4", from: 0, to: 0.55 }, { src: "halcyon-flight.mp4", from: 0.55, to: 1 }],
+      flash: "radial-gradient(60% 60% at 50% 50%, rgba(255,60,60,.85), rgba(46,242,224,.6) 55%, transparent 80%)",
+      headlines: [
+        { at: [0.05, 0.5], lines: [[["I build"]], [["the future.", true]]] },
+        { at: [0.6, 0.93], lines: [[["Built to"]], [["last.", true]]] },
+      ],
+      quotes: [
+        { index: "01 — ORIGIN", text: "Sometimes the only way forward is to build it yourself.", sig: "— HALCYON · FIELD LOG 001", at: 0.12, speed: 1 },
+        { index: "02 — CODE", text: "Armor is just a promise you keep.", sig: "— HALCYON · ARMORY NOTE", at: 0.28, speed: 1.7 },
+      ],
+      stats: [{ v: "48", l: "SUITS BUILT" }, { v: "3.2", u: "MACH", l: "TOP SPEED" }, { v: "99.7", u: "%", l: "UPTIME" }],
+      coords: [40.7128, -74.006, 312],
+      role: "ARMOR · ENGINEERING",
+    },
+    {
+      id: "stratos", name: "STRATOS", accent: "#9B6BFF",
+      dossier: ["STRATOS / STORMWATCH", "UNIT 02 · CLEARANCE Σ"],
+      poster: "hero-stratos.jpg",
+      videos: [{ src: "stratos.mp4", from: 0, to: 1 }],
+      lightning: [4000, 9000],
+      headlines: [{ at: [0.08, 0.92], lines: [[["Command"]], [["the storm.", true]]] }],
+      quotes: [
+        { index: "01 — DOCTRINE", text: "The sky listens to those who stand still.", sig: "— STRATOS · STORMWATCH", at: 0.14, speed: 1 },
+        { index: "02 — OATH", text: "Every storm has a keeper.", sig: "— STRATOS · OATH OF KEEPERS", at: 0.3, speed: 1.7 },
+      ],
+      stats: [{ v: "1.21", l: "GIGAWATTS" }, { v: "9", l: "REALMS" }, { v: "0", l: "RETREATS" }],
+      coords: [64.1466, -21.9426, 9120],
+      role: "WEATHER · COMMAND",
+    },
+    {
+      id: "wraith", name: "WRAITH", accent: "#FFB020",
+      dossier: ["WRAITH / NIGHTSHIFT", "UNIT 03 · CLEARANCE Δ"],
+      poster: "hero-wraith.jpg",
+      videos: [{ src: "wraith.mp4", from: 0, to: 1 }],
+      headlines: [{ at: [0.08, 0.92], lines: [[["Two lives."]], [["One mask.", true]]] }],
+      quotes: [
+        { index: "01 — IDENTITY", text: "The mask isn't a disguise. It's the honest face.", sig: "— WRAITH · UNSENT LETTER", at: 0.14, speed: 1 },
+        { index: "02 — METHOD", text: "Nobody sees the shadow until it's already gone.", sig: "— WRAITH · NIGHT LOG 214", at: 0.3, speed: 1.7 },
+      ],
+      stats: [{ v: "0", l: "SIGHTINGS" }, { v: "312", l: "ROOFTOPS" }, { v: "4.1", u: "S", l: "PER BLOCK" }],
+      coords: [51.5072, -0.1276, 88],
+      role: "STEALTH · RECON",
+    },
+  ],
+  persona: {
+    image: "wraith-persona.jpg",
+    kicker: "WRAITH // FILE 03-B",
+    title: "THE DUAL PERSONA",
+    body: "By day, an architect of quiet systems. By night, the city's fastest shadow.",
+    tagDay: "CIVILIAN",
+    tagNight: "WRAITH",
+    locked: "// SIGNAL ENCRYPTED",
+    alt: "Split portrait: the civilian on the left, the Wraith mask on the right",
+    specs: [{ l: "AGILITY", v: "98", f: 0.98 }, { l: "STEALTH", v: "95", f: 0.95 }, { l: "RESOLVE", v: "∞", f: 1 }],
+  },
+  roster: { title: "THE ROSTER.", sub: "THREE OPERATIVES · ONE INITIATIVE", open: "OPEN DOSSIER ↗" },
+  finale: { lines: ["Build", "the impossible."], cta: "ENLIST WITH VANGUARD ↗", href: "#top" },
+  footer: {
+    wordmark: "VANGUARD",
+    links: [{ label: "INSTAGRAM", href: "#" }, { label: "X / TWITTER", href: "#" }, { label: "PRESS KIT", href: "#" }, { label: "CAREERS", href: "#" }],
+    copyright: "© 2026 VANGUARD INITIATIVE",
+  },
+};
+
+/* ═════════════════ Basics ═════════════════ */
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const MOBILE = () => innerWidth < 768;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const clamp01 = (v) => Math.min(1, Math.max(0, v));
+const range = (p, a, b) => clamp01((p - a) / (b - a));
+const lerp = (a, b, t) => a + (b - a) * t;
+const bell = (t) => Math.sin(Math.PI * clamp01(t));
+const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const asset = (f) => CONFIG.assets + f;
+document.title = CONFIG.title;
+
+/* Missing assets: one accent banner, and the page falls back to gradients. */
+const missing = new Set();
+const banner = $("[data-banner]");
+const reportMissing = (file) => {
+  if (missing.has(file)) return;
+  missing.add(file);
+  banner.innerHTML = [...missing].map((f) => esc(CONFIG.missing + f)).join("<br>");
+  banner.classList.add("on");
+};
+
+/* ═════════════════ One shared RAF loop (Lenis first) ═════════════════ */
+let lenis = null;
+const tasks = [];
+const onFrame = (fn) => tasks.push(fn);
+let lastT = performance.now();
+function loop(t) {
+  requestAnimationFrame(loop);
+  lenis?.raf(t);
+  const dt = Math.min(64, t - lastT) / 16.667; lastT = t;
+  for (const fn of tasks) fn(t, dt);
+}
+
+/* ═════════════════ Build the page from CONFIG ═════════════════ */
+// Header + HUD row
+$("[data-header]").innerHTML = `
+  <a href="#top" class="brand mono" data-jump>${esc(CONFIG.brand)}</a>
+  <nav class="nav" aria-label="Primary">${CONFIG.nav.map((n) => `<a href="${n.href}" class="mono roll" data-jump><span>${esc(n.label)}</span><span aria-hidden="true">${esc(n.label)}</span></a>`).join("")}</nav>
+  <a href="${CONFIG.enlist.href}" class="pill mono" data-jump>${esc(CONFIG.enlist.label)}</a>`;
+$("[data-hudrow]").innerHTML = `
+  <span class="live mono"><span class="pulse"></span><span class="long">${esc(CONFIG.hud.link)}</span><span class="short">${esc(CONFIG.hud.linkShort)}</span></span>
+  <span class="hud-right">
+    <button type="button" class="cine mono" data-cine>${esc(CONFIG.hud.cinematic)}</button>
+    <button type="button" class="sound mono" data-sound aria-pressed="false"><span class="track-label">${esc(CONFIG.hud.track)} ·</span> <span data-sound-label>${esc(CONFIG.hud.soundOff)}</span><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></button>
+  </span>`;
+
+const main = $("[data-main]");
+CONFIG.chapters.forEach((ch, ci) => {
+  const sec = el("section", "chapter");
+  sec.id = ch.id;
+  sec.style.setProperty("--c", ch.accent);
+  sec.setAttribute("aria-label", ch.name);
+  let li = 0;
+  const heads = ch.headlines.map((h) => {
+    // Stagger index runs across both lines of a headline.
+    const html = h.lines.map((segs) => `<span class="line">${segs.map(([t, acc]) => `<span class="${acc ? "acc" : ""}" style="--i:${li++}">${esc(t)}</span>`).join(" ")}</span>`).join("");
+    li = 0;
+    return `<h2 class="headline" aria-label="${esc(h.lines.flat().map((s) => s[0]).join(" "))}">${html}</h2>`;
+  }).join("");
+  sec.innerHTML = `
+    <div class="stage">
+      <div class="fallback"></div>
+      <div class="media">
+        <img class="poster" alt="" decoding="async">
+        ${ch.videos.map(() => `<video muted playsinline preload="auto"></video>`).join("")}
+      </div>
+      <div class="shade"></div>
+      ${ch.flash ? `<div class="flash cross" style="background:${ch.flash}"></div>` : ""}
+      ${ch.lightning ? `<div class="flash bolt"></div>` : ""}
+      <div class="hud" aria-hidden="true">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        <div class="dossier mono"><b>${esc(ch.dossier[0])}</b><span>${esc(ch.dossier[1])}</span></div>
+        <div class="rail"><small class="mono">${String(ci + 1).padStart(2, "0")}</small><i></i><em class="mono" data-pct>000</em></div>
+        <p class="coords mono" data-coords></p>
+      </div>
+      <div class="cards">${ch.quotes.map((q) => `<figure class="qcard"><figcaption class="idx mono">${esc(q.index)}</figcaption><q>${esc(q.text)}</q><span class="sig mono">${esc(q.sig)}</span></figure>`).join("")}</div>
+      <div class="copy">${heads}</div>
+      <div class="stats">${ch.stats.map((s) => `<div class="stat"><b><span class="dr" data-dr="${esc(s.v)}"></span>${s.u ? `<small>${esc(s.u)}</small>` : ""}</b><span class="mono">${esc(s.l)}</span></div>`).join("")}</div>
+    </div>`;
+  main.appendChild(sec);
+});
+// Persona
+{
+  const P = CONFIG.persona;
+  const sec = el("section", "persona");
+  sec.id = "persona";
+  sec.setAttribute("aria-label", P.title);
+  sec.innerHTML = `
+    <div class="persona-stage">
+      <div class="pcard">
+        <div class="locked"><span class="mono">${esc(P.locked)}</span></div>
+        <img alt="${esc(P.alt)}" data-persona-img>
+        <span class="scanner"></span>
+        <span class="tag l mono">${esc(P.tagDay)}</span><span class="tag r mono">${esc(P.tagNight)}</span>
+      </div>
+      <div class="ptext">
+        <p class="mono">${esc(P.kicker)}</p>
+        <h2>${esc(P.title)}</h2>
+        <p>${esc(P.body)}</p>
+        <div class="spec">${P.specs.map((s, i) => `<div class="spec-row"><span class="mono">${esc(s.l)}</span><span class="bar"><i style="--v:${s.f};--d:${i}"></i></span><b>${esc(s.v)}</b></div>`).join("")}</div>
+      </div>
+    </div>`;
+  main.appendChild(sec);
+}
+// Roster
+{
+  const R = CONFIG.roster;
+  const sec = el("section", "roster");
+  sec.id = "roster";
+  sec.innerHTML = `
+    <h2 aria-label="${esc(R.title)}">${[...R.title].map((c, i) => `<span class="ch" aria-hidden="true" style="--i:${i}">${c === " " ? "&nbsp;" : esc(c)}</span>`).join("")}</h2>
+    <p class="roster-sub mono">${esc(R.sub)}</p>
+    <div class="rcards">${CONFIG.chapters.map((ch, i) => `
+      <a class="rcard" href="#${ch.id}" data-jump style="--c:${ch.accent}">
+        <div class="rcard-in">
+          <img alt="${esc(ch.name)}" data-roster-img="${esc(ch.poster)}" loading="lazy" decoding="async">
+          <span class="rnum mono">${String(i + 1).padStart(2, "0")} / ${String(CONFIG.chapters.length).padStart(2, "0")}</span>
+          <div class="rmeta"><p class="mono">${esc(ch.role)}</p><h3>${esc(ch.name)}</h3><span class="open mono">${esc(R.open)}</span></div>
+        </div>
+      </a>`).join("")}</div>`;
+  main.appendChild(sec);
+}
+// Finale + footer
+{
+  const F = CONFIG.finale, T = CONFIG.footer;
+  const sec = el("section", "finale");
+  sec.id = "finale";
+  sec.innerHTML = `<div><h2>${F.lines.map((l) => `<span>${esc(l)}</span>`).join("")}</h2><a href="${F.href}" class="magnet" data-magnet data-jump>${esc(F.cta)}</a></div>`;
+  main.appendChild(sec);
+  const foot = el("footer", "footer");
+  foot.innerHTML = `<p class="wordmark" aria-hidden="true">${esc(T.wordmark)}</p>
+    <div class="foot-row mono"><nav aria-label="Footer">${T.links.map((l) => `<a href="${l.href}">${esc(l.label)}</a>`).join("")}</nav><span>${esc(T.copyright)}</span></div>`;
+  document.body.insertBefore(foot, $("[data-smoke]"));
+}
+
+/* ═════════════════ Media: posters, videos, scrubbers ═════════════════ */
+// Cinematic mode: desktop by default, opt-in on phones, never with reduced motion.
+let cinematic = !REDUCED && !MOBILE();
+const chapters = CONFIG.chapters.map((ch) => {
+  const sec = $(`#${ch.id}`);
+  const stage = $(".stage", sec);
+  const poster = $(".poster", stage);
+  poster.addEventListener("error", () => { reportMissing(ch.poster); poster.style.display = "none"; });
+  poster.src = asset(ch.poster);
+  const vids = $$("video", stage).map((v, i) => ({
+    ...ch.videos[i], el: v, target: 0, current: 0, lastSeek: 0, ready: false, failed: false,
+  }));
+  return {
+    ch, sec, stage, poster, vids,
+    heads: $$(".headline", sec).map((h, i) => ({ el: h, at: ch.headlines[i].at, state: "" })),
+    cards: $$(".qcard", sec).map((c, i) => ({ el: c, ...ch.quotes[i] })),
+    stats: $(".stats", sec), statsOn: false,
+    rail: $(".rail i", sec), pct: $("[data-pct]", sec), coords: $("[data-coords]", sec),
+    cross: $(".flash.cross", sec), bolt: $(".flash.bolt", sec),
+    geo: ch.coords.slice(), top: 0, h: 0, p: 0, inView: false,
+  };
+});
+const byId = Object.fromEntries(chapters.map((c) => [c.ch.id, c]));
+
+const allVideos = [];
+function attachVideo(v, file) {
+  if (v.el.getAttribute("src")) return;
+  v.el.addEventListener("loadedmetadata", () => {
+    v.ready = true;
+    // iOS paints seeks only after one play(); pause straight away.
+    const p = v.el.play(); if (p?.then) p.then(() => v.el.pause()).catch(() => {});
+  }, { once: true });
+  v.el.addEventListener("error", () => { v.failed = true; reportMissing(file); }, { once: true });
+  v.el.src = asset(file);
+  allVideos.push(v);
+}
+function enableCinematic() {
+  cinematic = true;
+  for (const c of chapters) for (const v of c.vids) attachVideo(v, v.src);
+  attachVideo(smoke.v, CONFIG.smoke);
+  const b = $("[data-cine]"); b.textContent = CONFIG.hud.cinematicOn; b.disabled = true;
+}
+// Scrub: targets come from scroll; a lerp chases them; seeks are throttled.
+function scrub(v, now) {
+  if (!v.ready || v.failed) return;
+  const d = v.el.duration; if (!Number.isFinite(d)) return;
+  v.current += (v.target * d - v.current) * 0.09;
+  if (Math.abs(v.el.currentTime - v.current) > 0.02 && now - v.lastSeek >= 30 && !v.el.seeking) { v.el.currentTime = v.current; v.lastSeek = now; }
+}
+
+/* Smoke wipe between chapter 1 and 2 */
+const smoke = { box: $("[data-smoke]"), v: { el: $("[data-smoke] video"), target: 0, current: 0, lastSeek: 0, ready: false, failed: false } };
+smoke.v.el.addEventListener("error", () => smoke.box.classList.add("fallback"));
+
+/* ═════════════════ Layout cache ═════════════════ */
+const persona = { sec: $("#persona") };
+function measure() {
+  for (const c of chapters) { c.top = c.sec.offsetTop; c.h = c.sec.offsetHeight; }
+  persona.top = persona.sec.offsetTop; persona.h = persona.sec.offsetHeight;
+}
+addEventListener("resize", () => { clearTimeout(measure.t); measure.t = setTimeout(measure, 120); });
+
+/* ═════════════════ Digit roll ═════════════════ */
+function digitRoll(host, value) {
+  host.innerHTML = "";
+  const cols = [];
+  let d = 0;
+  for (const ch of value) {
+    if (/\d/.test(ch)) {
+      const col = el("span", "dr-col");
+      const stack = el("span");
+      stack.style.setProperty("--d", d++);
+      for (let i = 0; i <= 9; i++) stack.appendChild(el("span", "", String(i)));
+      col.appendChild(stack); host.appendChild(col);
+      cols.push({ stack, n: +ch });
+    } else host.appendChild(el("span", "", esc(ch)));
+  }
+  host.setAttribute("aria-label", value);
+  return {
+    play() { cols.forEach((c) => { c.stack.style.transform = `translateY(${-c.n * 10}%)`; }); },
+    reset() { cols.forEach((c) => { c.stack.style.transform = "translateY(0)"; }); },
+  };
+}
+for (const c of chapters) c.rolls = $$("[data-dr]", c.sec).map((h) => digitRoll(h, h.dataset.dr));
+
+/* ═════════════════ Pointer ═════════════════ */
+const ptr = { x: innerWidth / 2, y: innerHeight / 2, nx: 0, ny: 0 };
+addEventListener("pointermove", (e) => { ptr.x = e.clientX; ptr.y = e.clientY; ptr.nx = e.clientX / innerWidth * 2 - 1; ptr.ny = e.clientY / innerHeight * 2 - 1; }, { passive: true });
+
+/* ═════════════════ Chapter update ═════════════════ */
+const tilt = { x: 0, y: 0 };
+let coordTimer = 0;
+function updateChapter(c, now, vh) {
+  const y = scrollY;
+  c.inView = y + vh > c.top && y < c.top + c.h;
+  if (!c.inView) return;
+  const p = c.p = clamp01((y - c.top) / Math.max(1, c.h - vh));
+
+  // Media: scrub, crossfade, Ken Burns on the poster when no video plays.
+  let anyVideo = false;
+  for (const v of c.vids) {
+    const live = cinematic && v.ready && !v.failed;
+    const fade = c.vids.length > 1 ? (v.from > 0 ? range(p, v.from - 0.02, v.from + 0.02) : 1 - range(p, v.to - 0.02, v.to + 0.02)) : 1;
+    v.el.style.opacity = live ? fade : 0;
+    if (live) { anyVideo = true; v.target = range(p, v.from, v.to); scrub(v, now); }
+  }
+  c.poster.style.transform = `scale(${anyVideo ? 1 : lerp(1, 1.08, p)})`;
+  if (c.cross) c.cross.style.opacity = (0.9 * bell((p - 0.52) / 0.06)).toFixed(3); // red-teal flash at 55%
+
+  // Headlines: pre → in → out (up, blurred).
+  for (const h of c.heads) {
+    const st = p < h.at[0] ? "pre" : p > h.at[1] ? "out" : "in";
+    if (st !== h.state) {
+      h.state = st;
+      h.el.classList.toggle("in", st === "in");
+      h.el.classList.toggle("out", st === "out");
+      if (st === "in" && c.ch.lightning) strike(c);
+    }
+  }
+  // Quote cards: slide in, parallax at their own speed, tilt toward the pointer.
+  const last = c.heads[c.heads.length - 1].at[1];
+  c.cards.forEach((q) => {
+    const a = Math.min(range(p, q.at, q.at + 0.08), 1 - range(p, last - 0.04, last + 0.03));
+    const ty = (0.5 - p) * 260 * q.speed + (1 - a) * 60;
+    const tx = MOBILE() ? 0 : (1 - a) * 40;
+    const rot = MOBILE() || REDUCED ? "" : ` rotateX(${(-tilt.y * 7).toFixed(2)}deg) rotateY(${(tilt.x * 9).toFixed(2)}deg)`;
+    q.el.style.opacity = a.toFixed(3);
+    q.el.style.transform = `translate3d(${tx.toFixed(1)}px, ${MOBILE() ? (1 - a) * 30 : ty.toFixed(1)}px, 0)${rot}`;
+  });
+  // Stats
+  const statsOn = p > 0.2 && p < last + 0.02;
+  if (statsOn !== c.statsOn) { c.statsOn = statsOn; c.stats.classList.toggle("on", statsOn); c.rolls.forEach((r) => (statsOn ? r.play() : r.reset())); }
+  // Telemetry rail + percentage
+  c.rail.style.transform = `scaleY(${p.toFixed(4)})`;
+  c.pct.textContent = String(Math.round(p * 100)).padStart(3, "0");
+  // Coordinates: a small random walk every 120ms.
+  if (now > coordTimer) {
+    for (const cc of chapters) if (cc.inView) {
+      cc.geo[0] += (Math.random() - 0.5) * 0.0009; cc.geo[1] += (Math.random() - 0.5) * 0.0009; cc.geo[2] += Math.round((Math.random() - 0.5) * 6);
+      const [la, lo, al] = cc.geo;
+      cc.coords.textContent = `LAT ${Math.abs(la).toFixed(4)}°${la >= 0 ? "N" : "S"} · LON ${Math.abs(lo).toFixed(4)}°${lo >= 0 ? "E" : "W"} · ALT ${al}M`;
+    }
+    coordTimer = now + 120;
+  }
+}
+
+/* ═════════════════ Stratos lightning ═════════════════ */
+let nextBolt = 0;
+function strike(c) {
+  if (REDUCED || !c.bolt) return;
+  c.bolt.classList.remove("on"); void c.bolt.offsetWidth; c.bolt.classList.add("on");
+  const h = c.heads.find((x) => x.state === "in");
+  if (h) { h.el.classList.remove("zap"); void h.el.offsetWidth; h.el.classList.add("zap"); }
+}
+
+/* ═════════════════ Glitch between chapter 2 and 3 ═════════════════ */
+const glitch = (() => {
+  const cv = $("[data-glitch]"), ctx = cv.getContext("2d");
+  const red = document.createElement("canvas"), cyan = document.createElement("canvas");
+  let t0 = -1, strips = [];
+  const size = () => { cv.width = red.width = cyan.width = innerWidth; cv.height = red.height = cyan.height = innerHeight; };
+  size(); addEventListener("resize", size);
+  const cover = (g, src, sw, sh) => {
+    const W = cv.width, H = cv.height, s = Math.max(W / sw, H / sh);
+    g.drawImage(src, (W - sw * s) / 2, (H - sh * s) / 2, sw * s, sh * s);
+  };
+  // Snapshot the outgoing stage into a red and a cyan copy (added back together they give full colour).
+  const snapshot = (c) => {
+    const vid = c.vids.find((v) => cinematic && v.ready && !v.failed && v.el.readyState >= 2);
+    for (const [cnv, tint] of [[red, "#ff0000"], [cyan, "#00ffff"]]) {
+      const g = cnv.getContext("2d");
+      g.globalCompositeOperation = "source-over";
+      g.fillStyle = "#050505"; g.fillRect(0, 0, cnv.width, cnv.height);
+      const grad = g.createRadialGradient(cnv.width * 0.7, cnv.height * 0.45, 0, cnv.width * 0.7, cnv.height * 0.45, cnv.width * 0.6);
+      grad.addColorStop(0, c.ch.accent); grad.addColorStop(1, "#050505");
+      g.globalAlpha = 0.35; g.fillStyle = grad; g.fillRect(0, 0, cnv.width, cnv.height); g.globalAlpha = 1;
+      try {
+        if (vid) cover(g, vid.el, vid.el.videoWidth, vid.el.videoHeight);
+        else if (c.poster.complete && c.poster.naturalWidth) cover(g, c.poster, c.poster.naturalWidth, c.poster.naturalHeight);
+      } catch { /* keep the gradient */ }
+      g.globalCompositeOperation = "multiply"; g.fillStyle = tint; g.fillRect(0, 0, cnv.width, cnv.height);
+    }
+  };
+  return {
+    fire(c) {
+      if (REDUCED) return;
+      snapshot(c);
+      strips = Array.from({ length: 12 }, () => ({ dx: (Math.random() - 0.5) * 160, split: 4 + Math.random() * 14 }));
+      t0 = performance.now();
+      cv.style.opacity = 1;
+    },
+    frame(now) {
+      if (t0 < 0) return;
+      const k = (now - t0) / 450;
+      if (k >= 1) { t0 = -1; cv.style.opacity = 0; ctx.clearRect(0, 0, cv.width, cv.height); return; }
+      const W = cv.width, H = cv.height, sh = H / 12;
+      const amp = Math.sin(Math.PI * Math.min(1, k * 1.4)) * (1 - k * 0.6);
+      ctx.globalCompositeOperation = "source-over"; ctx.fillStyle = "#050505"; ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = "lighter";
+      strips.forEach((s, i) => {
+        const jitter = (Math.random() - 0.5) * 30 * amp;
+        const dx = s.dx * amp + jitter, sp = s.split * amp;
+        ctx.drawImage(red, 0, i * sh, W, sh, dx + sp, i * sh, W, sh);
+        ctx.drawImage(cyan, 0, i * sh, W, sh, dx - sp, i * sh, W, sh);
+      });
+      ctx.globalCompositeOperation = "source-over";
+      cv.style.opacity = k > 0.75 ? (1 - (k - 0.75) / 0.25).toFixed(3) : 1;
+    },
+  };
+})();
+
+/* ═════════════════ Persona scanner ═════════════════ */
+{
+  const P = CONFIG.persona;
+  const img = $("[data-persona-img]");
+  img.addEventListener("error", () => { reportMissing(P.image); img.style.display = "none"; });
+  img.src = asset(P.image);
+  const scanner = $(".pcard .scanner"), card = $(".pcard");
+  onFrame(() => {
+    const vh = innerHeight, y = scrollY;
+    if (y + vh < persona.top || y > persona.top + persona.h) return;
+    const q = range(clamp01((y - persona.top) / Math.max(1, persona.h - vh)), 0.1, 0.8);
+    // Starts on the civilian (left) half; the scanner sweeps right and uncovers the mask.
+    const edge = lerp(0.5, 1, q);
+    img.style.clipPath = `inset(0 ${((1 - edge) * 100).toFixed(2)}% 0 0)`;
+    scanner.style.transform = `translate3d(${(edge * card.clientWidth - 1).toFixed(1)}px, 0, 0)`;
+    card.classList.toggle("unmasked", q > 0.6);
+  });
+  const spec = $(".spec");
+  new IntersectionObserver(([e]) => spec.classList.toggle("on", e.isIntersecting), { threshold: 0.4 }).observe(spec);
+}
+
+/* ═════════════════ Roster ═════════════════ */
+{
+  const title = $(".roster h2");
+  new IntersectionObserver(([e]) => { if (e.isIntersecting) title.classList.add("on"); }, { threshold: 0.3 }).observe(title);
+  $$("[data-roster-img]").forEach((img) => {
+    img.addEventListener("error", () => { reportMissing(img.dataset.rosterImg); img.style.display = "none"; });
+    img.src = asset(img.dataset.rosterImg);
+  });
+  $$(".rcard").forEach((card) => {
+    const inner = $(".rcard-in", card);
+    card.addEventListener("pointermove", (e) => {
+      if (MOBILE() || REDUCED) return;
+      const b = card.getBoundingClientRect();
+      const x = (e.clientX - b.left) / b.width - 0.5, y = (e.clientY - b.top) / b.height - 0.5;
+      inner.style.transform = `translate3d(0,-8px,0) rotateY(${(x * 20).toFixed(2)}deg) rotateX(${(-y * 20).toFixed(2)}deg)`;
+    });
+    card.addEventListener("pointerleave", () => { inner.style.transform = ""; });
+  });
+}
+
+/* ═════════════════ Finale: magnetic CTA with a text scramble ═════════════════ */
+{
+  const btn = $("[data-magnet]");
+  const label = btn.textContent;
+  const pos = { x: 0, y: 0, tx: 0, ty: 0 };
+  const GLYPHS = "▓▒░<>/\\|=+*#%&01";
+  onFrame(() => {
+    if (MOBILE() || REDUCED) return;
+    const b = btn.getBoundingClientRect();
+    const cx = b.left + b.width / 2 - pos.x, cy = b.top + b.height / 2 - pos.y;
+    const dx = ptr.x - cx, dy = ptr.y - cy;
+    // Pull toward the cursor while it's within 40px of the button's edge.
+    const near = Math.abs(dx) < b.width / 2 + 40 && Math.abs(dy) < b.height / 2 + 40;
+    pos.tx = near ? dx * 0.3 : 0; pos.ty = near ? dy * 0.3 : 0;
+    pos.x += (pos.tx - pos.x) * 0.15; pos.y += (pos.ty - pos.y) * 0.15;
+    btn.style.transform = `translate3d(${pos.x.toFixed(2)}px, ${pos.y.toFixed(2)}px, 0)`;
+  });
+  btn.addEventListener("mouseenter", () => {
+    if (REDUCED) return;
+    const t0 = performance.now();
+    const tick = (now) => {
+      const k = (now - t0) / 150;
+      if (k >= 1) { btn.textContent = label; return; }
+      btn.textContent = [...label].map((ch, i) => (ch === " " || i / label.length < k ? ch : GLYPHS[(Math.random() * GLYPHS.length) | 0])).join("");
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+}
+
+/* ═════════════════ Audio (off by default, fades in/out) ═════════════════ */
+{
+  const btn = $("[data-sound]"), lab = $("[data-sound-label]");
+  let audio = null, on = false, fadeRaf = 0;
+  const fade = (to, done) => {
+    cancelAnimationFrame(fadeRaf);
+    const from = audio.volume, t0 = performance.now();
+    const step = (now) => {
+      const k = Math.min(1, (now - t0) / CONFIG.audio.fade);
+      audio.volume = from + (to - from) * k;
+      if (k < 1) fadeRaf = requestAnimationFrame(step); else done?.();
+    };
+    fadeRaf = requestAnimationFrame(step);
+  };
+  const set = (v) => { on = v; btn.classList.toggle("on", v); btn.setAttribute("aria-pressed", String(v)); lab.textContent = v ? CONFIG.hud.soundOn : CONFIG.hud.soundOff; };
+  btn.addEventListener("click", async () => {
+    if (!audio) {
+      audio = new Audio(asset(CONFIG.audio.file));
+      audio.loop = true; audio.volume = 0;
+      audio.addEventListener("error", () => { reportMissing(CONFIG.audio.file); set(false); });
+    }
+    if (!on) {
+      set(true);
+      try { await audio.play(); fade(CONFIG.audio.volume); } catch { set(false); }
+    } else { set(false); fade(0, () => audio.pause()); }
+  });
+}
+
+/* ═════════════════ Accent, crosshair, transitions ═════════════════ */
+const root = document.documentElement;
+const xhair = $("[data-xhair]"), xlabel = $("[data-xhair-label]");
+const xpos = { x: innerWidth / 2, y: innerHeight / 2 };
+let accent = "", glitchSide = null;
+onFrame((now, dt) => {
+  const vh = innerHeight, y = scrollY;
+  tilt.x = lerp(tilt.x, ptr.nx, 0.08); tilt.y = lerp(tilt.y, ptr.ny, 0.08);
+  for (const c of chapters) updateChapter(c, now, vh);
+
+  // Accent follows whatever sits at the middle of the screen.
+  const mid = y + vh / 2;
+  let a = CONFIG.chapters[0].accent;
+  for (const c of chapters) if (mid >= c.top) a = c.ch.accent;
+  if (mid >= persona.top) a = CONFIG.chapters[2].accent;
+  if (a !== accent) { accent = a; root.style.setProperty("--accent", a); }
+
+  // Stratos: random lightning while its stage is on screen.
+  const st = byId.stratos;
+  if (st.inView && st.p > 0.02 && st.p < 0.98 && now > nextBolt) {
+    if (nextBolt) strike(st);
+    const [lo, hi] = st.ch.lightning;
+    nextBolt = now + lo + Math.random() * (hi - lo);
+  }
+
+  // Smoke wipe 1 → 2, scrubbed across the hand-off.
+  const s0 = byId.stratos.top - vh * 1.1, s1 = byId.stratos.top + vh * 0.25;
+  const ts = (y - s0) / (s1 - s0);
+  const on = ts > 0 && ts < 1 && !REDUCED;
+  smoke.box.style.visibility = on ? "visible" : "hidden";
+  if (on) {
+    smoke.box.style.opacity = bell(ts).toFixed(3);
+    smoke.box.querySelector(".fog").style.transform = `scale(${lerp(0.8, 1.4, ts)}) translateX(${lerp(-8, 8, ts)}%)`;
+    smoke.v.target = ts; scrub(smoke.v, now);
+  }
+
+  // Glitch 2 → 3 when the boundary is crossed (either direction).
+  const side = y > byId.wraith.top - vh * 0.5;
+  if (glitchSide !== null && side !== glitchSide) glitch.fire(side ? byId.stratos : byId.wraith);
+  glitchSide = side;
+  glitch.frame(now);
+
+  // Crosshair eases toward the cursor over the chapter stages (desktop).
+  const showX = !MOBILE() && chapters.some((c) => c.inView && y >= c.top - 10 && y <= c.top + c.h - vh + 10);
+  xhair.classList.toggle("on", showX);
+  if (showX) {
+    xpos.x = lerp(xpos.x, ptr.x, 0.12); xpos.y = lerp(xpos.y, ptr.y, 0.12);
+    xhair.style.transform = `translate3d(${xpos.x.toFixed(1)}px, ${xpos.y.toFixed(1)}px, 0)`;
+    xlabel.textContent = `X ${String(Math.round(xpos.x)).padStart(4, "0")} · Y ${String(Math.round(xpos.y)).padStart(4, "0")}`;
+  }
+});
+
+/* ═════════════════ Film grain: 160px tile, every 3rd frame ═════════════════ */
+{
+  const cv = $("[data-grain]"), ctx = cv.getContext("2d");
+  const tile = document.createElement("canvas"); tile.width = tile.height = 160;
+  const tctx = tile.getContext("2d"), img = tctx.createImageData(160, 160);
+  const size = () => { cv.width = Math.ceil(innerWidth / 1.5); cv.height = Math.ceil(innerHeight / 1.5); };
+  size(); addEventListener("resize", size);
+  let n = 0;
+  const draw = () => {
+    const d = img.data;
+    for (let i = 0; i < d.length; i += 4) { const v = (Math.random() * 255) | 0; d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255; }
+    tctx.putImageData(img, 0, 0);
+    ctx.fillStyle = ctx.createPattern(tile, "repeat"); ctx.fillRect(0, 0, cv.width, cv.height);
+  };
+  draw();
+  if (!REDUCED) onFrame(() => { if (++n % 3 === 0) draw(); });
+}
+
+/* ═════════════════ Anchors ═════════════════ */
+$$("[data-jump]").forEach((a) => a.addEventListener("click", (e) => {
+  const href = a.getAttribute("href");
+  const target = href === "#top" ? 0 : $(href);
+  if (target === null) return;
+  e.preventDefault();
+  if (lenis) lenis.scrollTo(target, { duration: 1.6 });
+  else scrollTo({ top: target === 0 ? 0 : target.offsetTop, behavior: REDUCED ? "auto" : "smooth" });
+}));
+$("[data-cine]").addEventListener("click", enableCinematic);
+
+/* ═════════════════ Preloader: real loading, 000 → 100 ═════════════════ */
+async function boot() {
+  try {
+    // A variable specifier keeps Vite from rewriting it; the browser resolves it through the importmap.
+    const LENIS = "lenis";
+    const { default: Lenis } = await import(/* @vite-ignore */ LENIS);
+    lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+    window.lenis = lenis; // handy for debugging in the console
+  } catch { lenis = null; } // CDN unreachable: native scrolling still works
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  scrollTo(0, 0);
+  measure();
+  requestAnimationFrame(loop);
+
+  if (cinematic) enableCinematic();
+  const pre = $("[data-pre]"), count = $("[data-pre-count]"), line = $("[data-pre-line]");
+  $("[data-pre-label]").textContent = CONFIG.preloader;
+  lenis?.stop();
+  // What counts as "loaded": every video that will play, the posters, and the fonts.
+  const jobs = [];
+  const track = (p) => jobs.push(p.then(() => { done++; }, () => { done++; }));
+  let done = 0;
+  const vids = cinematic ? [...chapters.flatMap((c) => c.vids.map((v) => v.el)), smoke.v.el] : [];
+  vids.forEach((v) => track(new Promise((res, rej) => {
+    if (v.readyState >= 4) return res();
+    v.addEventListener("canplaythrough", res, { once: true });
+    v.addEventListener("error", rej, { once: true });
+  })));
+  chapters.forEach((c) => track(new Promise((res, rej) => {
+    if (c.poster.complete) return c.poster.naturalWidth ? res() : rej();
+    c.poster.addEventListener("load", res, { once: true }); c.poster.addEventListener("error", rej, { once: true });
+  })));
+  track(document.fonts ? document.fonts.ready : Promise.resolve());
+  const total = jobs.length, t0 = performance.now();
+  let shown = 0;
+  await new Promise((resolve) => {
+    const tick = (now) => {
+      const real = done / total, forced = (now - t0) / 5000; // never wait longer than 5s
+      const target = Math.max(real, Math.min(1, forced));
+      shown += (target - shown) * 0.12;
+      if (target >= 1 && shown > 0.995) shown = 1;
+      count.textContent = String(Math.round(shown * 100)).padStart(3, "0");
+      line.style.transform = `scaleX(${shown})`;
+      if (shown >= 1) return resolve();
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+  measure();
+  pre.classList.add("open");
+  lenis?.start();
+  setTimeout(() => pre.remove(), 1200);
+}
+boot();
+</script>
+</body>
+</html>
