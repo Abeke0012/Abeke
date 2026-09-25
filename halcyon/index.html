@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HALCYON HX-07 — Engineered for impact</title>
+<meta name="description" content="HALCYON HX-07. A hand-built armour system from the VANGUARD Initiative, taken apart plate by plate.">
+<meta name="theme-color" content="#050505">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
+    "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.mjs"
+  }
+}
+</script>
+<style>
+:root {
+  --black: #050505;
+  --bone: #EDEAE3;
+  --ink: #0d0d0c;
+  --white: #F4F2EE;
+  --accent: #2EF2E0;
+  --muted-d: rgba(244, 242, 238, .55);
+  --muted-l: rgba(13, 13, 12, .55);
+  --line-d: rgba(244, 242, 238, .14);
+  --line-l: rgba(13, 13, 12, .16);
+  --gap: 24px;
+  --margin: 32px;
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ease-organic: cubic-bezier(.65, .05, .36, 1);
+  --geist: "Geist", "Helvetica Neue", Arial, sans-serif;
+  --mono: "Space Mono", ui-monospace, Menlo, monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--black); color: var(--white); overscroll-behavior: none; }
+body { font-family: var(--geist); font-weight: 400; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+:focus-visible { outline: 1px solid var(--accent); outline-offset: 4px; }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); padding-inline: var(--margin); }
+.mono { font-family: var(--mono); font-size: 11px; font-weight: 400; letter-spacing: .08em; text-transform: uppercase; }
+.dark { background: var(--black); color: var(--white); }
+.light { background: var(--bone); color: var(--ink); }
+.light .muted { color: var(--muted-l); } .dark .muted { color: var(--muted-d); }
+
+/* Debug grid — press G */
+.grid-overlay { position: fixed; inset: 0; z-index: 9999; pointer-events: none; display: none; }
+.grid-overlay.on { display: grid; }
+.grid-overlay span { background: rgba(255, 0, 60, .09); border-inline: 1px solid rgba(255, 0, 60, .18); height: 100%; }
+
+/* Split-word reveal */
+.w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; margin-bottom: -.08em; }
+.w > span { display: inline-block; will-change: transform; transform: translate3d(0, 110%, 0); }
+
+/* DigitRoll */
+.dr { display: inline-flex; align-items: flex-end; font-variant-numeric: tabular-nums; }
+.dr-col { display: inline-block; height: 1em; line-height: 1; overflow: hidden; }
+.dr-col > span { display: block; will-change: transform; }
+.dr-col > span > span { display: block; height: 1em; line-height: 1; }
+.dr-lit { display: inline-block; line-height: 1; }
+
+/* ─── Header ─── */
+.header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 64px; align-items: center; mix-blend-mode: difference; color: #fff; }
+.brand { grid-column: 1 / 4; font-family: var(--geist); font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.brand small { font-family: var(--mono); font-weight: 400; font-size: 10px; letter-spacing: .1em; margin-left: 10px; opacity: .6; }
+.nav { grid-column: 5 / 9; display: flex; justify-content: space-between; }
+.nav a { opacity: .7; transition: opacity .3s var(--ease-out); }
+.nav a:hover { opacity: 1; }
+.head-cta { grid-column: 11 / 13; justify-self: end; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 16px; border: 1px solid currentColor; border-radius: 999px; transition: background-color .3s, color .3s; }
+.head-cta:hover { background: #fff; color: #000; }
+
+/* ─── Hero (3D) ─── */
+.hero { position: relative; height: 220vh; }
+.hero-stage { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+#stage3d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero-ui { position: absolute; inset: 0; z-index: 2; pointer-events: none; align-content: end; padding-bottom: 48px; }
+.hero-copy { grid-column: 1 / 7; }
+.kicker { display: flex; align-items: center; gap: 12px; color: var(--accent); }
+.kicker::before { content: ""; width: 24px; height: 1px; background: currentColor; }
+.hero h1 { margin-top: 22px; font-weight: 700; font-size: clamp(56px, 9.2vw, 148px); line-height: .88; letter-spacing: -.045em; }
+.hero-sub { margin-top: 26px; max-width: 30rem; font-size: 17px; line-height: 1.5; color: var(--muted-d); }
+.telemetry { position: absolute; z-index: 2; pointer-events: none; display: grid; gap: 6px; color: var(--muted-d); }
+.telemetry b { font-weight: 400; color: var(--white); }
+.telemetry.tl { top: 96px; left: var(--margin); }
+.telemetry.tr { top: 96px; right: var(--margin); text-align: right; }
+.telemetry.br { bottom: 48px; right: var(--margin); text-align: right; }
+.scrollcue { position: absolute; left: 50%; bottom: 20px; z-index: 2; transform: translateX(-50%); color: var(--muted-d); }
+.bracket { position: absolute; width: 14px; height: 14px; border: 0 solid var(--line-d); z-index: 2; pointer-events: none; }
+.bracket.a { top: 84px; left: var(--margin); border-top-width: 1px; border-left-width: 1px; }
+.bracket.b { top: 84px; right: var(--margin); border-top-width: 1px; border-right-width: 1px; }
+.bracket.c { bottom: 24px; left: var(--margin); border-bottom-width: 1px; border-left-width: 1px; }
+.bracket.d { bottom: 24px; right: var(--margin); border-bottom-width: 1px; border-right-width: 1px; }
+
+/* ─── Specs (bone) ─── */
+.specs { padding: 150px 0 140px; }
+.sec-head { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: end; }
+.sec-head .idx { grid-column: 1 / 3; }
+.sec-head h2 { grid-column: 3 / 11; font-weight: 700; font-size: clamp(44px, 6.4vw, 104px); line-height: .9; letter-spacing: -.04em; }
+.stat-row { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; margin-top: 110px; border-top: 1px solid var(--line-l); }
+.stat { grid-column: span 3; padding-top: 22px; }
+.stat .val { font-weight: 700; font-size: clamp(48px, 5.6vw, 92px); letter-spacing: -.04em; line-height: 1; display: flex; align-items: flex-end; gap: 8px; }
+.stat .val small { font-family: var(--mono); font-size: 13px; font-weight: 400; letter-spacing: .06em; padding-bottom: .5em; }
+.stat p { margin-top: 16px; max-width: 16rem; font-size: 15px; line-height: 1.45; }
+.stat .mono { display: block; margin-bottom: 18px; }
+
+/* ─── Anatomy (black) ─── */
+.anatomy { padding: 160px 0 150px; }
+.statement { grid-column: 3 / 12; font-weight: 600; font-size: clamp(30px, 3.6vw, 58px); line-height: 1.08; letter-spacing: -.03em; }
+.statement em { font-style: normal; color: var(--accent); }
+.parts { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; margin-top: 120px; }
+.part { grid-column: span 3; border-top: 1px solid var(--line-d); padding-top: 18px; }
+.part .mono { color: var(--accent); }
+.part h3 { margin-top: 44px; font-weight: 700; font-size: 30px; letter-spacing: -.03em; line-height: 1; }
+.part p { margin-top: 14px; font-size: 15px; line-height: 1.5; color: var(--muted-d); }
+
+/* ─── Breakdown (bone) ─── */
+.breakdown { padding: 150px 0; }
+.table { grid-column: 1 / -1; margin-top: 90px; border-top: 1px solid var(--ink); }
+.row { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); align-items: center; padding: 22px 0; border-bottom: 1px solid var(--line-l); }
+.row .n { grid-column: 1 / 2; }
+.row .k { grid-column: 2 / 6; font-weight: 600; font-size: 22px; letter-spacing: -.02em; }
+.row .m { grid-column: 6 / 9; }
+.row .v { grid-column: 9 / 11; font-weight: 700; font-size: 34px; letter-spacing: -.03em; text-align: right; justify-self: end; display: flex; align-items: flex-end; gap: 6px; }
+.row .v small { font-family: var(--mono); font-size: 11px; font-weight: 400; padding-bottom: .45em; }
+.row .bar { grid-column: 11 / 13; height: 2px; background: var(--line-l); position: relative; overflow: hidden; }
+.row .bar i { position: absolute; inset: 0; background: var(--ink); transform-origin: left; transform: scaleX(0); will-change: transform; }
+
+/* ─── Finale (black) ─── */
+.finale { min-height: 100vh; padding: 140px 0 60px; display: grid; align-content: space-between; }
+.finale h2 { grid-column: 1 / -1; font-weight: 700; font-size: clamp(64px, 15vw, 250px); line-height: .84; letter-spacing: -.055em; }
+.finale h2 .acc { color: var(--accent); }
+.finale-row { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: end; margin-top: 80px; padding-top: 22px; border-top: 1px solid var(--line-d); }
+.finale-row p { grid-column: 1 / 6; font-size: 17px; line-height: 1.5; color: var(--muted-d); }
+.cta { grid-column: 9 / 13; justify-self: end; display: inline-flex; align-items: center; gap: 12px; height: 60px; padding: 0 28px; border-radius: 999px; background: var(--white); color: var(--black); font-weight: 600; font-size: 16px; will-change: transform; }
+.cta span { display: inline-block; will-change: transform; }
+.foot { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 60px; color: var(--muted-d); }
+
+/* ─── Below 1024: rigid coordinates fold into document flow ─── */
+@media (max-width: 1023.98px) {
+  .nav { display: none; }
+  .brand { grid-column: 1 / 9; }
+  .head-cta { grid-column: 9 / 13; }
+  .hero-copy { grid-column: 1 / 10; }
+  .sec-head .idx, .sec-head h2 { grid-column: 1 / -1; }
+  .sec-head h2 { margin-top: 18px; }
+  .stat { grid-column: span 6; margin-bottom: 48px; }
+  .statement { grid-column: 1 / -1; }
+  .part { grid-column: span 6; margin-bottom: 40px; }
+  .row .k { grid-column: 2 / 7; } .row .m { grid-column: 7 / 10; } .row .v { grid-column: 10 / 13; } .row .bar { grid-column: 2 / 13; margin-top: 14px; }
+  .finale-row p { grid-column: 1 / 8; } .cta { grid-column: 8 / 13; }
+}
+/* ─── Phones: static canvas on top, text stacked beneath ─── */
+@media (max-width: 767.98px) {
+  :root { --gap: 12px; --margin: 16px; }
+  .brand small { display: none; }
+  .head-cta { height: 30px; padding: 0 12px; font-size: 10px; }
+  .hero { height: auto; }
+  .hero-stage { position: relative; height: auto; overflow: visible; display: flex; flex-direction: column; }
+  #stage3d { position: relative; inset: auto; height: 64vh; margin-top: 64px; }
+  .hero-ui { position: relative; inset: auto; padding: 8px var(--margin) 56px; }
+  .hero-copy { grid-column: 1 / -1; }
+  .hero h1 { font-size: 15vw; margin-top: 16px; }
+  .hero-sub { font-size: 15px; }
+  .telemetry.tr, .telemetry.br, .scrollcue, .bracket { display: none; }
+  .telemetry.tl { top: 76px; }
+  .specs, .anatomy, .breakdown { padding: 90px 0; }
+  .sec-head h2 { font-size: 12vw; }
+  .stat-row { margin-top: 56px; }
+  .stat { grid-column: 1 / -1; margin-bottom: 36px; }
+  .stat .val { font-size: 16vw; }
+  .statement { font-size: 7.4vw; }
+  .parts { margin-top: 64px; }
+  .part { grid-column: 1 / -1; margin-bottom: 28px; }
+  .part h3 { margin-top: 20px; font-size: 24px; }
+  .row { padding: 16px 0; }
+  .row .n { grid-column: 1 / 3; } .row .k { grid-column: 3 / 13; font-size: 18px; }
+  .row .m { grid-column: 3 / 9; margin-top: 8px; } .row .v { grid-column: 9 / 13; font-size: 24px; margin-top: 8px; }
+  .row .bar { grid-column: 3 / 13; }
+  .finale { min-height: auto; padding: 100px 0 40px; }
+  .finale h2 { font-size: 19vw; }
+  .finale-row p, .cta { grid-column: 1 / -1; justify-self: start; }
+  .cta { margin-top: 28px; }
+}
+</style>
+</head>
+<body>
+<div class="grid-overlay grid" data-grid-overlay aria-hidden="true"></div>
+
+<header class="header grid">
+  <a href="#top" class="brand" data-jump>HALCYON<small>HX-07 / VANGUARD</small></a>
+  <nav class="nav mono" aria-label="Primary">
+    <a href="#specs" data-jump>01 Specs</a>
+    <a href="#anatomy" data-jump>02 Anatomy</a>
+    <a href="#breakdown" data-jump>03 Breakdown</a>
+  </nav>
+  <a href="#finale" class="head-cta mono" data-jump>Request access ↗</a>
+</header>
+
+<main id="top">
+  <!-- 01 — Hero: the 3D suit -->
+  <section class="hero dark" data-hero aria-label="Halcyon HX-07">
+    <div class="hero-stage">
+      <canvas id="stage3d" aria-label="A 3D Halcyon armour bust that leans toward your cursor"></canvas>
+      <span class="bracket a"></span><span class="bracket b"></span><span class="bracket c"></span><span class="bracket d"></span>
+      <div class="telemetry tl mono"><span>UNIT <b>HX-07</b></span><span>STATUS <b data-status>ONLINE</b></span></div>
+      <div class="telemetry tr mono"><span>YAW <b data-yaw>+0.00°</b></span><span>PITCH <b data-pitch>+0.00°</b></span><span>FRAMES <b data-frames>0</b></span></div>
+      <div class="telemetry br mono"><span>CORE <b>2.21 GW</b></span><span>PLATES <b>48 / 48</b></span></div>
+      <div class="hero-ui grid">
+        <div class="hero-copy">
+          <p class="kicker mono">Prototype HX-07 // Halcyon armour</p>
+          <h1 data-split>Engineered for impact.</h1>
+          <p class="hero-sub" data-split>Forty-eight hand-machined plates around a single hexagonal core. Move your cursor — every part answers on its own spring.</p>
+        </div>
+      </div>
+      <p class="scrollcue mono">Scroll ↓</p>
+    </div>
+  </section>
+
+  <!-- 02 — Specs (bone) -->
+  <section class="specs light" id="specs" aria-label="Specifications">
+    <div class="grid">
+      <div class="sec-head"><p class="idx mono muted">02 / Specs</p><h2 data-split>Performance, measured.</h2></div>
+      <div class="stat-row">
+        <div class="stat"><span class="mono muted">Top speed</span><div class="val"><span data-roll="3.2"></span><small>MACH</small></div><p class="muted">Sustained flight at altitude, thrust vectored through four palm and heel nozzles.</p></div>
+        <div class="stat"><span class="mono muted">Armour plates</span><div class="val"><span data-roll="48"></span><small>PCS</small></div><p class="muted">Each one machined from a single billet of grade-5 titanium, then hand-fitted.</p></div>
+        <div class="stat"><span class="mono muted">Core output</span><div class="val"><span data-roll="2.21"></span><small>GW</small></div><p class="muted">A hexagonal cell that runs the suit for nine days between charges.</p></div>
+        <div class="stat"><span class="mono muted">Response</span><div class="val"><span data-roll="0.004"></span><small>SEC</small></div><p class="muted">Neural-link latency from intention to actuator, measured at the wrist.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 — Anatomy (black) -->
+  <section class="anatomy dark" id="anatomy" aria-label="Anatomy">
+    <div class="grid">
+      <div class="sec-head"><p class="idx mono muted">03 / Anatomy</p></div>
+      <p class="statement" data-split>Nothing on HX-07 is decorative. Every seam that glows is a <em>cooling channel</em>, every plate that moves carries load, and the suit was designed from the core outward.</p>
+      <div class="parts">
+        <div class="part"><p class="mono">A — Helm</p><h3 data-split>Split-shell helm</h3><p>Faceplate retracts in 0.3 s. Twin optics run a full thermal and lidar overlay.</p></div>
+        <div class="part"><p class="mono">B — Core</p><h3 data-split>Hexagonal core</h3><p>Six cells in a ring. If one fails the other five carry the suit home.</p></div>
+        <div class="part"><p class="mono">C — Pauldrons</p><h3 data-split>Layered pauldrons</h3><p>Three sliding plates per shoulder, free to lag the torso so the arms keep full reach.</p></div>
+        <div class="part"><p class="mono">D — Seams</p><h3 data-split>Light seams</h3><p>Teal channels carry coolant and double as status: calm, charging, critical.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 — Breakdown (bone) -->
+  <section class="breakdown light" id="breakdown" aria-label="Technical breakdown">
+    <div class="grid">
+      <div class="sec-head"><p class="idx mono muted">04 / Breakdown</p><h2 data-split>Plate by plate.</h2></div>
+      <div class="table">
+        <div class="row"><span class="n mono muted">01</span><span class="k">Helm shell</span><span class="m mono muted">Ti-6Al-4V · 2.4 mm</span><span class="v"><span data-roll="1.86"></span><small>KG</small></span><span class="bar"><i data-bar=".42"></i></span></div>
+        <div class="row"><span class="n mono muted">02</span><span class="k">Chest assembly</span><span class="m mono muted">Graphite composite</span><span class="v"><span data-roll="6.40"></span><small>KG</small></span><span class="bar"><i data-bar=".88"></i></span></div>
+        <div class="row"><span class="n mono muted">03</span><span class="k">Hex core</span><span class="m mono muted">Six-cell ring</span><span class="v"><span data-roll="0.92"></span><small>KG</small></span><span class="bar"><i data-bar=".22"></i></span></div>
+        <div class="row"><span class="n mono muted">04</span><span class="k">Pauldrons (pair)</span><span class="m mono muted">Ti · three-plate slide</span><span class="v"><span data-roll="3.15"></span><small>KG</small></span><span class="bar"><i data-bar=".6"></i></span></div>
+        <div class="row"><span class="n mono muted">05</span><span class="k">Total suit</span><span class="m mono muted">Fully armed</span><span class="v"><span data-roll="38.7"></span><small>KG</small></span><span class="bar"><i data-bar="1"></i></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 — Finale (black) -->
+  <section class="finale dark" id="finale" aria-label="Request access">
+    <div class="grid">
+      <h2 data-split>Suit <span class="acc">up.</span></h2>
+      <div class="finale-row">
+        <p data-split>HX-07 is built one at a time. Request access to the next fitting slot.</p>
+        <a href="#top" class="cta" data-cta data-jump><span>Request access ↗</span></a>
+      </div>
+      <footer class="foot mono"><span>© 2026 VANGUARD INITIATIVE · HALCYON INDUSTRIES</span><span>Press G for grid</span></footer>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+/* ═════════════════════════════════════════════════════════════════
+   CONFIG
+   ═════════════════════════════════════════════════════════════════ */
+const CONFIG = {
+  // Drop in a Draco-compressed glTF of your own suit to replace the procedural one.
+  model: { url: null, scale: 1 },
+  dracoDecoder: "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/libs/draco/gltf/",
+  exposure: 1.15,
+  accent: 0x2ef2e0,
+};
+
+/* ═════════════ Basics ═════════════ */
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const PHONE = () => innerWidth < 768;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const clamp01 = (v) => Math.min(1, Math.max(0, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+
+/* ═════════════ Shared ticker (Lenis first, then everything else) ═════════════ */
+let lenis = null;
+const subs = new Set();
+const onTick = (fn) => { subs.add(fn); return () => subs.delete(fn); };
+function tick(now) {
+  requestAnimationFrame(tick);
+  lenis?.raf(now);
+  for (const fn of subs) fn(now);
+}
+
+/* ═════════════ Spring solver ═════════════
+   The core of react-spring's integrator: per-millisecond explicit steps of
+   a = (−k·(x − to) − c·v) / m, with k and c scaled as react-spring does
+   (tension·1e-6, friction·1e-3 per ms). A duration + easing mode covers
+   fixed-length tweens. Springs register themselves while moving. */
+const EASE = {
+  linear: (t) => t,
+  easeOutCubic: (t) => 1 - Math.pow(1 - t, 3),
+  easeInOutCubic: (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+};
+const moving = new Set();
+class Spring {
+  constructor(value = 0, config = {}) {
+    this.x = value; this.v = 0; this.to = value; this.from = value;
+    this.c = { tension: 170, friction: 26, mass: 1, precision: 0.0005, ...config };
+    this.onChange = null; this.onRest = null; this.t0 = 0; this.last = 0;
+  }
+  get active() { return moving.has(this); }
+  start(to, { delay = 0, config } = {}) {
+    if (config) this.c = { ...this.c, ...config };
+    this.from = this.x; this.to = to;
+    this.t0 = performance.now() + delay; this.last = 0;
+    moving.add(this);
+    return this;
+  }
+  jump(x) { this.x = this.to = x; this.v = 0; moving.delete(this); this.onChange?.(x); }
+  step(now) {
+    if (now < this.t0) return;
+    const c = this.c;
+    if (c.duration !== undefined) {
+      const k = c.duration <= 0 ? 1 : clamp01((now - this.t0) / c.duration);
+      this.x = lerp(this.from, this.to, (c.easing || EASE.linear)(k));
+      this.onChange?.(this.x);
+      if (k >= 1) this.rest();
+      return;
+    }
+    const prev = this.last || now - 16.667;
+    this.last = now;
+    const steps = Math.max(1, Math.ceil(Math.min(64, now - prev)));
+    for (let i = 0; i < steps; i++) {
+      const a = (-c.tension * 1e-6 * (this.x - this.to) - c.friction * 1e-3 * this.v) / c.mass;
+      this.v += a; this.x += this.v;
+    }
+    const settled = Math.abs(this.v) < c.precision / 10 && Math.abs(this.x - this.to) < c.precision;
+    if (settled) { this.x = this.to; this.v = 0; }
+    this.onChange?.(this.x);
+    if (settled) this.rest();
+  }
+  rest() { moving.delete(this); this.onRest?.(this.x); }
+}
+onTick((now) => { for (const s of [...moving]) s.step(now); });
+const dur = (ms, ease = "easeOutCubic") => ({ duration: ms, easing: EASE[ease] });
+
+/* ═════════════ Inview: one IntersectionObserver per call ═════════════ */
+function inview(el, onEnter, { once = true, rootMargin = "0px 0px -12% 0px", threshold = 0 } = {}) {
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) if (e.isIntersecting) { onEnter(); if (once) io.disconnect(); }
+  }, { rootMargin, threshold });
+  io.observe(el);
+  return io;
+}
+
+/* ═════════════ Split words: masks + 110% → 0, 900ms easeOutCubic ═════════════ */
+function splitWords(el, { stagger = 45 } = {}) {
+  el.setAttribute("aria-label", el.textContent.replace(/\s+/g, " ").trim());
+  const springs = [];
+  const walk = (node) => {
+    for (const child of [...node.childNodes]) {
+      if (child.nodeType === 1) { walk(child); continue; }
+      if (child.nodeType !== 3) continue;
+      const frag = document.createDocumentFragment();
+      for (const part of child.textContent.split(/(\s+)/)) {
+        if (!part) continue;
+        if (/^\s+$/.test(part)) { frag.append(" "); continue; }
+        const mask = document.createElement("span"); mask.className = "w"; mask.setAttribute("aria-hidden", "true");
+        const inner = document.createElement("span"); inner.textContent = part;
+        mask.append(inner); frag.append(mask);
+        const s = new Spring(0, dur(900));
+        s.onChange = (v) => { inner.style.transform = `translate3d(0, ${lerp(110, 0, v).toFixed(2)}%, 0)`; };
+        springs.push(s);
+      }
+      child.replaceWith(frag);
+    }
+  };
+  walk(el);
+  return { play: () => springs.forEach((s, i) => s.start(1, { delay: REDUCED ? 0 : i * stagger, config: REDUCED ? dur(1) : undefined })) };
+}
+for (const el of $$("[data-split]")) {
+  const sp = splitWords(el, { stagger: el.tagName === "P" ? 18 : 45 });
+  inview(el, sp.play);
+}
+
+/* ═════════════ DigitRoll: each digit rides a 0–9 stack on its own spring ═════════════ */
+function digitRoll(host, value) {
+  host.classList.add("dr");
+  host.setAttribute("aria-label", value);
+  const cols = [];
+  for (const ch of value) {
+    if (!/\d/.test(ch)) { const s = document.createElement("span"); s.className = "dr-lit"; s.textContent = ch; s.setAttribute("aria-hidden", "true"); host.append(s); continue; }
+    const col = document.createElement("span"); col.className = "dr-col"; col.setAttribute("aria-hidden", "true");
+    const stack = document.createElement("span");
+    // Two full loops then the target, so every digit visibly travels.
+    for (let r = 0; r < 3; r++) for (let d = 0; d <= 9; d++) { const c = document.createElement("span"); c.textContent = d; stack.append(c); }
+    col.append(stack); host.append(col);
+    const target = 20 + +ch;
+    const s = new Spring(0, { tension: 95, friction: 24, mass: 1, precision: 0.002 });
+    s.onChange = (v) => { stack.style.transform = `translate3d(0, ${(-v / 30) * 100}%, 0)`; };
+    s.onChange(0);
+    cols.push({ s, target });
+  }
+  return { play: () => cols.forEach((c, i) => c.s.start(c.target, { delay: REDUCED ? 0 : i * 90 })), jump: () => cols.forEach((c) => c.s.jump(c.target)) };
+}
+for (const el of $$("[data-roll]")) { const r = digitRoll(el, el.dataset.roll); REDUCED ? r.jump() : inview(el, r.play); }
+for (const bar of $$("[data-bar]")) {
+  const s = new Spring(0, { tension: 90, friction: 24 });
+  s.onChange = (v) => { bar.style.transform = `scaleX(${v.toFixed(4)})`; };
+  inview(bar, () => s.start(+bar.dataset.bar));
+}
+
+/* ═════════════ Magnetic CTA (springs, desktop only) ═════════════ */
+{
+  const cta = $("[data-cta]"), label = cta.firstElementChild;
+  const sx = new Spring(0, { tension: 180, friction: 16 }), sy = new Spring(0, { tension: 180, friction: 16 });
+  const draw = () => { cta.style.transform = `translate3d(${sx.x.toFixed(2)}px, ${sy.x.toFixed(2)}px, 0)`; label.style.transform = `translate3d(${(sx.x * 0.4).toFixed(2)}px, ${(sy.x * 0.4).toFixed(2)}px, 0)`; };
+  sx.onChange = sy.onChange = draw;
+  cta.addEventListener("pointermove", (e) => {
+    if (PHONE() || e.pointerType === "touch") return;
+    const b = cta.getBoundingClientRect();
+    sx.start((e.clientX - (b.left + b.width / 2)) * 0.35); sy.start((e.clientY - (b.top + b.height / 2)) * 0.35);
+  });
+  cta.addEventListener("pointerleave", () => { sx.start(0); sy.start(0); });
+}
+
+/* ═════════════ Grid overlay (G) ═════════════ */
+{
+  const g = $("[data-grid-overlay]");
+  for (let i = 0; i < 12; i++) g.append(document.createElement("span"));
+  addEventListener("keydown", (e) => {
+    if (e.key.toLowerCase() !== "g" || e.metaKey || e.ctrlKey || e.altKey || /input|textarea/i.test(e.target.tagName)) return;
+    g.classList.toggle("on");
+  });
+}
+
+/* ═════════════ Pointer (shared) ═════════════ */
+const pointer = { x: 0, y: 0 };
+addEventListener("pointermove", (e) => {
+  if (e.pointerType === "touch") return;
+  pointer.x = (e.clientX / innerWidth) * 2 - 1;
+  pointer.y = (e.clientY / innerHeight) * 2 - 1;
+  lean.aim();
+}, { passive: true });
+
+/* ═════════════ PointerLean: independent springs per structural group ═════════════
+   The torso is heavy and slow, the helm quick, the faceplate lags the helm with
+   a little overshoot, the pauldrons trail the torso, the core ring wobbles. */
+const LEAN = {
+  body:     { yaw: 0.28, pitch: 0.08, slide: 0.18, cfg: { tension: 110, friction: 26, mass: 2.2 } },
+  head:     { yaw: 0.6,  pitch: 0.32, cfg: { tension: 220, friction: 22, mass: 1 } },
+  face:     { yaw: 0.1,  pitch: 0.08, cfg: { tension: 140, friction: 11, mass: 1 } },
+  pauldron: { yaw: 0.12, pitch: 0.1,  cfg: { tension: 70,  friction: 18, mass: 2.6 } },
+  core:     { spin: 1.4, cfg: { tension: 90, friction: 9, mass: 1 } },
+};
+const lean = (() => {
+  // Rest threshold in pointer units (±1): fine enough to be invisible, coarse enough to stop quickly.
+  const mk = (cfg) => ({ x: new Spring(0, { ...cfg, precision: 0.002 }), y: new Spring(0, { ...cfg, precision: 0.002 }) });
+  const S = { body: mk(LEAN.body.cfg), head: mk(LEAN.head.cfg), face: mk(LEAN.face.cfg), pauldron: mk(LEAN.pauldron.cfg), core: new Spring(0, { ...LEAN.core.cfg, precision: 0.002 }) };
+  const all = [S.body.x, S.body.y, S.head.x, S.head.y, S.face.x, S.face.y, S.pauldron.x, S.pauldron.y, S.core];
+  return {
+    S,
+    enabled: () => !PHONE() && !REDUCED,
+    aim() {
+      if (!this.enabled()) return;
+      for (const k of ["body", "head", "face", "pauldron"]) { S[k].x.start(pointer.x); S[k].y.start(pointer.y); }
+      S.core.start(pointer.x);
+    },
+    anyActive: () => all.some((s) => s.active),
+  };
+})();
+
+/* ═════════════ The 3D stage ═════════════ */
+async function stage3D() {
+  const canvas = $("#stage3d");
+  // Variable specifiers: the browser resolves them through the importmap, and Vite leaves them alone.
+  const SPEC = { three: "three", draco: "three/addons/loaders/DRACOLoader.js", gltf: "three/addons/loaders/GLTFLoader.js" };
+  const THREE = await import(/* @vite-ignore */ SPEC.three);
+  const { DRACOLoader } = await import(/* @vite-ignore */ SPEC.draco);
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.NeutralToneMapping;
+  renderer.toneMappingExposure = CONFIG.exposure;
+  renderer.setClearColor(0x050505, 1);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+
+  // ── Studio: emissive softbox planes baked into a PMREM environment ──
+  {
+    const room = new THREE.Scene();
+    room.background = new THREE.Color(0x000000); // keeps the reflections' shadows truly black
+    const box = (w, h, intensity, pos, look, color = 0xffffff) => {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(intensity), side: THREE.DoubleSide }));
+      m.position.set(...pos); m.lookAt(...look); room.add(m);
+    };
+    box(9, 4, 5.5, [0, 7, 1], [0, 0, 0]);                 // key softbox overhead
+    box(1.4, 8, 7, [-6, 1.5, 2.5], [0, 1, 0]);            // left strip
+    box(1.4, 8, 7, [6, 1.5, 2.5], [0, 1, 0]);             // right strip
+    box(6, 2.5, 1.2, [0, 1.5, 7], [0, 1, 0]);             // soft front fill
+    box(3, 6, 2.2, [0, 2, -6], [0, 1, 0], 0x9ffcf4);      // faint teal kicker behind
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(room, 0.03).texture;
+    scene.environmentIntensity = 0.85;
+    pmrem.dispose();
+  }
+  // Two sharp rim lights, 60° off-axis behind the subject.
+  const rimL = new THREE.DirectionalLight(0xffffff, 3.2); rimL.position.set(-Math.sin(Math.PI / 3) * 6, 3.5, -Math.cos(Math.PI / 3) * 6);
+  const rimR = new THREE.DirectionalLight(0xdffbff, 2.6); rimR.position.set(Math.sin(Math.PI / 3) * 6, 2.5, -Math.cos(Math.PI / 3) * 6);
+  scene.add(rimL, rimR);
+
+  // ── The suit ──
+  let rig = buildHalcyon(THREE);
+  scene.add(rig.root);
+  if (CONFIG.model.url) {
+    try {
+      const { GLTFLoader } = await import(/* @vite-ignore */ SPEC.gltf);
+      const draco = new DRACOLoader().setDecoderPath(CONFIG.dracoDecoder);
+      const gltf = await new GLTFLoader().setDRACOLoader(draco).loadAsync(CONFIG.model.url);
+      scene.remove(rig.root);
+      const root = new THREE.Group(); root.add(gltf.scene); gltf.scene.scale.setScalar(CONFIG.model.scale);
+      const find = (n) => gltf.scene.getObjectByName(n) || new THREE.Group();
+      rig = { root, parts: { body: root, head: find("Head"), face: find("Faceplate"), pauldronL: find("PauldronL"), pauldronR: find("PauldronR"), core: find("Core") } };
+      scene.add(root);
+    } catch (err) { console.warn("Model failed to load; keeping the procedural suit.", err); }
+  }
+
+  // ── Drawing on demand ──
+  let dirty = true, visible = true, frames = 0, scrollP = 0;
+  const hero = $("[data-hero]");
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) dirty = true; }).observe(hero);
+  const resize = () => {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    // Wide screens: the suit sits right of centre, clear of the headline.
+    const shift = w >= 1024 ? -0.16 * w : 0;
+    camera.setViewOffset(w, h, shift, 0, w, h);
+    camera.updateProjectionMatrix();
+    dirty = true;
+  };
+  let rt = 0;
+  addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(resize, 120); });
+  resize();
+  const readScroll = () => {
+    if (PHONE()) { scrollP = 0; return; }
+    const r = hero.getBoundingClientRect();
+    const p = clamp01(-r.top / Math.max(1, r.height - innerHeight));
+    if (Math.abs(p - scrollP) > 1e-4) { scrollP = p; dirty = true; }
+  };
+  addEventListener("scroll", readScroll, { passive: true });
+
+  const yawEl = $("[data-yaw]"), pitchEl = $("[data-pitch]"), framesEl = $("[data-frames]");
+  const { S } = lean, P = rig.parts;
+  onTick(() => {
+    if (!visible) return;                                   // off-screen: frozen
+    if (!dirty && !lean.anyActive()) return;                // settled: frozen
+    dirty = false;
+    const L = LEAN;
+    // Scroll: a slow quarter turn and a dolly in.
+    rig.root.rotation.y = S.body.x.x * L.body.yaw - scrollP * 0.9;
+    rig.root.rotation.x = S.body.y.x * L.body.pitch;
+    rig.root.position.x = S.body.x.x * L.body.slide;
+    rig.root.position.y = -S.body.y.x * 0.06;
+    P.head.rotation.y = (S.head.x.x - S.body.x.x) * L.head.yaw;
+    P.head.rotation.x = (S.head.y.x - S.body.y.x) * L.head.pitch * 0.6 + S.head.y.x * 0.18;
+    P.face.rotation.y = (S.face.x.x - S.head.x.x) * L.face.yaw;
+    P.face.rotation.x = (S.face.y.x - S.head.y.x) * L.face.pitch;
+    P.face.position.z = 0.012 + Math.abs(S.face.x.x - S.head.x.x) * 0.02;
+    const pl = (S.pauldron.x.x - S.body.x.x), pp = (S.pauldron.y.x - S.body.y.x);
+    P.pauldronL.rotation.z = 0.32 + pp * L.pauldron.pitch - pl * 0.05; P.pauldronL.rotation.y = pl * L.pauldron.yaw;
+    P.pauldronR.rotation.z = -0.32 - pp * L.pauldron.pitch - pl * 0.05; P.pauldronR.rotation.y = pl * L.pauldron.yaw;
+    P.core.rotation.z = S.core.x * L.core.spin;
+    // Narrow screens: back off until the shoulders fit the width.
+    const fit = 1.8 / (Math.tan((camera.fov / 2) * Math.PI / 180) * camera.aspect);
+    camera.position.set(0, lerp(1.3, 1.5, scrollP), Math.max(lerp(8.2, 6.6, scrollP), fit));
+    camera.lookAt(0, lerp(0.72, 1.0, scrollP), 0);
+    renderer.render(scene, camera);
+    frames++;
+    yawEl.textContent = `${rig.root.rotation.y >= 0 ? "+" : ""}${(rig.root.rotation.y * 57.3).toFixed(2)}°`;
+    pitchEl.textContent = `${rig.root.rotation.x >= 0 ? "+" : ""}${(rig.root.rotation.x * 57.3).toFixed(2)}°`;
+    framesEl.textContent = frames;
+  });
+  window.__stage = { get frames() { return frames; } };
+}
+
+/* ═════════════ Procedural HX-07 bust ═════════════ */
+function buildHalcyon(THREE) {
+  const graphite = new THREE.MeshPhysicalMaterial({ color: 0x17191b, metalness: 0.9, roughness: 0.34, clearcoat: 0.6, clearcoatRoughness: 0.22 });
+  const titanium = new THREE.MeshPhysicalMaterial({ color: 0x8e979c, metalness: 1, roughness: 0.24, clearcoat: 0.3, clearcoatRoughness: 0.3 });
+  const rubber = new THREE.MeshStandardMaterial({ color: 0x0a0b0c, metalness: 0.2, roughness: 0.75 });
+  const glow = new THREE.MeshBasicMaterial({ color: CONFIG.accent, toneMapped: false });
+  const add = (parent, geo, mat, pos = [0, 0, 0], rot = [0, 0, 0], scale) => {
+    const m = new THREE.Mesh(geo, mat); m.position.set(...pos); m.rotation.set(...rot); if (scale) m.scale.set(...scale); parent.add(m); return m;
+  };
+  // Helmet profile: taller than wide, jaw tapering, back slightly flattened.
+  const shapeHead = (geo) => {
+    const p = geo.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      let x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+      y *= 1.14;
+      if (y < 0) { const t = 1 + y * 0.42; x *= t; z *= t; }
+      if (z < 0) z *= 0.9;
+      p.setXYZ(i, x, y, z);
+    }
+    geo.computeVertexNormals();
+    return geo;
+  };
+  const root = new THREE.Group();
+  const body = new THREE.Group(); root.add(body);
+
+  // Torso: a bevelled shield-shaped chest plate.
+  const chestShape = new THREE.Shape();
+  [[-0.95, 0.55], [0.95, 0.55], [1.08, 0.08], [0.78, -0.55], [0.32, -0.78], [-0.32, -0.78], [-0.78, -0.55], [-1.08, 0.08]].forEach(([x, y], i) => (i ? chestShape.lineTo(x, y) : chestShape.moveTo(x, y)));
+  chestShape.closePath();
+  const chestGeo = new THREE.ExtrudeGeometry(chestShape, { depth: 0.55, bevelEnabled: true, bevelThickness: 0.16, bevelSize: 0.13, bevelSegments: 6, curveSegments: 4 });
+  chestGeo.center();
+  add(body, chestGeo, graphite, [0, 0.35, 0]);
+  // Pectoral plates
+  const pec = new THREE.Shape(); pec.moveTo(0.08, 0.42); pec.lineTo(0.86, 0.42); pec.lineTo(0.94, 0.04); pec.lineTo(0.5, -0.2); pec.lineTo(0.08, -0.06); pec.closePath();
+  const pecGeo = new THREE.ExtrudeGeometry(pec, { depth: 0.06, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.03, bevelSegments: 3 });
+  add(body, pecGeo, titanium, [0, 0.36, 0.4]);
+  add(body, pecGeo, titanium, [0, 0.36, 0.4], [0, Math.PI, 0]).position.z = 0.52;
+  // Abdomen plates with glowing seams
+  for (let i = 0; i < 3; i++) {
+    add(body, new THREE.BoxGeometry(0.62 - i * 0.08, 0.16, 0.34), graphite, [0, -0.28 - i * 0.2, 0.26]);
+    add(body, new THREE.BoxGeometry(0.5 - i * 0.08, 0.012, 0.3), glow, [0, -0.365 - i * 0.2, 0.28]);
+  }
+  // Seams: collarbones and sternum
+  add(body, new THREE.BoxGeometry(0.02, 0.62, 0.02), glow, [0, 0.36, 0.555]);
+  add(body, new THREE.BoxGeometry(0.62, 0.016, 0.02), glow, [-0.46, 0.78, 0.46], [0, 0, -0.08]);
+  add(body, new THREE.BoxGeometry(0.62, 0.016, 0.02), glow, [0.46, 0.78, 0.46], [0, 0, 0.08]);
+  // Hexagonal core
+  const core = new THREE.Group(); core.position.set(0, 0.42, 0.58); body.add(core);
+  add(core, new THREE.CylinderGeometry(0.15, 0.15, 0.06, 6), glow, [0, 0, 0], [Math.PI / 2, 0, 0]);
+  add(core, new THREE.TorusGeometry(0.22, 0.035, 10, 6), titanium, [0, 0, 0], [0, 0, Math.PI / 6]);
+  add(core, new THREE.TorusGeometry(0.29, 0.012, 8, 6), glow, [0, 0, -0.01], [0, 0, Math.PI / 6]);
+  for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2; add(core, new THREE.BoxGeometry(0.03, 0.07, 0.03), titanium, [Math.cos(a) * 0.36, Math.sin(a) * 0.36, 0], [0, 0, a]); }
+  // Neck
+  add(body, new THREE.CylinderGeometry(0.26, 0.34, 0.42, 32), rubber, [0, 0.98, 0]);
+  for (let i = 0; i < 3; i++) add(body, new THREE.TorusGeometry(0.29 - i * 0.02, 0.012, 8, 40), titanium, [0, 0.86 + i * 0.1, 0], [Math.PI / 2, 0, 0]);
+
+  // Head
+  const head = new THREE.Group(); head.position.set(0, 1.58, 0); body.add(head);
+  add(head, shapeHead(new THREE.SphereGeometry(0.6, 72, 48)), graphite);
+  const face = new THREE.Group(); head.add(face);
+  add(face, shapeHead(new THREE.SphereGeometry(0.622, 72, 40, Math.PI / 2 - 0.95, 1.9, Math.PI * 0.3, Math.PI * 0.62)), titanium);
+  // Visor slits
+  add(face, new THREE.BoxGeometry(0.2, 0.034, 0.06), glow, [-0.15, 0.1, 0.6], [0, -0.2, 0.16]);
+  add(face, new THREE.BoxGeometry(0.2, 0.034, 0.06), glow, [0.15, 0.1, 0.6], [0, 0.2, -0.16]);
+  // Mouth grille
+  for (let i = 0; i < 4; i++) add(face, new THREE.BoxGeometry(0.16 - i * 0.02, 0.012, 0.04), rubber, [0, -0.26 - i * 0.045, 0.53 - i * 0.02]);
+  // Crest ridge over the top
+  add(head, new THREE.TorusGeometry(0.598, 0.018, 8, 80, Math.PI * 0.9), titanium, [0, 0, 0], [0, Math.PI / 2, 0.05 * Math.PI], [1, 1.14, 0.95]);
+  // Cheek vents
+  for (const s of [-1, 1]) for (let i = 0; i < 3; i++) add(head, new THREE.BoxGeometry(0.02, 0.1, 0.12), rubber, [s * 0.555, -0.12 - i * 0.06, 0.14], [0, 0, s * 0.18]);
+
+  // Pauldrons: layered half-domes with a glowing rim
+  const pauldron = (side) => {
+    const g = new THREE.Group(); g.position.set(side * 1.16, 0.74, 0); g.rotation.z = side * -0.32;
+    add(g, new THREE.SphereGeometry(0.46, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2), graphite, [0, 0, 0], [0, 0, 0], [1.12, 0.78, 1]);
+    add(g, new THREE.SphereGeometry(0.4, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2), titanium, [side * 0.06, 0.12, 0], [0, 0, 0], [1.05, 0.62, 0.95]);
+    add(g, new THREE.TorusGeometry(0.462, 0.012, 8, 64), glow, [0, 0.005, 0], [Math.PI / 2, 0, 0], [1.12, 1, 1]);
+    add(g, new THREE.CylinderGeometry(0.26, 0.24, 0.9, 32), graphite, [side * 0.02, -0.48, 0]);
+    body.add(g);
+    return g;
+  };
+  const pauldronL = pauldron(-1), pauldronR = pauldron(1);
+
+  root.traverse((o) => { if (o.isMesh) o.frustumCulled = true; });
+  return { root, parts: { body, head, face, pauldronL, pauldronR, core } };
+}
+
+/* ═════════════ Anchors + boot ═════════════ */
+$$("[data-jump]").forEach((a) => a.addEventListener("click", (e) => {
+  const href = a.getAttribute("href"), target = href === "#top" ? 0 : $(href);
+  if (target === null) return;
+  e.preventDefault();
+  lenis ? lenis.scrollTo(target, { duration: 1.5 }) : scrollTo({ top: target === 0 ? 0 : target.offsetTop, behavior: "smooth" });
+}));
+
+(async () => {
+  try {
+    const LENIS = "lenis";
+    const { default: Lenis } = await import(/* @vite-ignore */ LENIS);
+    lenis = new Lenis({ lerp: 0.085, smoothWheel: true });
+    window.lenis = lenis;
+  } catch { lenis = null; }
+  requestAnimationFrame(tick);
+  try { await stage3D(); }
+  catch (err) { console.warn("3D stage unavailable:", err); $("#stage3d").style.background = "radial-gradient(50% 50% at 65% 45%, rgba(46,242,224,.18), transparent 70%), #050505"; }
+})();
+</script>
+</body>
+</html>
