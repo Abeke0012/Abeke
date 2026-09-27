@@ -1,0 +1,28 @@
+/* ── Tier 1: raw primitives. Every ink step holds the same ~354° hue and only drops chroma,
+      so the darkest field is the accent's own colour, not a grey the accent sits on. ── */
+:root {
+  --raw-ink-950: #150406;
+  --raw-ink-900: #1e070a;
+  --raw-ink-800: #2c0e13;
+  --raw-ink-700: #431a20;
+  --raw-bone-50: #f2f3f5;
+  --raw-bone-400: #9a8a8d;
+  --raw-bone-500: #75666a;
+  --raw-scarlet-500: #e0202b;
+  --raw-scarlet-300: #ff5d64;
+  --raw-cobalt-500: #2b4fd0;
+}
+/* ── Tier 2: semantic roles. Scarlet belongs to the figure, cobalt to the room; never both. ── */
+:root {
+  --color-field: var(--raw-ink-950);
+  --color-field-raised: var(--raw-ink-900);
+  --color-hairline: var(--raw-ink-700);
+  --color-text: var(--raw-bone-50);
+  --color-text-muted: var(--raw-bone-400);
+  --color-text-faint: var(--raw-bone-500);
+  --color-figure: var(--raw-scarlet-500);
+  --color-figure-hot: var(--raw-scarlet-300);
+  --color-room: var(--raw-cobalt-500);
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}

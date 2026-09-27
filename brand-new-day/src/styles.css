@@ -1,0 +1,43 @@
+/* Tier 3 — bind: components only ever reference semantic roles. */
+*, *::before, *::after { box-sizing: border-box; }
+html { overflow-x: hidden; }
+html, body { margin: 0; background: var(--color-field); color: var(--color-text); }
+body { font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+
+.track { height: 2200vh; position: relative; }
+.stage { position: sticky; top: 0; height: 100vh; height: 100svh; width: 100%; overflow: hidden; background: var(--color-field); }
+.stage canvas { display: block; }
+
+.ov { position: absolute; inset: 0; pointer-events: none; perspective: 900px; }
+.ov .ch { display: inline-block; will-change: transform, filter, opacity; backface-visibility: hidden; }
+
+.title {
+  position: absolute; left: 0; right: 0; top: 50%; margin: 0; transform: translateY(-50%);
+  text-align: center; font-weight: 800; font-stretch: 125%;
+  font-size: clamp(2.1rem, 9.2vw, 9.5rem); line-height: 0.9; letter-spacing: -0.02em;
+  color: var(--color-text); transform-style: preserve-3d; white-space: nowrap;
+}
+.phrase {
+  position: absolute; left: 0; right: 0; bottom: 14vh; margin: 0; text-align: center;
+  font-family: var(--font-mono); font-weight: 500; font-size: clamp(0.8rem, 1.6vw, 1.05rem);
+  letter-spacing: 0.5em; padding-left: 0.5em; color: var(--color-text-muted);
+  transform-style: preserve-3d; visibility: hidden;
+}
+.dots { position: absolute; right: 22px; top: 50%; transform: translateY(-50%); display: grid; gap: 10px; }
+.dots i { display: block; width: 4px; height: 4px; background: var(--color-text); opacity: 0.18; }
+.bar { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--color-hairline); }
+.bar i { display: block; height: 100%; background: var(--color-text-muted); transform-origin: 0 50%; transform: scaleX(0); }
+
+.replay {
+  position: absolute; left: 50%; bottom: 8vh; transform: translateX(-50%);
+  pointer-events: auto; visibility: hidden; opacity: 0;
+  width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--color-hairline);
+  background: transparent; color: var(--color-text); font-size: 20px; cursor: pointer;
+}
+.replay:hover { border-color: var(--color-text-muted); }
+.replay:focus-visible { outline: 1px solid var(--color-text); outline-offset: 3px; }
+
+@media (max-width: 760px) {
+  .dots { right: 12px; }
+  .phrase { letter-spacing: 0.35em; }
+}
