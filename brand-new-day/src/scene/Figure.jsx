@@ -13,7 +13,14 @@ export default function Figure() {
   const geo = useMemo(() => new THREE.SphereGeometry(0.5, 8, 6), []);
   const mat = useMemo(() => new THREE.MeshBasicMaterial({ transparent: true, opacity: 1, fog: true }), []);
 
-  useEffect(() => { let live = true; loadPlate().then((img) => live && setBeads(sampleFigure(img, COUNT))); return () => { live = false; }; }, []);
+  useEffect(() => {
+    let live = true;
+    loadPlate().then(({ img, photo }) => live && setBeads(sampleFigure(img, COUNT, { photo })));
+    // A photo picked or dropped on the page re-bakes the beads once. Nothing here runs per frame.
+    const onPlate = (e) => setBeads(sampleFigure(e.detail.img, COUNT, { photo: e.detail.photo }));
+    window.addEventListener("bnd:plate", onPlate);
+    return () => { live = false; window.removeEventListener("bnd:plate", onPlate); };
+  }, []);
 
   useEffect(() => {
     const m = mesh.current; if (!m || !beads) return;

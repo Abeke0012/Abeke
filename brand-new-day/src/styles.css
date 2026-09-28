@@ -34,6 +34,13 @@ body { font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
   width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--color-hairline);
   background: transparent; color: var(--color-text); font-size: 20px; cursor: pointer;
 }
+.photo {
+  position: absolute; left: 22px; top: 22px; pointer-events: auto;
+  width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--color-hairline);
+  background: transparent; color: var(--color-text-muted); cursor: pointer; display: grid; place-items: center;
+}
+.photo:hover { color: var(--color-text); border-color: var(--color-text-muted); }
+.photo:focus-visible { outline: 1px solid var(--color-text); outline-offset: 3px; }
 .replay:hover { border-color: var(--color-text-muted); }
 .replay:focus-visible { outline: 1px solid var(--color-text); outline-offset: 3px; }
 
