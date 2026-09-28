@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CHRONO-MATRIX — Caliber 01</title>
+  <meta name="description" content="CHRONO-MATRIX Caliber 01. A central flying tourbillon, taken apart by scroll." />
+  <meta name="theme-color" content="#0A0A0A" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syncopate:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <!-- Calibration matrix: toggled with G -->
+  <div class="dev-grid" aria-hidden="true"><div class="dev-grid__cols"></div></div>
+
+  <!-- ── SECTION 1 · FIXED HEAD & CALIBRATION BAR ── -->
+  <header class="head">
+    <div class="head__brand">
+      <a class="head__logo" href="#caliber" data-jump="0">CHRONO-MATRIX<sup>®</sup></a>
+      <div class="head__clock" aria-label="Local time">
+        <svg class="head__dial" viewBox="-10 -10 20 20" aria-hidden="true">
+          <circle r="8.5" fill="none" stroke="currentColor" stroke-width="1" />
+          <line class="head__tick" x1="0" y1="0" x2="0" y2="-7" stroke="currentColor" stroke-width="1.2" />
+        </svg>
+        <span class="head__time">00:00:00.000</span>
+      </div>
+    </div>
+    <nav class="head__nav" aria-label="Sections">
+      <a href="#caliber" data-jump="0">01 / CALIBER</a>
+      <a href="#anatomy" data-jump="0.41">02 / ANATOMY</a>
+      <a href="#spec" data-jump="0.97">03 / SPEC</a>
+    </nav>
+    <div class="head__cta"><a class="btn-reserve" href="#spec" data-jump="0.97"><span>+ RESERVE PIECE</span></a></div>
+  </header>
+
+  <main>
+    <!-- ── SECTION 2 · THE CALIBER HERO (1600vh) ── -->
+    <section class="hero" id="hero" aria-label="Caliber 01">
+      <!-- anchor targets for the nav (keyboard + no-JS fallback) -->
+      <span class="hero__anchor" id="caliber" style="top:0"></span>
+      <span class="hero__anchor" id="anatomy" style="top:38%"></span>
+      <span class="hero__anchor" id="spec" style="top:90%"></span>
+
+      <div class="lens">
+        <!-- Background: the gearbox -->
+        <div class="gearbox" aria-hidden="true">
+          <div class="gear gear--a" data-gear="a"></div>
+          <div class="gear gear--b" data-gear="b"></div>
+          <div class="gear gear--c" data-gear="c"></div>
+        </div>
+
+        <!-- Phase 3 backdrop: blueprint macro -->
+        <div class="blueprint" aria-hidden="true"></div>
+
+        <!-- Centerpiece: the exploding chassis -->
+        <div class="chassis" aria-hidden="true">
+          <div class="layer layer--1" data-layer="1"></div>
+          <div class="layer layer--2" data-layer="2"><div class="zoom"></div></div>
+          <div class="layer layer--3" data-layer="3"></div>
+          <div class="layer layer--4" data-layer="4"></div>
+        </div>
+
+        <!-- Phase 2 side-labels, positioned by projecting their 3D anchors -->
+        <div class="labels" aria-hidden="true">
+          <div class="tag tag--r" data-tag="3"><i class="tag__dot"></i><i class="tag__line"></i><span class="tag__txt"><b>FLYBACK CHRONOGRAPH</b><em>L3 · DIAL / 30-MIN REGISTER · Z +150</em></span></div>
+          <div class="tag tag--l" data-tag="2"><i class="tag__dot"></i><i class="tag__line"></i><span class="tag__txt"><b>ANTI-MAGNETIC BALANCE WHEEL</b><em>L2 · SILICON HAIRSPRING · Z ±0</em></span></div>
+          <div class="tag tag--l" data-tag="1"><i class="tag__dot"></i><i class="tag__line"></i><span class="tag__txt"><b>65-HOUR POWER RESERVE</b><em>L1 · TWIN BARREL · Z −200</em></span></div>
+        </div>
+
+        <!-- Copy on a 12-column grid -->
+        <div class="lens__grid">
+          <h1 class="title"><span class="title__row">CALIBER</span><span class="title__row">01</span></h1>
+
+          <div class="macro">
+            <p class="macro__kicker">PHASE 03 / MACRO · ×4.5</p>
+            <p class="macro__txt">Beating at 28,800 vibrations per hour. Hand-finished chamfered bridges. Precision regulation inside a flying cage.</p>
+          </div>
+
+          <div class="spec" aria-label="Technical specification">
+            <p class="spec__kicker">03 / SPEC — CALIBER CM-01</p>
+            <dl class="spec__grid">
+              <div class="spec__cell"><dt>MATERIAL</dt><dd>GRADE 5 TITANIUM</dd></div>
+              <div class="spec__cell"><dt>FREQUENCY</dt><dd>4 HZ</dd></div>
+              <div class="spec__cell"><dt>JEWELS</dt><dd>38 RUBIES</dd></div>
+              <div class="spec__cell"><dt>WATER RESISTANCE</dt><dd>100M</dd></div>
+            </dl>
+            <a class="btn-reserve btn-reserve--lg" href="#spec"><span>+ RESERVE PIECE</span></a>
+          </div>
+        </div>
+
+        <!-- Instrument readout -->
+        <div class="hud" aria-hidden="true">
+          <span class="hud__phase">PHASE 01 / CALIBER</span>
+          <span class="hud__gauge"><i></i></span>
+          <span class="hud__pct">000.0%</span>
+        </div>
+        <div class="hud hud--r" aria-hidden="true"><span class="hud__z">Z · L4 +000 · L3 +000 · L1 −000</span></div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <div class="foot__line"></div>
+      <p>CHRONO-MATRIX<sup>®</sup> · CALIBER CM-01 · EDITION OF 88</p>
+      <p class="foot__mono">PRESS G · CALIBRATION MATRIX</p>
+    </footer>
+  </main>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
