@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NEXUS-MIND — Neural Architecture</title>
+  <meta name="description" content="NEXUS-MIND. A neural-interface security core, rendered as a live procedural particle matrix." />
+  <meta name="theme-color" content="#030303" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Orbitron:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <!-- Proxy scroller: the viewport is locked; this container's scroll drives the timeline -->
+  <div class="scroller" id="scroller" tabindex="0" aria-label="Scroll to explore">
+    <div class="scroller__track"></div>
+  </div>
+
+  <canvas id="matrix-canvas" aria-hidden="true"></canvas>
+
+  <div class="ui" id="ui">
+    <header class="bar">
+      <div class="bar__brand"><span class="bar__mark" aria-hidden="true"></span>NEXUS-MIND</div>
+      <div class="bar__status"><i class="dot"></i><span>SECURE CHANNEL · AES-512 / QKD</span></div>
+      <div class="bar__hint">[ H ] CONSOLE</div>
+    </header>
+
+    <main class="grid">
+      <!-- PHASE 1 -->
+      <section class="p1" aria-label="Neural architecture">
+        <p class="kicker">// 01 · CONSTELLATION</p>
+        <h1 class="title">
+          <span class="w">NEURAL</span>
+          <span class="w">ARCHI&shy;TECTURE</span>
+        </h1>
+        <p class="lede"><span class="w2">A</span> <span class="w2">self-organising</span> <span class="w2">defence</span> <span class="w2">lattice.</span> <span class="w2">Every</span> <span class="w2">node</span> <span class="w2">learns,</span> <span class="w2">every</span> <span class="w2">link</span> <span class="w2">verifies.</span></p>
+      </section>
+
+      <!-- PHASE 2 -->
+      <aside class="p2" aria-label="Live telemetry">
+        <p class="kicker">// 02 · VORTEX</p>
+        <div class="block"><span class="block__k">SYNAPTIC THROUGHPUT</span><span class="block__v"><b data-live="through">4.82</b> PB/s</span><span class="block__bar"><i></i></span></div>
+        <div class="block"><span class="block__k">ENTROPY INDEX</span><span class="block__v"><b data-live="entropy">0.99970</b></span><span class="block__bar"><i style="--w:.97"></i></span></div>
+        <div class="block"><span class="block__k">THREAT VECTORS NEUTRALISED</span><span class="block__v"><b data-live="threats">1,284,091</b></span><span class="block__bar"><i style="--w:.64"></i></span></div>
+        <div class="block"><span class="block__k">SPIN · BOUND TO SCROLL</span><span class="block__v"><b data-live="spin">0.00</b> RAD/S</span><span class="block__bar"><i data-live-bar="spin"></i></span></div>
+      </aside>
+
+      <!-- PHASE 3 -->
+      <section class="p3" aria-label="Volumetric core">
+        <p class="kicker">// 03 · VOLUMETRIC MESH</p>
+        <h2 class="h2">CORE / MK-IV</h2>
+        <p class="copy">A hardware root of trust, drawn as a live node mesh. Hover to scan it; the lattice bends around the probe and snaps back.</p>
+        <p class="scan"><i class="dot"></i> HOVER TO SCAN · <span data-live="scan">IDLE</span></p>
+      </section>
+
+      <!-- PHASE 4 -->
+      <section class="p4" aria-label="Core interface">
+        <p class="kicker">// 04 · CORE INTERFACE</p>
+        <div class="diag">
+          <div class="cell"><span class="cell__k">NODE MESH</span><span class="cell__v" data-live="nodes">400</span><span class="cell__s ok">SYNCED</span></div>
+          <div class="cell"><span class="cell__k">LATENCY</span><span class="cell__v"><b data-live="latency">0.41</b> ms</span><span class="cell__s ok">NOMINAL</span></div>
+          <div class="cell"><span class="cell__k">QUANTUM KEYS</span><span class="cell__v">2<sup>14</sup></span><span class="cell__s ok">ROTATING</span></div>
+          <div class="cell"><span class="cell__k">INTRUSION GUARD</span><span class="cell__v">L-9</span><span class="cell__s ok">ARMED</span></div>
+          <div class="cell"><span class="cell__k">NEURAL BANDWIDTH</span><span class="cell__v"><b data-live="band">96.2</b>%</span><span class="cell__s">HEADROOM 3.8%</span></div>
+          <div class="cell"><span class="cell__k">CORE TEMP</span><span class="cell__v"><b data-live="temp">31.4</b>°C</span><span class="cell__s ok">STABLE</span></div>
+          <div class="cell"><span class="cell__k">ANOMALIES / 24H</span><span class="cell__v">0</span><span class="cell__s ok">CLEAR</span></div>
+          <div class="cell"><span class="cell__k">CORE STATE</span><span class="cell__v" data-core-state>STANDBY</span><span class="cell__s warn" data-core-sub>AWAITING INIT</span></div>
+        </div>
+        <button class="cta" type="button" id="cta"><span class="cta__txt">[ INITIALIZE CORE ]</span><i class="cta__fill"></i></button>
+      </section>
+    </main>
+
+    <footer class="phase" aria-hidden="true">
+      <span class="phase__name">PHASE 01 · CONSTELLATION</span>
+      <span class="phase__bar"><i></i></span>
+      <span class="phase__pct">000%</span>
+    </footer>
+  </div>
+
+  <!-- Dev console (H) -->
+  <pre class="console" id="console" aria-hidden="true"></pre>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
