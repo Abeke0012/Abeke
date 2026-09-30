@@ -54,21 +54,39 @@ function Summary({ build, onReset, onAdd }: { build: Build; onReset: () => void;
   const total = buildTotal(build);
   const inCart = cart.burgers.reduce((n, b) => n + b.qty, 0);
   return (
-    <div className="rounded-3xl bg-char p-6 ring-1 ring-inset ring-line">
-      <div className="flex items-baseline justify-between gap-4">
-        <p className="text-sm text-smoke">Этот бургер</p>
-        <motion.p key={total} initial={{ opacity: 0.4, y: -6 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl font-bold tabular-nums">
-          {formatPrice(total)}
-        </motion.p>
+    <div>
+      <div className="rotate-[-0.6deg] drop-shadow-[0_24px_30px_rgba(0,0,0,0.55)]">
+      <div className="receipt relative bg-ink px-6 pb-9 pt-6 text-coal">
+        <div className="flex items-center justify-between border-b-2 border-dashed border-coal/25 pb-4">
+          <p className="font-display text-xl font-black tracking-[-0.02em]">SELF</p>
+          <p className="font-display text-[10px] font-bold tracking-[0.3em] text-coal/55">ТВОЙ ЧЕК</p>
+        </div>
+        <ul className="mt-4 flex max-h-40 flex-col gap-2 overflow-y-auto pr-1 text-sm">
+          <AnimatePresence initial={false}>
+            {lines.map((l, i) => (
+              <motion.li
+                key={`${l.name}-${i}`}
+                layout
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 12 }}
+                className="flex items-baseline gap-2"
+              >
+                <span className="min-w-0 font-medium">{l.name}</span>
+                <span className="mb-1 min-w-4 flex-1 border-b-2 border-dotted border-coal/25" />
+                <span className="shrink-0 tabular-nums text-coal/70">{formatPrice(l.price)}</span>
+              </motion.li>
+            ))}
+          </AnimatePresence>
+        </ul>
+        <div className="mt-4 flex items-baseline justify-between border-t-2 border-dashed border-coal/25 pt-4">
+          <p className="font-display text-xs font-bold tracking-[0.24em]">ИТОГО</p>
+          <motion.p key={total} initial={{ opacity: 0.4, y: -6 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl font-black tabular-nums">
+            {formatPrice(total)}
+          </motion.p>
+        </div>
       </div>
-      <ul className="mt-5 flex max-h-56 flex-col gap-2 overflow-y-auto pr-1 text-sm">
-        {lines.map((l, i) => (
-          <li key={`${l.name}-${i}`} className="flex justify-between gap-4 text-ink/80">
-            <span className="min-w-0">{l.name}</span>
-            <span className="shrink-0 tabular-nums text-smoke">{formatPrice(l.price)}</span>
-          </li>
-        ))}
-      </ul>
+      </div>
       <div className="mt-6 flex flex-wrap gap-3">
         <button
           type="button"
@@ -149,7 +167,7 @@ export default function Builder() {
       <div className="mt-14 grid items-start gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
         {/* preview */}
         <div className="sticky top-16 z-10 -mx-5 bg-coal/90 px-5 pb-3 backdrop-blur-md md:top-[72px] lg:top-24 lg:mx-0 lg:bg-transparent lg:px-0 lg:backdrop-blur-none">
-          <div ref={preview} className="relative h-[34svh] w-full overflow-hidden rounded-3xl bg-char bg-[radial-gradient(60%_50%_at_50%_60%,rgb(255_106_26/0.16),transparent_70%)] lg:aspect-square lg:h-auto">
+          <div ref={preview} className="relative h-[34svh] w-full overflow-hidden rounded-3xl bg-char bg-[radial-gradient(60%_50%_at_50%_60%,rgb(255_106_26/0.16),transparent_70%)] lg:h-[min(44svh,520px)]">
             <BurgerStage stack={stack} active={inView} quality={quality} dropIn />
             <div className="pointer-events-none absolute inset-x-4 bottom-4 flex items-end justify-between gap-3 lg:hidden">
               <p className="rounded-full bg-coal/80 px-4 py-2 font-display text-lg font-bold tabular-nums">{formatPrice(buildTotal(build))}</p>

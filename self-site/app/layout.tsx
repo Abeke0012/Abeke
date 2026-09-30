@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Onest, Unbounded } from "next/font/google";
+import Cursor from "@/components/fx/Cursor";
+import Preloader from "@/components/fx/Preloader";
 import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
 
@@ -30,6 +32,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <SmoothScroll>{children}</SmoothScroll>
         <div className="grain" aria-hidden />
+        <Cursor />
+        <Preloader />
       </body>
     </html>
   );

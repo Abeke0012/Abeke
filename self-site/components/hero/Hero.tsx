@@ -1,9 +1,10 @@
 "use client";
 
 import OrderButton from "@/components/cart/OrderButton";
+import Magnetic from "@/components/fx/Magnetic";
 import { motion, useInView, useMotionValueEvent, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
 import dynamic from "next/dynamic";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Logo from "@/components/Logo";
 import { PHOTO_LAYERS } from "./PhotoBurger";
 import { phaseAt } from "./timeline";
@@ -48,6 +49,10 @@ function LayerList({ progress }: { progress: MotionValue<number> }) {
 export default function Hero() {
   const section = useRef<HTMLElement>(null);
   const quality = useQuality();
+  // The section height depends on quality; let scroll-linked sections below re-measure.
+  useEffect(() => {
+    window.dispatchEvent(new Event("resize"));
+  }, [quality]);
   const inView = useInView(section, { margin: "200px 0px 200px 0px" });
   const { scrollYProgress } = useScroll({ target: section, offset: ["start start", "end end"] });
   const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 32, mass: 0.6 });
@@ -61,6 +66,7 @@ export default function Hero() {
     <section
       ref={section}
       id="top"
+      data-cursor="Листай"
       aria-label="SELF — Burgers Made Bold"
       className={quality === "high" ? "relative h-[620vh]" : "relative h-[440vh]"}
     >
@@ -109,11 +115,13 @@ export default function Hero() {
             transition={{ duration: 0.9, delay: 1.5 }}
             className="flex items-center gap-6"
           >
-            <OrderButton
-              className="rounded-full bg-flame px-9 py-4 font-display text-sm font-bold tracking-[0.18em] text-coal transition hover:bg-ink"
-            >
-              ЗАКАЗАТЬ
-            </OrderButton>
+            <Magnetic>
+              <OrderButton
+                className="rounded-full bg-flame px-9 py-4 font-display text-sm font-bold tracking-[0.18em] text-coal transition hover:bg-ink"
+              >
+                ЗАКАЗАТЬ
+              </OrderButton>
+            </Magnetic>
             <motion.span style={{ opacity: cue }} className="hidden items-center gap-3 text-sm text-smoke md:flex">
               <span className="relative h-10 w-px overflow-hidden bg-smoke/30">
                 <span className="absolute inset-x-0 top-0 h-1/2 animate-[scrollcue_1.8s_ease-in-out_infinite] bg-flame" />
@@ -138,11 +146,13 @@ export default function Hero() {
           <Logo withTagline className="text-[clamp(3rem,7vw,5.5rem)]" />
         </motion.div>
         <motion.div style={finale} className="absolute inset-x-0 bottom-[6svh] flex justify-center">
-          <OrderButton
-            className="rounded-full bg-flame px-12 py-5 font-display text-sm font-bold tracking-[0.2em] text-coal shadow-[0_0_60px_-10px] shadow-flame/60 transition hover:bg-ink"
-          >
-            ЗАКАЗАТЬ
-          </OrderButton>
+          <Magnetic>
+            <OrderButton
+              className="rounded-full bg-flame px-12 py-5 font-display text-sm font-bold tracking-[0.2em] text-coal shadow-[0_0_60px_-10px] shadow-flame/60 transition hover:bg-ink"
+            >
+              ЗАКАЗАТЬ
+            </OrderButton>
+          </Magnetic>
         </motion.div>
       </div>
     </section>

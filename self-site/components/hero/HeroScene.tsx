@@ -10,6 +10,7 @@ import * as THREE from "three";
 import Burger, { type Quality } from "./Burger";
 import { HERO_BUILD, stackFor } from "./looks";
 import PhotoBurger, { PHOTO_HEIGHT } from "./PhotoBurger";
+import Embers from "./Embers";
 import SelfBox, { BOX, BURGER_SCALE, BURGER_SLOT } from "./SelfBox";
 import { cameraAt, easeInOut, easeOutBack, lerp, orbitAngle, phaseAt, range, smooth } from "./timeline";
 
@@ -192,6 +193,8 @@ function Rig({ progress, quality }: RigProps) {
       <group ref={box}>
         <SelfBox lid={lid} quality={quality} />
       </group>
+
+      <Embers count={high ? 160 : 70} floor={FLOOR} />
 
       {/* soft shadow under the photo burger */}
       <mesh ref={shadow} rotation-x={-Math.PI / 2} renderOrder={1}>

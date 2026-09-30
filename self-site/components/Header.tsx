@@ -24,8 +24,9 @@ export default function Header() {
         </a>
         <nav aria-label="Разделы" className="hidden items-center gap-8 lg:flex">
           {NAV.map((item) => (
-            <a key={item.href} href={item.href} className="text-sm text-ink/70 transition hover:text-ink">
+            <a key={item.href} href={item.href} className="group relative text-sm text-ink/70 transition hover:text-ink">
               {item.label}
+              <span className="absolute -bottom-1.5 left-0 h-px w-full origin-right scale-x-0 bg-flame transition-transform duration-500 group-hover:origin-left group-hover:scale-x-100" />
             </a>
           ))}
         </nav>

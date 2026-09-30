@@ -86,3 +86,10 @@ html.lenis body {
     transform: translateY(200%);
   }
 }
+
+/* Paper receipt with a torn, zig-zag bottom edge */
+.receipt {
+  --tooth: 10px;
+  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / calc(var(--tooth) * 2) 100%;
+  border-radius: 6px 6px 0 0;
+}

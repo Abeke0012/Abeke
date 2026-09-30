@@ -1,4 +1,6 @@
 import OrderButton from "@/components/cart/OrderButton";
+import GiantWordmark from "@/components/fx/GiantWordmark";
+import Magnetic from "@/components/fx/Magnetic";
 import Logo from "@/components/Logo";
 import { INFO, NAV, WHATSAPP_NUMBER } from "@/lib/site";
 import { Reveal } from "./ui";
@@ -49,11 +51,13 @@ export default function OrderCta() {
             </dl>
           </Reveal>
           <Reveal delay={0.3}>
+            <Magnetic className="mt-12">
             <OrderButton
-              className="mt-12 inline-flex rounded-full bg-flame px-14 py-5 font-display text-sm font-bold tracking-[0.2em] text-coal shadow-[0_0_80px_-10px] shadow-flame/60 transition hover:bg-ink"
+              className="inline-flex rounded-full bg-flame px-14 py-5 font-display text-sm font-bold tracking-[0.2em] text-coal shadow-[0_0_80px_-10px] shadow-flame/60 transition hover:bg-ink"
             >
               ЗАКАЗАТЬ СЕЙЧАС
             </OrderButton>
+            </Magnetic>
           </Reveal>
         </div>
       </section>
@@ -81,6 +85,7 @@ export default function OrderCta() {
           <p className="text-sm text-smoke">© {new Date().getFullYear()} SELF Burgers</p>
         </div>
       </footer>
+      <GiantWordmark />
     </>
   );
 }
