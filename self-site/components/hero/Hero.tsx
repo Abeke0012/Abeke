@@ -5,8 +5,7 @@ import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
 import Logo from "@/components/Logo";
 import { ORDER_URL } from "@/lib/site";
-import { LAYER_LABEL, type LayerKind } from "./burgerGeometry";
-import { CLASSIC } from "./Burger";
+import { HERO_BUILD, stackFor } from "./looks";
 import { phaseAt } from "./timeline";
 import useQuality from "./useQuality";
 
@@ -20,22 +19,24 @@ function useBeat(p: MotionValue<number>, a: number, b: number, c = 2, d = 3) {
   return { opacity, y, pointerEvents };
 }
 
+const HERO_LAYERS = stackFor(HERO_BUILD);
+
 function LayerList({ progress }: { progress: MotionValue<number> }) {
   const [active, setActive] = useState(-1);
   useMotionValueEvent(progress, "change", (p) => {
     const e = phaseAt(p).explode;
-    const n = CLASSIC.length;
+    const n = HERO_LAYERS.length;
     setActive(e < 0.05 ? -1 : Math.min(n - 1, Math.floor(e * n)));
   });
   const beat = useBeat(progress, 0.08, 0.14, 0.4, 0.46);
   return (
     <motion.ol style={beat} className="pointer-events-none absolute right-6 top-1/2 hidden -translate-y-1/2 flex-col gap-3 md:flex lg:right-12">
-      {[...CLASSIC].reverse().map((kind: LayerKind, idx) => {
-        const i = CLASSIC.length - 1 - idx;
+      {[...HERO_LAYERS].reverse().map((layer, idx) => {
+        const i = HERO_LAYERS.length - 1 - idx;
         const on = i <= active;
         return (
-          <li key={kind} className="flex items-center justify-end gap-3 text-right">
-            <span className={`text-sm transition-colors duration-500 ${on ? "text-ink" : "text-smoke/50"}`}>{LAYER_LABEL[kind]}</span>
+          <li key={layer.key} className="flex items-center justify-end gap-3 text-right">
+            <span className={`text-sm transition-colors duration-500 ${on ? "text-ink" : "text-smoke/50"}`}>{layer.label}</span>
             <span className={`h-px transition-all duration-500 ${on ? "w-10 bg-flame" : "w-4 bg-smoke/40"}`} />
           </li>
         );

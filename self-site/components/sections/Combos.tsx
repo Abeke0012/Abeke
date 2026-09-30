@@ -1,53 +1,75 @@
-import { COMBOS, comboDetails } from "@/lib/menu";
-import { formatPrice, ORDER_URL } from "@/lib/site";
+"use client";
+
+import { useInView } from "framer-motion";
+import dynamic from "next/dynamic";
+import { useMemo, useRef, useState } from "react";
+import { stackFor } from "@/components/hero/looks";
+import useQuality from "@/components/hero/useQuality";
+import { buildTotal, COMBOS, describe, type Combo } from "@/lib/menu";
+import { formatPrice, openInBuilder, ORDER_URL } from "@/lib/site";
 import { Reveal, Section, SectionHeading } from "./ui";
+
+const BurgerStage = dynamic(() => import("./BurgerStage"), { ssr: false });
+
+function Card({ combo, index }: { combo: Combo; index: number }) {
+  const ref = useRef<HTMLElement>(null);
+  const inView = useInView(ref, { margin: "100px" });
+  const [open, setOpen] = useState(false);
+  const quality = useQuality();
+  const stack = useMemo(() => stackFor(combo.build), [combo]);
+
+  return (
+    <Reveal delay={index * 0.1} className="h-full">
+      <article
+        ref={ref}
+        onPointerEnter={(e) => e.pointerType === "mouse" && setOpen(true)}
+        onPointerLeave={(e) => e.pointerType === "mouse" && setOpen(false)}
+        className="group flex h-full flex-col overflow-hidden rounded-3xl bg-char"
+      >
+        <button
+          type="button"
+          aria-label={`Показать слои: ${combo.name}`}
+          onClick={() => setOpen((o) => !o)}
+          className="relative aspect-square w-full bg-[radial-gradient(60%_50%_at_50%_58%,rgb(255_106_26/0.16),transparent_70%)]"
+        >
+          <BurgerStage stack={stack} open={open} active={inView} quality={quality} />
+        </button>
+        <div className="flex flex-1 flex-col gap-3 p-6">
+          <div className="flex items-baseline justify-between gap-4">
+            <h3 className="font-display text-xl font-bold">{combo.name}</h3>
+            <p className="shrink-0 font-display text-lg font-bold tabular-nums text-flame">{formatPrice(buildTotal(combo.build))}</p>
+          </div>
+          <p className="text-sm leading-relaxed text-smoke">{describe(combo.build)}</p>
+          <div className="mt-auto flex flex-wrap gap-2 pt-4">
+            <a href={ORDER_URL} className="rounded-full bg-ink px-5 py-3 font-display text-[11px] font-bold tracking-[0.16em] text-coal transition hover:bg-flame">
+              ЗАКАЗАТЬ
+            </a>
+            <button
+              type="button"
+              onClick={() => openInBuilder(combo.build)}
+              className="rounded-full border border-line px-5 py-3 text-sm text-ink transition hover:border-flame hover:text-flame"
+            >
+              Изменить под себя
+            </button>
+          </div>
+        </div>
+      </article>
+    </Reveal>
+  );
+}
 
 export default function Combos() {
   return (
-    <Section id="combo">
-      <SectionHeading eyebrow="КОМБО" title="Бургер не ест один" intro="Собрали наборы с картофелем, соусами и напитками. Выходит дешевле, чем по отдельности." />
-      <div className="mt-14 grid gap-6 lg:grid-cols-3">
-        {COMBOS.map((combo, i) => {
-          const { lines, regular, saving } = comboDetails(combo);
-          const featured = combo.id === "duo";
-          return (
-            <Reveal key={combo.id} delay={i * 0.1} className="h-full">
-              <article
-                className={`flex h-full flex-col rounded-3xl p-7 md:p-9 ${featured ? "bg-flame text-coal" : "bg-char ring-1 ring-inset ring-line"}`}
-              >
-                <p className={`font-display text-xs font-bold tracking-[0.28em] ${featured ? "text-coal/70" : "text-smoke"}`}>{combo.forWhom.toUpperCase()}</p>
-                <h3 className="mt-3 font-display text-4xl font-black tracking-[-0.02em]">{combo.name}</h3>
-                <ul className={`mt-7 flex flex-col gap-2.5 ${featured ? "text-coal/85" : "text-ink/85"}`}>
-                  {lines.map((l) => (
-                    <li key={l.name} className="flex justify-between gap-4">
-                      <span>{l.name}</span>
-                      <span className="tabular-nums">×{l.qty}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className={`mt-auto border-t pt-6 ${featured ? "border-coal/20" : "border-line"}`}>
-                  <div className="mt-2 flex items-end justify-between gap-4">
-                    <div>
-                      <p className={`text-sm line-through tabular-nums ${featured ? "text-coal/60" : "text-smoke"}`}>{formatPrice(regular)}</p>
-                      <p className="font-display text-3xl font-bold tabular-nums">{formatPrice(combo.price)}</p>
-                    </div>
-                    <p className={`rounded-full px-3 py-1.5 text-sm font-medium tabular-nums ${featured ? "bg-coal text-flame" : "bg-flame/15 text-flame"}`}>
-                      −{formatPrice(saving)}
-                    </p>
-                  </div>
-                  <a
-                    href={ORDER_URL}
-                    className={`mt-6 flex w-full justify-center rounded-full py-4 font-display text-xs font-bold tracking-[0.2em] transition ${
-                      featured ? "bg-coal text-ink hover:bg-ink hover:text-coal" : "bg-ink text-coal hover:bg-flame"
-                    }`}
-                  >
-                    ЗАКАЗАТЬ {combo.name.toUpperCase()}
-                  </a>
-                </div>
-              </article>
-            </Reveal>
-          );
-        })}
+    <Section id="combo" className="bg-char/40">
+      <SectionHeading
+        eyebrow="ГОТОВЫЕ КОМБО"
+        title="Не хочешь собирать — возьми готовое"
+        intro="Любое комбо можно доработать под себя одним движением. Наведите или нажмите на бургер, чтобы увидеть слои."
+      />
+      <div className="mt-14 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+        {COMBOS.map((c, i) => (
+          <Card key={c.id} combo={c} index={i} />
+        ))}
       </div>
     </Section>
   );

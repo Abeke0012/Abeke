@@ -85,6 +85,23 @@ export function pattyColorTexture() {
   });
 }
 
+/** Salmon fillet: coral flesh with pale fat lines. */
+export function salmonTexture() {
+  return canvasTexture(1024, 512, (ctx) => {
+    ctx.fillStyle = "#e9825a";
+    ctx.fillRect(0, 0, 1024, 512);
+    ctx.strokeStyle = "#f7cdb2";
+    ctx.lineWidth = 7;
+    for (let x = -512; x < 1024; x += 46) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.bezierCurveTo(x + 120, 170, x + 60, 340, x + 200, 512);
+      ctx.stroke();
+    }
+    speckle(ctx, 1024, 512, 900, [1, 4], ["#d86d45", "#f09a74"], 51);
+  });
+}
+
 export function pattyBumpTexture() {
   return canvasTexture(1024, 512, (ctx) => {
     ctx.fillStyle = "#777";

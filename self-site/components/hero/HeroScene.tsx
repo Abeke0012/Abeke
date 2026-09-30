@@ -8,12 +8,14 @@ import type { DepthOfFieldEffect } from "postprocessing";
 import { Suspense, useRef } from "react";
 import * as THREE from "three";
 import Burger, { type Quality } from "./Burger";
+import { HERO_BUILD, stackFor, stackHeight } from "./looks";
 import SelfBox, { BOX, BURGER_SCALE, BURGER_SLOT } from "./SelfBox";
 import { cameraAt, easeInOut, easeOutBack, lerp, orbitAngle, phaseAt, range, smooth } from "./timeline";
 
+export const HERO_STACK = stackFor(HERO_BUILD);
 const FLOOR = -1.2;
-/** Assembled burger height is ≈1.63, so this centres it on the origin. */
-const HERO_POS = new THREE.Vector3(0, -0.82, 0);
+/** Centres the assembled burger on the origin. */
+const HERO_POS = new THREE.Vector3(0, -stackHeight(HERO_STACK) / 2, 0);
 const SLOT_POS = new THREE.Vector3(0, FLOOR, 0).add(BURGER_SLOT);
 const BOX_CENTER = new THREE.Vector3(0, FLOOR + BOX.h * 0.5, 0);
 const INTRO_SECONDS = 2.4;
@@ -145,7 +147,7 @@ function Rig({ progress, quality }: RigProps) {
 
       <group ref={anchor}>
         <group ref={tilt}>
-          <Burger explode={explode} quality={quality} explodeAnchor={0.1} />
+          <Burger stack={HERO_STACK} explode={explode} quality={quality} explodeAnchor={0.1} />
         </group>
       </group>
 

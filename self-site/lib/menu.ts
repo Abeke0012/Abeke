@@ -1,92 +1,175 @@
-import type { LayerKind } from "@/components/hero/burgerGeometry";
+/** SELF menu, Astana. Source: "Self-menu" PDF. Prices in tenge. */
 
-export type MenuItem = {
-  id: string;
-  name: string;
-  description: string;
-  /** Portion weight or volume as printed on the menu. */
-  portion: string;
-  price: number;
-};
+export type Option = { portion: string; price: number };
+export type Item<Id extends string = string> = { id: Id; name: string; options: Option[] };
 
-export type Burger = MenuItem & {
-  /** Layer stack used to render the burger in 3D, bottom to top. */
-  stack: LayerKind[];
-};
+const one = <Id extends string>(id: Id, name: string, portion: string, price: number): Item<Id> => ({ id, name, options: [{ portion, price }] });
 
-export const BURGERS: Burger[] = [
-  {
-    id: "classic",
-    name: "SELF Classic",
-    description: "Говяжья котлета 150 г, чеддер, карамелизированный лук, соус SELF, бриошь.",
-    portion: "290 г",
-    price: 2990,
-    stack: ["bottomBun", "sauce", "patty", "cheese", "onions", "topBun"],
-  },
-  {
-    id: "double",
-    name: "Double Bold",
-    description: "Две котлеты по 150 г, двойной чеддер, карамелизированный лук, соус SELF.",
-    portion: "440 г",
-    price: 3990,
-    stack: ["bottomBun", "sauce", "patty", "cheese", "patty", "cheese", "onions", "topBun"],
-  },
-  {
-    id: "onion",
-    name: "Onion Jam",
-    description: "Котлета 150 г, двойная порция лука, томлённого до карамели, чеддер, соус SELF.",
-    portion: "330 г",
-    price: 3290,
-    stack: ["bottomBun", "sauce", "patty", "cheese", "onions", "onions", "topBun"],
-  },
-  {
-    id: "cheese",
-    name: "Cheese Lava",
-    description: "Котлета 150 г под двумя слоями расплавленного чеддера и соусом SELF.",
-    portion: "310 г",
-    price: 3190,
-    stack: ["bottomBun", "sauce", "patty", "cheese", "cheese", "topBun"],
-  },
-];
-
-export const SIDES: MenuItem[] = [
-  { id: "fries", name: "Картофель фри", description: "Толстая нарезка, морская соль.", portion: "130 г", price: 990 },
-  { id: "fries-l", name: "Картофель фри большой", description: "Толстая нарезка, морская соль.", portion: "200 г", price: 1290 },
-  { id: "sauce-self", name: "Соус SELF", description: "Сливочный, с копчёной паприкой и горчицей.", portion: "40 г", price: 290 },
-  { id: "sauce-cheese", name: "Сырный соус", description: "Тёплый, на выдержанном чеддере.", portion: "40 г", price: 290 },
-];
-
-export const DRINKS: MenuItem[] = [
-  { id: "shake", name: "Молочный коктейль", description: "Ваниль, шоколад или солёная карамель.", portion: "400 мл", price: 1490 },
-  { id: "lemonade", name: "Лимонад SELF", description: "Апельсин, лайм и мята.", portion: "400 мл", price: 990 },
-  { id: "cola", name: "Кола", description: "Со льдом.", portion: "500 мл", price: 690 },
-];
-
-export const MENU = [
-  { id: "burgers", label: "Бургеры", items: BURGERS as MenuItem[] },
-  { id: "sides", label: "Картофель и соусы", items: SIDES },
-  { id: "drinks", label: "Напитки", items: DRINKS },
+export const BUNS = [
+  one("sesame", "Классическая с кунжутом", "80 г", 450),
+  one("brioche", "Бриошь", "80 г", 500),
+  one("black", "Чёрная", "80 г", 500),
 ] as const;
 
-const byId = Object.fromEntries([...BURGERS, ...SIDES, ...DRINKS].map((i) => [i.id, i]));
+export const PATTIES = [
+  one("beef", "Говяжья котлета", "120 г", 1790),
+  one("chicken", "Куриная котлета", "120 г", 890),
+  one("chickenFillet", "Куриное филе", "120 г", 1090),
+  one("pulled", "Томлёное мясо", "120 г", 1590),
+  one("salmon", "Сёмга", "120 г", 2790),
+] as const;
 
-export type Combo = {
-  id: string;
-  name: string;
-  forWhom: string;
-  /** Item ids with quantities; the regular price is computed from the menu. */
-  items: [id: string, qty: number][];
-  price: number;
-};
+export const TOPPINGS = [
+  one("caramelizedOnion", "Карамелизированный лук", "20 г", 180),
+  one("onionRings", "Луковые кольца", "30 г", 250),
+  one("potatoPatty", "Картофельная котлета", "50 г", 300),
+  one("pickles", "Солёные огурцы", "20 г", 150),
+  one("tomato", "Помидор", "25 г", 150),
+  one("redOnion", "Красный лук", "15 г", 120),
+  one("onion", "Лук", "15 г", 100),
+  one("iceberg", "Айсберг", "20 г", 120),
+  one("cucumber", "Свежие огурцы", "20 г", 150),
+  one("cheese", "Сыр", "20 г", 250),
+  one("mushrooms", "Обжаренные шампиньоны", "30 г", 300),
+  one("arugula", "Руккола", "10 г", 200),
+  one("lettuce", "Лист салата", "15 г", 100),
+  one("chili", "Стручковый перец", "20 г", 180),
+  one("jalapeno", "Халапеньо", "15 г", 180),
+] as const;
 
-export const COMBOS: Combo[] = [
-  { id: "solo", name: "Solo", forWhom: "На одного", items: [["classic", 1], ["fries", 1], ["sauce-self", 1], ["cola", 1]], price: 4490 },
-  { id: "duo", name: "Duo", forWhom: "На двоих", items: [["classic", 1], ["double", 1], ["fries-l", 2], ["sauce-self", 1], ["sauce-cheese", 1], ["lemonade", 2]], price: 10490 },
-  { id: "crew", name: "Crew", forWhom: "На компанию", items: [["classic", 2], ["double", 1], ["onion", 1], ["fries-l", 3], ["sauce-self", 2], ["sauce-cheese", 2]], price: 15990 },
+export const SAUCES = [
+  one("piquant", "Пикант", "30 г", 250),
+  one("bbq", "BBQ", "30 г", 250),
+  one("creamCheese", "Сливочно-сырный", "30 г", 300),
+  one("ranch", "Ранч", "30 г", 250),
+  one("cheeseSauce", "Сырный", "30 г", 300),
+  one("tabasco", "Табаско", "20 г", 300),
+  one("teriyaki", "Терияки", "30 г", 250),
+  one("cherry", "Вишнёвый", "30 г", 300),
+  one("thousand", "1000 островов", "30 г", 250),
+] as const;
+
+export const SIDES = [
+  one("fries", "Картофель фри", "120 г", 950),
+  one("wedges", "Картофель по-деревенски", "150 г", 1100),
+  one("nuggets", "Наггетсы", "150 г", 1500),
+  one("rings", "Луковые кольца", "120 г", 1350),
+  one("sweetPotato", "Батат", "120 г", 1500),
+  one("cheeseBalls", "Сырные шарики", "120 г", 1500),
+] as const;
+
+const sizes = (small: string, sp: number, big: string, bp: number) => [
+  { portion: small, price: sp },
+  { portion: big, price: bp },
 ];
 
-export const comboDetails = (combo: Combo) => {
-  const lines = combo.items.map(([id, qty]) => ({ name: byId[id].name, qty }));
-  const regular = combo.items.reduce((sum, [id, qty]) => sum + byId[id].price * qty, 0);
-  return { lines, regular, saving: regular - combo.price };
+export const DRINKS: Item[] = [
+  { id: "mojito", name: "Лимонад Мохито", options: sizes("500 мл", 980, "1 л", 1880) },
+  { id: "watermelon", name: "Лимонад Арбуз-клубника", options: sizes("500 мл", 980, "1 л", 1880) },
+  { id: "cranberry", name: "Лимонад клюквенный", options: sizes("500 мл", 980, "1 л", 1880) },
+  { id: "cola", name: "Coca-Cola", options: sizes("500 мл", 880, "1 л", 1580) },
+  { id: "colaZero", name: "Coca-Cola Zero", options: sizes("500 мл", 880, "1 л", 1580) },
+  { id: "fanta", name: "Fanta", options: sizes("500 мл", 880, "1 л", 1580) },
+  { id: "sprite", name: "Sprite", options: sizes("500 мл", 880, "1 л", 1580) },
+  { id: "borjomi", name: "Borjomi", options: sizes("500 мл", 1080, "750 мл", 1780) },
+  { id: "tassay", name: "Tassay", options: sizes("500 мл", 680, "1 л", 1080) },
+];
+
+export type BunId = (typeof BUNS)[number]["id"];
+export type PattyId = (typeof PATTIES)[number]["id"];
+export type ToppingId = (typeof TOPPINGS)[number]["id"];
+export type SauceId = (typeof SAUCES)[number]["id"];
+export type SideId = (typeof SIDES)[number]["id"];
+
+export const MAX_PATTIES = 4;
+export const MAX_SAUCES = 3;
+
+export const MENU_TABS: { id: string; label: string; note?: string; items: readonly Item[] }[] = [
+  { id: "buns", label: "Булочки", items: BUNS },
+  { id: "patties", label: "Котлеты", note: `Можно выбрать сразу несколько видов — до ${MAX_PATTIES} котлет в одном бургере.`, items: PATTIES },
+  { id: "toppings", label: "Ингредиенты", items: TOPPINGS },
+  { id: "sauces", label: "Соусы", note: `До ${MAX_SAUCES} соусов на один бургер.`, items: SAUCES },
+  { id: "sides", label: "Гарниры", items: SIDES },
+  { id: "drinks", label: "Напитки", items: DRINKS },
+];
+
+/** Everything a guest picks in the builder. */
+export type Build = {
+  bun: BunId;
+  patties: PattyId[];
+  toppings: ToppingId[];
+  sauces: SauceId[];
+  side?: SideId;
+  /** Drink id and the index of its size option. */
+  drink?: { id: string; size: number };
 };
+
+const find = <T extends Item>(list: readonly T[], id: string) => list.find((i) => i.id === id)!;
+export const bun = (id: BunId) => find(BUNS, id);
+export const patty = (id: PattyId) => find(PATTIES, id);
+export const topping = (id: ToppingId) => find(TOPPINGS, id);
+export const sauce = (id: SauceId) => find(SAUCES, id);
+export const side = (id: SideId) => find(SIDES, id);
+export const drink = (id: string) => find(DRINKS, id);
+
+/** Every line of a build with its price, in the order it is listed on the receipt. */
+export function buildLines(b: Build) {
+  const lines: { name: string; price: number }[] = [];
+  lines.push({ name: `Булочка: ${bun(b.bun).name}`, price: bun(b.bun).options[0].price });
+  b.patties.forEach((p) => lines.push({ name: patty(p).name, price: patty(p).options[0].price }));
+  b.toppings.forEach((t) => lines.push({ name: topping(t).name, price: topping(t).options[0].price }));
+  b.sauces.forEach((s) => lines.push({ name: `Соус ${sauce(s).name}`, price: sauce(s).options[0].price }));
+  if (b.side) lines.push({ name: side(b.side).name, price: side(b.side).options[0].price });
+  if (b.drink) {
+    const d = drink(b.drink.id);
+    const o = d.options[b.drink.size];
+    lines.push({ name: `${d.name}, ${o.portion}`, price: o.price });
+  }
+  return lines;
+}
+
+export const buildTotal = (b: Build) => buildLines(b).reduce((s, l) => s + l.price, 0);
+
+export type Combo = { id: string; name: string; build: Build };
+
+/** Ready-made combos from the menu. Their prices are the sum of their parts. */
+export const COMBOS: Combo[] = [
+  {
+    id: "classic",
+    name: "Классика Self",
+    build: { bun: "sesame", patties: ["beef"], toppings: ["cheese", "tomato", "iceberg", "redOnion"], sauces: ["bbq"] },
+  },
+  {
+    id: "country",
+    name: "Кантри с курицей",
+    build: { bun: "brioche", patties: ["chickenFillet"], toppings: ["cheese", "iceberg", "tomato", "caramelizedOnion"], sauces: ["ranch"] },
+  },
+  {
+    id: "fire",
+    name: "Огненный халапеньо",
+    build: { bun: "sesame", patties: ["chicken"], toppings: ["jalapeno", "cheese", "onionRings"], sauces: ["piquant"], side: "fries" },
+  },
+  {
+    id: "bbq",
+    name: "Томлёный BBQ",
+    build: { bun: "brioche", patties: ["pulled"], toppings: ["caramelizedOnion", "cheese", "pickles"], sauces: ["bbq"] },
+  },
+];
+
+/** Plain-language list of what is inside, as printed on the menu. */
+export function describe(b: Build) {
+  return [
+    bun(b.bun).name === "Классическая с кунжутом" ? "Кунжутная булочка" : bun(b.bun).name,
+    ...b.patties.map((p) => patty(p).name),
+    ...b.toppings.map((t) => topping(t).name),
+    ...b.sauces.map((s) => {
+      const n = sauce(s).name;
+      return `соус ${n === n.toUpperCase() ? n : n.toLowerCase()}`;
+    }),
+    ...(b.side ? [side(b.side).name] : []),
+  ]
+    .map((s, i) => (i === 0 ? s : s.charAt(0).toLowerCase() + s.slice(1)))
+    .join(", ");
+}
+
+export const MENU_SIZE = [BUNS, PATTIES, TOPPINGS, SAUCES, SIDES].reduce((n, l) => n + l.length, 0) + DRINKS.reduce((n, d) => n + d.options.length, 0);

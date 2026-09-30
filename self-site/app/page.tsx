@@ -1,11 +1,11 @@
 import Header from "@/components/Header";
 import Hero from "@/components/hero/Hero";
 import About from "@/components/sections/About";
+import Builder from "@/components/sections/Builder";
 import Combos from "@/components/sections/Combos";
-import Ingredients from "@/components/sections/Ingredients";
+import How from "@/components/sections/How";
 import Menu from "@/components/sections/Menu";
 import OrderCta from "@/components/sections/OrderCta";
-import Popular from "@/components/sections/Popular";
 
 export default function Home() {
   return (
@@ -13,10 +13,10 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
-        <Menu />
-        <Popular />
-        <Ingredients />
+        <Builder />
         <Combos />
+        <Menu />
+        <How />
         <About />
         <OrderCta />
       </main>
