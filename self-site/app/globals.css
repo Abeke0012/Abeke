@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+/* SELF palette: warm black stage, white type, flame orange accent, brand red star. */
+@theme {
+  --color-coal: #0a0807;
+  --color-char: #14100d;
+  --color-ember: #1d1612;
+  --color-ink: #f6f1ea;
+  --color-smoke: #a79d92;
+  --color-flame: #ff6a1a;
+  --color-brand: #e2311d;
+  --color-gold: #f2b544;
+  --color-line: rgb(246 241 234 / 0.12);
+
+  --font-display: var(--font-unbounded), "Arial Black", sans-serif;
+  --font-sans: var(--font-onest), system-ui, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background: var(--color-coal);
+  color: var(--color-ink);
+}
+
+body {
+  background: var(--color-coal);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+::selection {
+  background: var(--color-flame);
+  color: var(--color-coal);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-flame);
+  outline-offset: 3px;
+}
+
+/* Lenis smooth scrolling */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.grain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes scrollcue {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(200%);
+  }
+}
