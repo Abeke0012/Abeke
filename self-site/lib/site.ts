@@ -1,13 +1,7 @@
 import type { Build } from "./menu";
 
-/** Every "Заказать" button on the page scrolls to the order section. */
-export const ORDER_URL = "#order";
-
-/**
- * Target of the main "Заказать сейчас" button. Replace with your delivery
- * page, aggregator listing or messenger link before going live.
- */
-export const DELIVERY_URL = "#builder";
+/** WhatsApp number that receives orders, in international format (8 708 … → +7 708 …). */
+export const WHATSAPP_NUMBER = "+7 708 008 08 53";
 
 /** Restaurant details, as printed on the menu. */
 export const INFO = {

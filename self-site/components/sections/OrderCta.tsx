@@ -1,8 +1,12 @@
+import OrderButton from "@/components/cart/OrderButton";
 import Logo from "@/components/Logo";
-import { DELIVERY_URL, INFO, NAV } from "@/lib/site";
+import { INFO, NAV, WHATSAPP_NUMBER } from "@/lib/site";
 import { Reveal } from "./ui";
 
-const DETAILS = [
+const WA_LINK = `https://wa.me/${WHATSAPP_NUMBER.replace(/\D/g, "")}`;
+
+const DETAILS: { label: string; value: string; href?: string }[] = [
+  { label: "WhatsApp для заказов", value: WHATSAPP_NUMBER, href: WA_LINK },
   { label: "Адрес", value: INFO.address },
   { label: "Режим работы", value: INFO.hours },
   { label: "Доставка", value: `курьер до двери за ${INFO.delivery}` },
@@ -29,20 +33,27 @@ export default function OrderCta() {
           <Reveal delay={0.25} className="w-full">
             <dl className="mx-auto mt-12 grid max-w-4xl gap-px overflow-hidden rounded-3xl bg-line text-left sm:grid-cols-2">
               {DETAILS.map((d) => (
-                <div key={d.label} className="bg-coal p-6">
+                <div key={d.label} className="bg-coal p-6 sm:first:col-span-2">
                   <dt className="font-display text-xs font-bold tracking-[0.24em] text-smoke">{d.label.toUpperCase()}</dt>
-                  <dd className="mt-2 text-lg">{d.value}</dd>
+                  <dd className="mt-2 text-lg">
+                    {d.href ? (
+                      <a href={d.href} target="_blank" rel="noopener noreferrer" className="tabular-nums text-flame underline-offset-4 hover:underline">
+                        {d.value}
+                      </a>
+                    ) : (
+                      d.value
+                    )}
+                  </dd>
                 </div>
               ))}
             </dl>
           </Reveal>
           <Reveal delay={0.3}>
-            <a
-              href={DELIVERY_URL}
+            <OrderButton
               className="mt-12 inline-flex rounded-full bg-flame px-14 py-5 font-display text-sm font-bold tracking-[0.2em] text-coal shadow-[0_0_80px_-10px] shadow-flame/60 transition hover:bg-ink"
             >
               ЗАКАЗАТЬ СЕЙЧАС
-            </a>
+            </OrderButton>
           </Reveal>
         </div>
       </section>
@@ -56,6 +67,9 @@ export default function OrderCta() {
             <p className="text-sm text-smoke">
               {INFO.address} · {INFO.hours}
             </p>
+            <a href={WA_LINK} target="_blank" rel="noopener noreferrer" className="w-fit text-sm tabular-nums text-smoke transition hover:text-flame">
+              WhatsApp: {WHATSAPP_NUMBER}
+            </a>
           </div>
           <nav aria-label="Разделы" className="flex flex-wrap gap-x-7 gap-y-3 text-sm text-smoke">
             {NAV.map((item) => (

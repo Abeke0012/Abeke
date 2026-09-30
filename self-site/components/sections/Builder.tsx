@@ -3,25 +3,25 @@
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useCart } from "@/components/cart/CartProvider";
+import ExtrasPicker from "@/components/cart/ExtrasPicker";
 import { stackFor } from "@/components/hero/looks";
 import useQuality from "@/components/hero/useQuality";
 import {
   BUNS,
   buildLines,
   buildTotal,
-  DRINKS,
   MAX_PATTIES,
   MAX_SAUCES,
   PATTIES,
   SAUCES,
-  SIDES,
   TOPPINGS,
   type Build,
   type PattyId,
   type SauceId,
   type ToppingId,
 } from "@/lib/menu";
-import { formatPrice, onOpenInBuilder, ORDER_URL } from "@/lib/site";
+import { formatPrice, onOpenInBuilder } from "@/lib/site";
 import { Reveal, Section, SectionHeading } from "./ui";
 
 const BurgerStage = dynamic(() => import("./BurgerStage"), { ssr: false });
@@ -48,13 +48,15 @@ function Step({ n, title, hint, children }: { n: number; title: string; hint?: s
   );
 }
 
-function Summary({ build, onReset }: { build: Build; onReset: () => void }) {
+function Summary({ build, onReset, onAdd }: { build: Build; onReset: () => void; onAdd: () => void }) {
+  const { cart, open } = useCart();
   const lines = buildLines(build);
   const total = buildTotal(build);
+  const inCart = cart.burgers.reduce((n, b) => n + b.qty, 0);
   return (
     <div className="rounded-3xl bg-char p-6 ring-1 ring-inset ring-line">
       <div className="flex items-baseline justify-between gap-4">
-        <p className="text-sm text-smoke">Итого</p>
+        <p className="text-sm text-smoke">Этот бургер</p>
         <motion.p key={total} initial={{ opacity: 0.4, y: -6 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl font-bold tabular-nums">
           {formatPrice(total)}
         </motion.p>
@@ -68,13 +70,22 @@ function Summary({ build, onReset }: { build: Build; onReset: () => void }) {
         ))}
       </ul>
       <div className="mt-6 flex flex-wrap gap-3">
-        <a href={ORDER_URL} className="flex-1 rounded-full bg-flame px-6 py-4 text-center font-display text-xs font-bold tracking-[0.18em] text-coal transition hover:bg-ink">
-          ЗАКАЗАТЬ · {formatPrice(total)}
-        </a>
+        <button
+          type="button"
+          onClick={onAdd}
+          className="flex-1 rounded-full bg-flame px-6 py-4 text-center font-display text-xs font-bold tracking-[0.18em] text-coal transition hover:bg-ink"
+        >
+          <span className="hidden sm:inline">ДОБАВИТЬ </span>В ЗАКАЗ · {formatPrice(total)}
+        </button>
         <button type="button" onClick={onReset} className="rounded-full border border-line px-5 py-4 text-sm text-smoke transition hover:text-ink">
           Сбросить
         </button>
       </div>
+      {inCart > 0 && (
+        <button type="button" onClick={open} className="mt-4 w-full text-center text-sm text-smoke underline-offset-4 transition hover:text-ink hover:underline">
+          В заказе бургеров: {inCart} — открыть заказ
+        </button>
+      )}
     </div>
   );
 }
@@ -86,12 +97,26 @@ export default function Builder() {
   const preview = useRef<HTMLDivElement>(null);
   const inView = useInView(preview, { margin: "100px" });
   const stack = useMemo(() => stackFor(build), [build]);
-
-  useEffect(() => onOpenInBuilder((b) => setBuild({ ...b, patties: [...b.patties], toppings: [...b.toppings], sauces: [...b.sauces] })), []);
+  const { addBurger } = useCart();
 
   const note = (text: string) => {
     setFlash(text);
-    window.setTimeout(() => setFlash((f) => (f === text ? null : f)), 2200);
+    window.setTimeout(() => setFlash((f) => (f === text ? null : f)), 2600);
+  };
+
+  // A combo opens here as a burger; its side is picked separately in step 5.
+  useEffect(
+    () =>
+      onOpenInBuilder((b) => {
+        setBuild({ bun: b.bun, patties: [...b.patties], toppings: [...b.toppings], sauces: [...b.sauces] });
+        if (b.side) note("Гарнир из комбо можно добавить в шаге 5");
+      }),
+    [],
+  );
+
+  const add = () => {
+    const name = addBurger(build);
+    note(`${name} в заказе. Можно собрать следующий`);
   };
 
   const count = (p: PattyId) => build.patties.filter((x) => x === p).length;
@@ -128,9 +153,9 @@ export default function Builder() {
             <BurgerStage stack={stack} active={inView} quality={quality} dropIn />
             <div className="pointer-events-none absolute inset-x-4 bottom-4 flex items-end justify-between gap-3 lg:hidden">
               <p className="rounded-full bg-coal/80 px-4 py-2 font-display text-lg font-bold tabular-nums">{formatPrice(buildTotal(build))}</p>
-              <a href={ORDER_URL} className="pointer-events-auto rounded-full bg-flame px-5 py-3 font-display text-xs font-bold tracking-[0.16em] text-coal">
-                ЗАКАЗАТЬ
-              </a>
+              <button type="button" onClick={add} className="pointer-events-auto rounded-full bg-flame px-5 py-3 font-display text-xs font-bold tracking-[0.16em] text-coal">
+                В ЗАКАЗ
+              </button>
             </div>
             <AnimatePresence>
               {flash && (
@@ -147,7 +172,7 @@ export default function Builder() {
             </AnimatePresence>
           </div>
           <div className="mt-6 hidden lg:block">
-            <Summary build={build} onReset={() => setBuild(START)} />
+            <Summary build={build} onReset={() => setBuild(START)} onAdd={add} />
           </div>
         </div>
 
@@ -240,47 +265,12 @@ export default function Builder() {
             </div>
           </Step>
 
-          <Step n={5} title="Гарнир">
-            <div className="flex flex-wrap gap-2">
-              <button type="button" aria-pressed={!build.side} onClick={() => setBuild({ ...build, side: undefined })} className={chip(!build.side)}>
-                Без гарнира
-              </button>
-              {SIDES.map((s) => {
-                const on = build.side === s.id;
-                return (
-                  <button key={s.id} type="button" aria-pressed={on} onClick={() => setBuild({ ...build, side: s.id })} className={chip(on)}>
-                    {s.name} <span className={on ? "text-coal/70" : "text-smoke"}>{formatPrice(s.options[0].price)}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </Step>
-
-          <Step n={6} title="Напиток">
-            <button type="button" aria-pressed={!build.drink} onClick={() => setBuild({ ...build, drink: undefined })} className={chip(!build.drink)}>
-              Без напитка
-            </button>
-            <ul className="mt-4 flex flex-col divide-y divide-line">
-              {DRINKS.map((d) => (
-                <li key={d.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
-                  <span className="font-medium">{d.name}</span>
-                  <span className="flex gap-2">
-                    {d.options.map((o, i) => {
-                      const on = build.drink?.id === d.id && build.drink.size === i;
-                      return (
-                        <button key={o.portion} type="button" aria-pressed={on} onClick={() => setBuild({ ...build, drink: { id: d.id, size: i } })} className={chip(on)}>
-                          {o.portion} · <span className="tabular-nums">{formatPrice(o.price)}</span>
-                        </button>
-                      );
-                    })}
-                  </span>
-                </li>
-              ))}
-            </ul>
+          <Step n={5} title="Гарниры и напитки к заказу" hint="Любое количество">
+            <ExtrasPicker />
           </Step>
 
           <div className="lg:hidden">
-            <Summary build={build} onReset={() => setBuild(START)} />
+            <Summary build={build} onReset={() => setBuild(START)} onAdd={add} />
           </div>
         </Reveal>
       </div>

@@ -157,10 +157,16 @@ export const COMBOS: Combo[] = [
 ];
 
 /** Plain-language list of what is inside, as printed on the menu. */
+const BUN_SHORT: Record<BunId, string> = { sesame: "Кунжутная булочка", brioche: "Бриошь", black: "Чёрная булочка" };
+
 export function describe(b: Build) {
+  const patties = [...new Set(b.patties)].map((p) => {
+    const n = b.patties.filter((x) => x === p).length;
+    return n > 1 ? `${patty(p).name} ×${n}` : patty(p).name;
+  });
   return [
-    bun(b.bun).name === "Классическая с кунжутом" ? "Кунжутная булочка" : bun(b.bun).name,
-    ...b.patties.map((p) => patty(p).name),
+    BUN_SHORT[b.bun],
+    ...patties,
     ...b.toppings.map((t) => topping(t).name),
     ...b.sauces.map((s) => {
       const n = sauce(s).name;

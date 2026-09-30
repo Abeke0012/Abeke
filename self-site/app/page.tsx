@@ -1,3 +1,4 @@
+import CartProvider from "@/components/cart/CartProvider";
 import Header from "@/components/Header";
 import Hero from "@/components/hero/Hero";
 import About from "@/components/sections/About";
@@ -9,7 +10,7 @@ import OrderCta from "@/components/sections/OrderCta";
 
 export default function Home() {
   return (
-    <>
+    <CartProvider>
       <Header />
       <main>
         <Hero />
@@ -20,6 +21,6 @@ export default function Home() {
         <About />
         <OrderCta />
       </main>
-    </>
+    </CartProvider>
   );
 }

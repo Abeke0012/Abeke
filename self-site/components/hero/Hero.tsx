@@ -1,10 +1,10 @@
 "use client";
 
+import OrderButton from "@/components/cart/OrderButton";
 import { motion, useInView, useMotionValueEvent, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
 import Logo from "@/components/Logo";
-import { ORDER_URL } from "@/lib/site";
 import { HERO_BUILD, stackFor } from "./looks";
 import { phaseAt } from "./timeline";
 import useQuality from "./useQuality";
@@ -109,12 +109,11 @@ export default function Hero() {
             transition={{ duration: 0.9, delay: 1.5 }}
             className="flex items-center gap-6"
           >
-            <a
-              href={ORDER_URL}
+            <OrderButton
               className="rounded-full bg-flame px-9 py-4 font-display text-sm font-bold tracking-[0.18em] text-coal transition hover:bg-ink"
             >
               ЗАКАЗАТЬ
-            </a>
+            </OrderButton>
             <motion.span style={{ opacity: cue }} className="hidden items-center gap-3 text-sm text-smoke md:flex">
               <span className="relative h-10 w-px overflow-hidden bg-smoke/30">
                 <span className="absolute inset-x-0 top-0 h-1/2 animate-[scrollcue_1.8s_ease-in-out_infinite] bg-flame" />
@@ -139,12 +138,11 @@ export default function Hero() {
           <Logo withTagline className="text-[clamp(3rem,7vw,5.5rem)]" />
         </motion.div>
         <motion.div style={finale} className="absolute inset-x-0 bottom-[6svh] flex justify-center">
-          <a
-            href={ORDER_URL}
+          <OrderButton
             className="rounded-full bg-flame px-12 py-5 font-display text-sm font-bold tracking-[0.2em] text-coal shadow-[0_0_60px_-10px] shadow-flame/60 transition hover:bg-ink"
           >
             ЗАКАЗАТЬ
-          </a>
+          </OrderButton>
         </motion.div>
       </div>
     </section>

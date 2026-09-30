@@ -1,9 +1,10 @@
 "use client";
 
+import OrderButton from "@/components/cart/OrderButton";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { useState } from "react";
 import Logo from "@/components/Logo";
-import { NAV, ORDER_URL } from "@/lib/site";
+import { NAV } from "@/lib/site";
 
 export default function Header() {
   const { scrollY } = useScroll();
@@ -28,12 +29,11 @@ export default function Header() {
             </a>
           ))}
         </nav>
-        <a
-          href={ORDER_URL}
+        <OrderButton
           className="rounded-full border border-ink/25 px-5 py-2.5 font-display text-xs font-bold tracking-[0.16em] transition hover:border-flame hover:bg-flame hover:text-coal"
         >
           ЗАКАЗАТЬ
-        </a>
+        </OrderButton>
       </div>
     </motion.header>
   );

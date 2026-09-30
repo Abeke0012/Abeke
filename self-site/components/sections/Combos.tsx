@@ -6,7 +6,8 @@ import { useMemo, useRef, useState } from "react";
 import { stackFor } from "@/components/hero/looks";
 import useQuality from "@/components/hero/useQuality";
 import { buildTotal, COMBOS, describe, type Combo } from "@/lib/menu";
-import { formatPrice, openInBuilder, ORDER_URL } from "@/lib/site";
+import { formatPrice, openInBuilder } from "@/lib/site";
+import { useCart } from "@/components/cart/CartProvider";
 import { Reveal, Section, SectionHeading } from "./ui";
 
 const BurgerStage = dynamic(() => import("./BurgerStage"), { ssr: false });
@@ -17,6 +18,7 @@ function Card({ combo, index }: { combo: Combo; index: number }) {
   const [open, setOpen] = useState(false);
   const quality = useQuality();
   const stack = useMemo(() => stackFor(combo.build), [combo]);
+  const { addCombo } = useCart();
 
   return (
     <Reveal delay={index * 0.1} className="h-full">
@@ -41,9 +43,13 @@ function Card({ combo, index }: { combo: Combo; index: number }) {
           </div>
           <p className="text-sm leading-relaxed text-smoke">{describe(combo.build)}</p>
           <div className="mt-auto flex flex-wrap gap-2 pt-4">
-            <a href={ORDER_URL} className="rounded-full bg-ink px-5 py-3 font-display text-[11px] font-bold tracking-[0.16em] text-coal transition hover:bg-flame">
-              ЗАКАЗАТЬ
-            </a>
+            <button
+              type="button"
+              onClick={() => addCombo(combo)}
+              className="rounded-full bg-ink px-5 py-3 font-display text-[11px] font-bold tracking-[0.16em] text-coal transition hover:bg-flame"
+            >
+              В ЗАКАЗ
+            </button>
             <button
               type="button"
               onClick={() => openInBuilder(combo.build)}
