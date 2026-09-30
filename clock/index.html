@@ -1,0 +1,305 @@
+<title>Хронограф</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Jost:wght@400;500&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one watch face as the hero, a strip of world-time sub-dials, and a chronograph panel below. */
+:root {
+  --bg: #eef1f4;        /* brushed steel */
+  --surface: #ffffff;
+  --fg: #16202b;
+  --muted: #5d6b7a;
+  --line: #d3dae2;
+  --dial: #f7f8fa;      /* silver dial */
+  --dial-edge: #c3ccd6;
+  --hand: #1d3a78;      /* blued steel */
+  --second: #b8322a;
+  --index: #23303d;
+  --accent: #1d3a78;
+  --font-display: "Unbounded", "Trebuchet MS", sans-serif;
+  --font-body: "Jost", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b1220; --surface: #121b2c; --fg: #e6ebf2; --muted: #93a1b5; --line: #243149;
+    --dial: #13244a; --dial-edge: #2c3f66; --hand: #d9e2ef; --second: #e0574c; --index: #c9d3e1;
+    --accent: #8fb0ea; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b1220; --surface: #121b2c; --fg: #e6ebf2; --muted: #93a1b5; --line: #243149;
+  --dial: #13244a; --dial-edge: #2c3f66; --hand: #d9e2ef; --second: #e0574c; --index: #c9d3e1;
+  --accent: #8fb0ea; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font: 400 16px/1.55 var(--font-body);
+  padding: 32px 20px 56px;
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 48px; }
+
+.eyebrow { font: 500 12px/1 var(--font-body); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+h1, h2 { font-family: var(--font-display); font-weight: 700; margin: 0; text-wrap: balance; }
+h2 { font-size: 20px; }
+
+/* Hero */
+.hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 40px; align-items: center; }
+.dial-wrap { width: 100%; max-width: 460px; aspect-ratio: 1; justify-self: center; }
+#dial { width: 100%; height: 100%; display: block; }
+.readout { display: grid; gap: 14px; min-width: 0; }
+.readout h1 { font-size: clamp(28px, 4vw, 40px); }
+#digital { font: 600 clamp(44px, 8vw, 76px)/1 var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+#digital .sec { color: var(--second); }
+#date { font-size: 20px; text-transform: capitalize; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--muted); font-size: 14px; }
+.facts b { color: var(--fg); font-weight: 500; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* World time */
+.head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 18px; }
+.cities { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.city { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; justify-items: center; gap: 6px; }
+.city canvas { width: 88px; height: 88px; }
+.city .name { font-weight: 500; }
+.city .t { font: 600 18px/1 var(--font-mono); font-variant-numeric: tabular-nums; }
+.city .off { font-size: 13px; color: var(--muted); }
+
+/* Chronograph */
+.chrono { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; }
+#sw { font: 600 clamp(40px, 7vw, 64px)/1 var(--font-mono); font-variant-numeric: tabular-nums; margin: 14px 0 20px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; }
+button {
+  font: 500 15px/1 var(--font-body); padding: 12px 20px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: transparent; color: var(--fg);
+}
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+button:disabled { opacity: .45; cursor: default; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.laps { min-width: 0; max-height: 260px; overflow: auto; }
+.laps table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 14px; }
+.laps th { text-align: left; font: 500 12px var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 0 0 8px; }
+.laps td { padding: 8px 0; border-top: 1px solid var(--line); }
+.laps td:not(:first-child), .laps th:not(:first-child) { text-align: right; }
+.laps .empty { color: var(--muted); font-family: var(--font-body); }
+.best { color: var(--accent); }
+.worst { color: var(--second); }
+
+@media (max-width: 720px) {
+  .hero, .chrono { grid-template-columns: minmax(0, 1fr); }
+  .readout { text-align: center; justify-items: center; }
+}
+</style>
+
+<main>
+  <section class="hero">
+    <div class="dial-wrap"><canvas id="dial" aria-label="Аналоговые часы с текущим временем" role="img"></canvas></div>
+    <div class="readout">
+      <span class="eyebrow">Местное время · <span id="tzname"></span></span>
+      <h1>Хронограф</h1>
+      <div id="digital" aria-live="off">--:--<span class="sec">:--</span></div>
+      <div id="date"></div>
+      <div class="facts">
+        <span>Неделя <b id="week"></b></span>
+        <span>День года <b id="doy"></b></span>
+        <span>UTC <b id="utc"></b></span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <h2>Мировое время</h2>
+      <span class="eyebrow">Разница с вашим временем</span>
+    </div>
+    <div class="cities" id="cities"></div>
+  </section>
+
+  <section class="chrono">
+    <div>
+      <span class="eyebrow">Секундомер</span>
+      <div id="sw">00:00.00</div>
+      <div class="btns">
+        <button id="sw-start" class="primary" type="button">Старт</button>
+        <button id="sw-lap" type="button" disabled>Круг</button>
+        <button id="sw-reset" type="button" disabled>Сброс</button>
+      </div>
+    </div>
+    <div class="laps">
+      <table>
+        <thead><tr><th>Круг</th><th>Время круга</th><th>Общее</th></tr></thead>
+        <tbody id="laps"><tr><td class="empty" colspan="3">Нажмите «Круг» во время отсчёта, чтобы записать отрезок.</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const CITIES = [
+    ["Алматы", "Asia/Almaty"], ["Москва", "Europe/Moscow"], ["Лондон", "Europe/London"],
+    ["Нью-Йорк", "America/New_York"], ["Дубай", "Asia/Dubai"], ["Токио", "Asia/Tokyo"],
+  ];
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // A mechanical movement at 28,800 vph moves the seconds hand in 8 steps per second.
+  const BEATS = 8;
+
+  let colors = {};
+  const readColors = () => {
+    const s = getComputedStyle(document.documentElement);
+    for (const k of ["dial", "dial-edge", "hand", "second", "index", "muted"]) colors[k] = s.getPropertyValue("--" + k).trim();
+  };
+  readColors();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readColors);
+  new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  function fit(canvas) {
+    const r = canvas.getBoundingClientRect(), d = devicePixelRatio || 1;
+    const w = Math.round(r.width * d), h = Math.round(r.height * d);
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+    return Math.min(w, h);
+  }
+
+  function hand(ctx, angle, len, width, color, tail = 0) {
+    ctx.save(); ctx.rotate(angle);
+    ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(0, tail); ctx.lineTo(0, -len); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawDial(canvas, h, m, s, opts = {}) {
+    const size = fit(canvas), ctx = canvas.getContext("2d"), R = size / 2;
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    // Case and dial.
+    ctx.fillStyle = colors["dial-edge"]; ctx.beginPath(); ctx.arc(0, 0, R * 0.99, 0, 2 * Math.PI); ctx.fill();
+    ctx.fillStyle = colors.dial; ctx.beginPath(); ctx.arc(0, 0, R * 0.93, 0, 2 * Math.PI); ctx.fill();
+    // Minute track and hour indices.
+    for (let i = 0; i < 60; i++) {
+      const hour = i % 5 === 0, a = i * Math.PI / 30;
+      if (opts.mini && !hour) continue;
+      ctx.save(); ctx.rotate(a);
+      ctx.strokeStyle = colors.index; ctx.lineCap = "butt";
+      ctx.lineWidth = hour ? R * (i % 15 === 0 ? 0.045 : 0.03) : R * 0.008;
+      ctx.beginPath(); ctx.moveTo(0, -R * 0.88); ctx.lineTo(0, -R * (hour ? 0.74 : 0.84)); ctx.stroke();
+      ctx.restore();
+    }
+    if (!opts.mini) {
+      ctx.fillStyle = colors.index; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.font = `600 ${R * 0.12}px Unbounded, sans-serif`;
+      [[12, 0], [6, Math.PI]].forEach(([n, a]) => ctx.fillText(n, Math.sin(a) * R * 0.6, -Math.cos(a) * R * 0.6));
+      ctx.fillText(9, -R * 0.6, 0);
+      // Date window at 3 o'clock.
+      const w = R * 0.2, x = R * 0.5;
+      ctx.fillStyle = colors["dial-edge"]; ctx.fillRect(x - w / 2 - 2, -R * 0.075 - 2, w + 4, R * 0.15 + 4);
+      ctx.fillStyle = "#fff"; ctx.fillRect(x - w / 2, -R * 0.075, w, R * 0.15);
+      ctx.fillStyle = "#16202b"; ctx.font = `600 ${R * 0.1}px "JetBrains Mono", monospace`;
+      ctx.fillText(opts.day, x, R * 0.005);
+      ctx.fillStyle = colors.muted; ctx.font = `500 ${R * 0.055}px Jost, sans-serif`;
+      ctx.fillText("28 800 A/Ч", 0, R * 0.32);
+    }
+    hand(ctx, (h % 12 + m / 60) * Math.PI / 6, R * 0.5, R * (opts.mini ? 0.07 : 0.05), colors.hand, R * 0.08);
+    hand(ctx, (m + s / 60) * Math.PI / 30, R * 0.78, R * (opts.mini ? 0.05 : 0.032), colors.hand, R * 0.1);
+    if (!opts.mini) hand(ctx, s * Math.PI / 30, R * 0.84, R * 0.012, colors.second, R * 0.18);
+    ctx.fillStyle = opts.mini ? colors.hand : colors.second;
+    ctx.beginPath(); ctx.arc(0, 0, R * 0.035, 0, 2 * Math.PI); ctx.fill();
+  }
+
+  // Time helpers.
+  const pad = n => String(n).padStart(2, "0");
+  const partsIn = (tz, d) => {
+    const p = Object.fromEntries(new Intl.DateTimeFormat("en-GB", { timeZone: tz, hour12: false, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" })
+      .formatToParts(d).map(x => [x.type, x.value]));
+    return { y: +p.year, mo: +p.month, d: +p.day, h: +p.hour % 24, m: +p.minute, s: +p.second };
+  };
+  const offsetMin = (tz, d) => {
+    const p = partsIn(tz, d);
+    return Math.round((Date.UTC(p.y, p.mo - 1, p.d, p.h, p.m, p.s) - Math.floor(d / 1000) * 1000) / 60000);
+  };
+  const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  const isoWeek = d => {
+    const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day);
+    return Math.ceil(((t - Date.UTC(t.getUTCFullYear(), 0, 1)) / 864e5 + 1) / 7);
+  };
+  const dayOfYear = d => Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(d.getFullYear(), 0, 0)) / 864e5);
+  const fmtOffset = min => {
+    if (min === 0) return "как у вас";
+    const sign = min > 0 ? "+" : "−", a = Math.abs(min), h = Math.floor(a / 60), m = a % 60;
+    return `${sign}${h} ч${m ? " " + m + " мин" : ""}`;
+  };
+
+  // Build city cards.
+  const citiesEl = document.getElementById("cities");
+  const cityEls = CITIES.map(([name, tz]) => {
+    const card = document.createElement("div"); card.className = "city";
+    card.innerHTML = `<canvas role="img" aria-label="Время: ${name}"></canvas><span class="name">${name}</span><span class="t"></span><span class="off"></span>`;
+    citiesEl.append(card);
+    return { tz, canvas: card.querySelector("canvas"), t: card.querySelector(".t"), off: card.querySelector(".off") };
+  });
+
+  const dial = document.getElementById("dial");
+  const $ = id => document.getElementById(id);
+  document.getElementById("tzname").textContent = localTz.replace(/_/g, " ");
+  const dateFmt = new Intl.DateTimeFormat("ru-RU", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  let lastSecond = -1;
+
+  function tick() {
+    const now = new Date();
+    const ms = now.getMilliseconds();
+    const sec = now.getSeconds() + (reduced ? 0 : Math.floor(ms / (1000 / BEATS)) / BEATS);
+    drawDial(dial, now.getHours(), now.getMinutes(), sec, { day: now.getDate() });
+
+    if (now.getSeconds() !== lastSecond) {
+      lastSecond = now.getSeconds();
+      $("digital").innerHTML = `${pad(now.getHours())}:${pad(now.getMinutes())}<span class="sec">:${pad(now.getSeconds())}</span>`;
+      $("date").textContent = dateFmt.format(now);
+      $("week").textContent = isoWeek(now);
+      $("doy").textContent = dayOfYear(now);
+      $("utc").textContent = `${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}`;
+      const mine = -now.getTimezoneOffset();
+      for (const c of cityEls) {
+        const p = partsIn(c.tz, now);
+        c.t.textContent = `${pad(p.h)}:${pad(p.m)}`;
+        const diff = offsetMin(c.tz, now) - mine;
+        const dayShift = p.d !== now.getDate() ? (diff > 0 ? " · завтра" : " · вчера") : "";
+        c.off.textContent = fmtOffset(diff) + dayShift;
+        drawDial(c.canvas, p.h, p.m, p.s, { mini: true });
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+  addEventListener("resize", () => { lastSecond = -1; });
+
+  // Stopwatch.
+  let running = false, startAt = 0, acc = 0, laps = [], raf = 0;
+  const elapsed = () => acc + (running ? performance.now() - startAt : 0);
+  const fmtSw = t => {
+    const cs = Math.floor(t / 10) % 100, s = Math.floor(t / 1000) % 60, m = Math.floor(t / 60000) % 60, h = Math.floor(t / 3600000);
+    return (h ? h + ":" + pad(m) : pad(m)) + ":" + pad(s) + "." + pad(cs);
+  };
+  const swEl = $("sw"), bStart = $("sw-start"), bLap = $("sw-lap"), bReset = $("sw-reset"), lapsEl = $("laps");
+  const render = () => { swEl.textContent = fmtSw(elapsed()); if (running) raf = requestAnimationFrame(render); };
+  const renderLaps = () => {
+    if (!laps.length) { lapsEl.innerHTML = `<tr><td class="empty" colspan="3">Нажмите «Круг» во время отсчёта, чтобы записать отрезок.</td></tr>`; return; }
+    const splits = laps.map((t, i) => t - (laps[i - 1] || 0));
+    const best = Math.min(...splits), worst = Math.max(...splits);
+    lapsEl.innerHTML = splits.map((sp, i) => {
+      const cls = laps.length > 1 ? (sp === best ? "best" : sp === worst ? "worst" : "") : "";
+      return `<tr><td>${i + 1}</td><td class="${cls}">${fmtSw(sp)}</td><td>${fmtSw(laps[i])}</td></tr>`;
+    }).reverse().join("");
+  };
+  bStart.addEventListener("click", () => {
+    if (running) { acc = elapsed(); running = false; cancelAnimationFrame(raf); bStart.textContent = "Продолжить"; }
+    else { startAt = performance.now(); running = true; bStart.textContent = "Стоп"; render(); }
+    bLap.disabled = !running; bReset.disabled = running || acc === 0;
+  });
+  bLap.addEventListener("click", () => { laps.push(elapsed()); renderLaps(); });
+  bReset.addEventListener("click", () => {
+    acc = 0; laps = []; swEl.textContent = fmtSw(0); renderLaps();
+    bStart.textContent = "Старт"; bReset.disabled = true;
+  });
+})();
+</script>
