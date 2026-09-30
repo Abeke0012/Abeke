@@ -8,18 +8,36 @@ import type { DepthOfFieldEffect } from "postprocessing";
 import { Suspense, useRef } from "react";
 import * as THREE from "three";
 import Burger, { type Quality } from "./Burger";
-import { HERO_BUILD, stackFor, stackHeight } from "./looks";
+import { HERO_BUILD, stackFor } from "./looks";
+import PhotoBurger, { PHOTO_HEIGHT } from "./PhotoBurger";
 import SelfBox, { BOX, BURGER_SCALE, BURGER_SLOT } from "./SelfBox";
 import { cameraAt, easeInOut, easeOutBack, lerp, orbitAngle, phaseAt, range, smooth } from "./timeline";
 
 export const HERO_STACK = stackFor(HERO_BUILD);
 const FLOOR = -1.2;
-/** Centres the assembled burger on the origin. */
-const HERO_POS = new THREE.Vector3(0, -stackHeight(HERO_STACK) / 2, 0);
+/** Centres the assembled photo burger on the origin. */
+const HERO_POS = new THREE.Vector3(0, -PHOTO_HEIGHT / 2, 0);
 const SLOT_POS = new THREE.Vector3(0, FLOOR, 0).add(BURGER_SLOT);
 const BOX_CENTER = new THREE.Vector3(0, FLOOR + BOX.h * 0.5, 0);
 const INTRO_SECONDS = 2.4;
 const FOG_NEAR = 9;
+
+/** Radial soft shadow, drawn once. */
+let shadowTex: THREE.CanvasTexture | null = null;
+function SHADOW_TEXTURE() {
+  if (shadowTex) return shadowTex;
+  const c = document.createElement("canvas");
+  c.width = c.height = 256;
+  const ctx = c.getContext("2d")!;
+  const g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+  g.addColorStop(0, "rgba(0,0,0,0.9)");
+  g.addColorStop(0.6, "rgba(0,0,0,0.35)");
+  g.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 256, 256);
+  shadowTex = new THREE.CanvasTexture(c);
+  return shadowTex;
+}
 const FOG_FAR = 20;
 
 type RigProps = { progress: MotionValue<number>; quality: Quality };
@@ -34,6 +52,9 @@ function Rig({ progress, quality }: RigProps) {
   const key = useRef<THREE.SpotLight>(null);
   const dof = useRef<DepthOfFieldEffect>(null);
 
+  const model = useRef<THREE.Group>(null);
+  const shadow = useRef<THREE.Mesh>(null);
+  const photoOpacity = useRef(1);
   const explode = useRef(0);
   const lid = useRef(0);
   const start = useRef<number | null>(null);
@@ -59,6 +80,18 @@ function Rig({ progress, quality }: RigProps) {
       const s = lerp(1, BURGER_SCALE, m) * lerp(0.6, 1, easeOutBack(intro));
       anchor.current.scale.setScalar(s);
       anchor.current.rotation.y = (t * 0.25 + (1 - intro) * -2.6) * (1 - m) + m * Math.PI * 2;
+    }
+
+    // Photo burger on stage; mid-flight it hands over to the 3D burger that fits in the box.
+    photoOpacity.current = 1 - smooth(range(m, 0.22, 0.5));
+    if (model.current) {
+      const show = smooth(range(m, 0.3, 0.52));
+      model.current.visible = show > 0.001;
+      model.current.scale.setScalar(Math.max(show, 0.001));
+    }
+    if (shadow.current && anchor.current) {
+      shadow.current.position.set(anchor.current.position.x, FLOOR + 0.004, anchor.current.position.z);
+      (shadow.current.material as THREE.MeshBasicMaterial).opacity = 0.55 * (1 - m) * intro;
     }
 
     // Pointer reaction while the burger is the star of the frame.
@@ -147,13 +180,22 @@ function Rig({ progress, quality }: RigProps) {
 
       <group ref={anchor}>
         <group ref={tilt}>
-          <Burger stack={HERO_STACK} explode={explode} quality={quality} explodeAnchor={0.1} />
+          <group ref={model} visible={false}>
+            <Burger stack={HERO_STACK} explode={explode} quality={quality} explodeAnchor={0.1} />
+          </group>
+          <PhotoBurger explode={explode} opacity={photoOpacity} />
         </group>
       </group>
 
       <group ref={box}>
         <SelfBox lid={lid} quality={quality} />
       </group>
+
+      {/* soft shadow under the photo burger */}
+      <mesh ref={shadow} rotation-x={-Math.PI / 2} renderOrder={1}>
+        <planeGeometry args={[3.4, 1.6]} />
+        <meshBasicMaterial map={SHADOW_TEXTURE()} transparent depthWrite={false} opacity={0} toneMapped={false} />
+      </mesh>
 
       {/* floor */}
       <mesh rotation-x={-Math.PI / 2} position-y={FLOOR - 0.001} receiveShadow>

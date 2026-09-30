@@ -44,24 +44,26 @@ export default function About() {
               {FACTS.map((f) => (
                 <div key={f.label}>
                   <dt className="sr-only">{f.label}</dt>
-                  <dd className="font-display text-[clamp(1.4rem,2.6vw,2.1rem)] font-bold tabular-nums text-ink">{f.value}</dd>
+                  <dd className="whitespace-nowrap font-display text-[clamp(1.2rem,1.9vw,1.75rem)] font-bold tabular-nums text-ink">{f.value}</dd>
                   <dd className="mt-1 text-sm text-smoke">{f.label}</dd>
                 </div>
               ))}
             </dl>
           </Reveal>
         </div>
-        <div ref={frame} className="relative order-1 aspect-[4/5] overflow-hidden rounded-3xl lg:order-2">
-          <motion.div style={{ y }} className="absolute -inset-y-[10%] inset-x-0">
+        <div
+          ref={frame}
+          className="relative order-1 aspect-[4/5] overflow-hidden rounded-3xl bg-char bg-[radial-gradient(60%_45%_at_50%_55%,rgb(255_106_26/0.28),transparent_72%)] lg:order-2"
+        >
+          <motion.div style={{ y }} className="absolute inset-x-[6%] inset-y-0">
             <Image
-              src="/images/burger-signature.webp"
-              alt="Бургер SELF на бриоши с говяжьей котлетой, сыром и карамелизированным луком"
+              src="/images/burger-photo.webp"
+              alt="Бургер на кунжутной булочке с говяжьей котлетой, сыром, помидором, салатом и огурцами"
               fill
               sizes="(min-width: 1024px) 45vw, 100vw"
-              className="object-cover object-center"
+              className="object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.6)]"
             />
           </motion.div>
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-coal/60 via-transparent to-transparent" />
         </div>
       </div>
     </Section>
