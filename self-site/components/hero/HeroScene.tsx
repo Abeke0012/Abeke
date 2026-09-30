@@ -145,6 +145,8 @@ function Rig({ progress, quality }: RigProps) {
     if (dof.current?.target) {
       focus.current.set(0, ph.explode * 1.2, 0).lerp(BOX_CENTER, m);
       dof.current.target.copy(focus.current);
+      // The photo layers are already soft; keep the bokeh light until the 3D box scene.
+      dof.current.bokehScale = lerp(0.6, 3.2, smooth(range(p, 0.45, 0.62)));
     }
   });
 
