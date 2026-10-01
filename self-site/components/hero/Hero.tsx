@@ -6,7 +6,7 @@ import { motion, useInView, useMotionValueEvent, useScroll, useSpring, useTransf
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import Logo from "@/components/Logo";
-import { PHOTO_LAYERS } from "./PhotoBurger";
+import { HERO_BUILD, stackFor } from "./looks";
 import { phaseAt } from "./timeline";
 import useQuality from "./useQuality";
 
@@ -20,7 +20,7 @@ function useBeat(p: MotionValue<number>, a: number, b: number, c = 2, d = 3) {
   return { opacity, y, pointerEvents };
 }
 
-const HERO_LAYERS = PHOTO_LAYERS.map((l) => ({ key: l.file, label: l.label }));
+const HERO_LAYERS = stackFor(HERO_BUILD);
 
 function LayerList({ progress }: { progress: MotionValue<number> }) {
   const [active, setActive] = useState(-1);

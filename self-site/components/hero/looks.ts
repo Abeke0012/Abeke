@@ -123,5 +123,5 @@ export function stackFor(b: Build): Layer[] {
   return layers;
 }
 
-/** The hero commercial's burger, matching the photo layers: sesame bun, beef, cheese, tomato, red onion, lettuce. */
-export const HERO_BUILD: Build = { bun: "sesame", patties: ["beef"], toppings: ["cheese", "tomato", "redOnion", "lettuce"], sauces: [] };
+/** The hero commercial's burger: brioche, beef, cheese, caramelised onion. */
+export const HERO_BUILD: Build = { bun: "brioche", patties: ["beef"], toppings: ["cheese", "caramelizedOnion"], sauces: ["creamCheese"] };

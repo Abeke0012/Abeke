@@ -1,9 +1,10 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import Image from "next/image";
 import { useRef } from "react";
+import { HERO_BUILD } from "@/components/hero/looks";
 import { MENU_SIZE } from "@/lib/menu";
+import Burger3D from "./Burger3D";
 import { formatPrice, INFO } from "@/lib/site";
 import { Reveal, Section } from "./ui";
 
@@ -55,14 +56,8 @@ export default function About() {
           ref={frame}
           className="relative order-1 aspect-[4/5] overflow-hidden rounded-3xl bg-char bg-[radial-gradient(60%_45%_at_50%_55%,rgb(255_106_26/0.28),transparent_72%)] lg:order-2"
         >
-          <motion.div style={{ y }} className="absolute inset-x-[6%] inset-y-0">
-            <Image
-              src="/images/burger-photo.webp"
-              alt="Бургер на кунжутной булочке с говяжьей котлетой, сыром, помидором, салатом и огурцами"
-              fill
-              sizes="(min-width: 1024px) 45vw, 100vw"
-              className="object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.6)]"
-            />
+          <motion.div style={{ y }} className="absolute inset-0">
+            <Burger3D build={HERO_BUILD} label="Бургер SELF на бриоши с говяжьей котлетой, сыром и карамелизированным луком" />
           </motion.div>
         </div>
       </div>

@@ -1,11 +1,14 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import Image from "next/image";
 import { useRef } from "react";
-import { BUNS, MAX_PATTIES, MAX_SAUCES, PATTIES, SAUCES, SIDES, TOPPINGS } from "@/lib/menu";
+import { type Build, BUNS, MAX_PATTIES, MAX_SAUCES, PATTIES, SAUCES, SIDES, TOPPINGS } from "@/lib/menu";
 import { formatPrice, INFO } from "@/lib/site";
+import Burger3D from "./Burger3D";
 import { RevealItem, Section, SectionHeading } from "./ui";
+
+/** A full build shown open, so every step on the right has a layer on the left. */
+const LAYERED: Build = { bun: "sesame", patties: ["beef", "beef"], toppings: ["cheese", "tomato", "lettuce", "redOnion"], sauces: ["bbq"] };
 
 const min = (list: readonly { options: { price: number }[] }[]) => Math.min(...list.map((i) => i.options[0].price));
 
@@ -37,14 +40,8 @@ export default function How() {
       />
       <div className="mt-16 grid items-start gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
         <div ref={photo} className="relative overflow-hidden rounded-3xl lg:sticky lg:top-28">
-          <motion.div style={{ scale, y }} className="relative aspect-[658/420] w-full">
-            <Image
-              src="/images/burger-layers.webp"
-              alt="Бургер в разрезе по слоям: булочка, лук, сыр, котлета, соус, нижняя булочка"
-              fill
-              sizes="(min-width: 1024px) 55vw, 100vw"
-              className="object-cover"
-            />
+          <motion.div style={{ scale, y }} className="relative aspect-[658/420] w-full bg-coal bg-[radial-gradient(55%_60%_at_50%_55%,rgb(255_106_26/0.18),transparent_72%)]">
+            <Burger3D build={LAYERED} open label="Бургер SELF в разрезе по слоям: булочка, котлеты, сыр, помидор, салат, лук и соус" />
           </motion.div>
           <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-inset ring-line" />
         </div>
